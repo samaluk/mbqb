@@ -1,0 +1,14 @@
+{
+  "name": "mbqb",
+  "private": true,
+  "packageManager": "pnpm@11.3.0",
+  "scripts": {
+    "build": "pnpm --filter @mbqb/web build",
+    "dev": "pnpm --filter @mbqb/web dev",
+    "generate:types": "pnpm --filter @mbqb/web generate:types",
+    "lint": "pnpm --filter @mbqb/web lint",
+    "test": "pnpm --filter @mbqb/web test",
+    "test:int": "pnpm --filter @mbqb/web test:int",
+    "test:unit": "pnpm --filter @mbqb/web test:unit"
+  }
+}

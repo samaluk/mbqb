@@ -1,0 +1,79 @@
+export type RutValidationError = 'empty' | 'invalid_format' | 'invalid_check_digit'
+
+export type NormalizedRut = {
+  body: string
+  checkDigit: string
+  value: string
+  formatted: string
+}
+
+export type RutValidationResult =
+  | {
+      ok: true
+      rut: NormalizedRut
+    }
+  | {
+      ok: false
+      reason: RutValidationError
+    }
+
+const cleanRut = (input: string) => input.replace(/[.\-\s]/g, '').toUpperCase()
+
+const calculateCheckDigit = (body: string) => {
+  let multiplier = 2
+  let sum = 0
+
+  for (let index = body.length - 1; index >= 0; index -= 1) {
+    sum += Number(body[index]) * multiplier
+    multiplier = multiplier === 7 ? 2 : multiplier + 1
+  }
+
+  const remainder = 11 - (sum % 11)
+
+  if (remainder === 11) return '0'
+  if (remainder === 10) return 'K'
+
+  return String(remainder)
+}
+
+export const formatRut = (body: string, checkDigit: string) =>
+  `${new Intl.NumberFormat('es-CL').format(Number(body))}-${checkDigit}`
+
+export const validateRut = (input: string): RutValidationResult => {
+  const cleaned = cleanRut(input)
+
+  if (!cleaned) {
+    return { ok: false, reason: 'empty' }
+  }
+
+  const body = cleaned.slice(0, -1)
+  const checkDigit = cleaned.slice(-1)
+
+  if (!/^\d{1,8}$/.test(body) || !/^[0-9K]$/.test(checkDigit)) {
+    return { ok: false, reason: 'invalid_format' }
+  }
+
+  const expectedCheckDigit = calculateCheckDigit(body)
+
+  if (checkDigit !== expectedCheckDigit) {
+    return { ok: false, reason: 'invalid_check_digit' }
+  }
+
+  return {
+    ok: true,
+    rut: {
+      body,
+      checkDigit,
+      value: `${body}-${checkDigit}`,
+      formatted: formatRut(body, checkDigit),
+    },
+  }
+}
+
+export const normalizeRut = (input: string) => {
+  const result = validateRut(input)
+
+  if (!result.ok) return null
+
+  return result.rut.value
+}

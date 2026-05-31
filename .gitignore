@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# local env
+.env
+.env*.local
+
+# build output
+.next/
+out/
+build/
+coverage/
+test-results/
+playwright-report/
+blob-report/
+
+# system
+.DS_Store
+*.tsbuildinfo
