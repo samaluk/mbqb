@@ -22,6 +22,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             <Link href="/la-biblia">La Biblia</Link>
             <Link href="/bogeyficador">Bogeyficador</Link>
             <Link href="/productos">Productos</Link>
+            <Link href="/sobre-nosotros">Sobre nosotros</Link>
           </nav>
         </header>
         <main>{children}</main>

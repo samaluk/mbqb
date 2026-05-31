@@ -26,4 +26,13 @@ test.describe('Frontend', () => {
 
     await expect(page.getByText('Revisa el RUT ingresado.')).toBeVisible()
   })
+
+  test('public launch routes render', async () => {
+    for (const path of ['/canchas', '/la-biblia', '/productos', '/sobre-nosotros', '/privacidad']) {
+      const response = await page.goto(`http://localhost:3000${path}`)
+
+      expect(response?.status()).toBe(200)
+      await expect(page.locator('h1')).toBeVisible()
+    }
+  })
 })
