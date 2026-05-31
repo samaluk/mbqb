@@ -17,3 +17,4 @@ blob-report/
 # system
 .DS_Store
 *.tsbuildinfo
+.vercel
