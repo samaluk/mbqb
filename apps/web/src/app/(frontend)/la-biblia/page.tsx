@@ -1,4 +1,5 @@
 import config from '@payload-config'
+import Link from 'next/link'
 import { getPayload } from 'payload'
 
 export const dynamic = 'force-dynamic'
@@ -43,7 +44,7 @@ export default async function LaBibliaPage() {
               className="rich-snippet"
               dangerouslySetInnerHTML={{ __html: article.bodyHtml }}
             />
-            <a href={article.sourceUrl}>Leer original</a>
+            <Link href={`/la-biblia/${article.slug}`}>Leer articulo</Link>
           </article>
         ))}
       </div>

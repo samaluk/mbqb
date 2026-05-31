@@ -1,4 +1,5 @@
 import config from '@payload-config'
+import Link from 'next/link'
 import { getPayload } from 'payload'
 
 export const dynamic = 'force-dynamic'
@@ -37,7 +38,7 @@ export default async function CanchasPage() {
             </div>
             <h2>{cancha.title}</h2>
             {cancha.summary ? <p>{cancha.summary}</p> : null}
-            <a href={cancha.sourceUrl}>Ver ficha original</a>
+            <Link href={`/canchas/${cancha.slug}`}>Ver ficha</Link>
           </article>
         ))}
       </div>

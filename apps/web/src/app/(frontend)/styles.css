@@ -227,6 +227,68 @@ p {
   object-fit: cover;
 }
 
+.detail-page {
+  display: grid;
+  gap: 18px;
+  padding: 56px 0 96px;
+}
+
+.detail-page h1 {
+  max-width: 900px;
+  margin-bottom: 0;
+  font-size: clamp(38px, 6vw, 74px);
+}
+
+.lead {
+  max-width: 780px;
+  color: var(--muted);
+}
+
+.back-link {
+  width: fit-content;
+  color: var(--green);
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.rich-content {
+  display: grid;
+  gap: 16px;
+  max-width: 780px;
+  margin-top: 12px;
+  color: var(--ink);
+}
+
+.rich-content :where(p, ul, ol, blockquote) {
+  max-width: none;
+  margin: 0;
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.rich-content :where(h2, h3, h4) {
+  margin: 18px 0 0;
+  line-height: 1.1;
+}
+
+.rich-content a {
+  color: var(--green);
+  font-weight: 800;
+}
+
+.rich-content img,
+.detail-image {
+  width: min(100%, 720px);
+  height: auto;
+  border-radius: 8px;
+}
+
+.product-detail .detail-image {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
 .check-panel {
   border: 1px solid var(--line);
   border-radius: 8px;
