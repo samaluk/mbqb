@@ -70,6 +70,10 @@ export interface Config {
     users: User;
     media: Media;
     'active-memberships': ActiveMembership;
+    canchas: Cancha;
+    'la-biblia-articles': LaBibliaArticle;
+    products: Product;
+    'legacy-pages': LegacyPage;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,6 +84,10 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'active-memberships': ActiveMembershipsSelect<false> | ActiveMembershipsSelect<true>;
+    canchas: CanchasSelect<false> | CanchasSelect<true>;
+    'la-biblia-articles': LaBibliaArticlesSelect<false> | LaBibliaArticlesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    'legacy-pages': LegacyPagesSelect<false> | LegacyPagesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -88,14 +96,14 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: null;
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('es' | 'en') | ('es' | 'en')[];
   globals: {
     'site-settings': SiteSetting;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
-  locale: null;
+  locale: 'es' | 'en';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -190,6 +198,80 @@ export interface ActiveMembership {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "canchas".
+ */
+export interface Cancha {
+  id: number;
+  title: string;
+  slug: string;
+  summary?: string | null;
+  bodyHtml: string;
+  accessType: 'pay-and-play' | 'private' | 'restricted' | 'unknown';
+  region?: string | null;
+  city?: string | null;
+  sourceUrl: string;
+  sourceUpdatedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "la-biblia-articles".
+ */
+export interface LaBibliaArticle {
+  id: number;
+  title: string;
+  slug: string;
+  bodyHtml: string;
+  category:
+    | 'primeros-pasos'
+    | 'reglas-y-etiqueta'
+    | 'equipo'
+    | 'canchas'
+    | 'tecnica-basica'
+    | 'diccionario-golfistico'
+    | 'cultura-golf';
+  difficulty: 'principiante' | 'intermedio' | 'avanzado';
+  reviewedAt?: string | null;
+  sourceUrl: string;
+  sourceUpdatedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  title: string;
+  slug: string;
+  bodyHtml: string;
+  priceCLP: number;
+  stockStatus: 'available' | 'unavailable';
+  imageUrl?: string | null;
+  sourceUrl: string;
+  sourceUpdatedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legacy-pages".
+ */
+export interface LegacyPage {
+  id: number;
+  title: string;
+  slug: string;
+  bodyHtml: string;
+  legacyKind: 'page' | 'hub' | 'bogeyficador';
+  sourceUrl: string;
+  sourceUpdatedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -223,6 +305,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'active-memberships';
         value: number | ActiveMembership;
+      } | null)
+    | ({
+        relationTo: 'canchas';
+        value: number | Cancha;
+      } | null)
+    | ({
+        relationTo: 'la-biblia-articles';
+        value: number | LaBibliaArticle;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'legacy-pages';
+        value: number | LegacyPage;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -317,6 +415,69 @@ export interface ActiveMembershipsSelect<T extends boolean = true> {
   rutLookupHash?: T;
   isActive?: T;
   notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "canchas_select".
+ */
+export interface CanchasSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  summary?: T;
+  bodyHtml?: T;
+  accessType?: T;
+  region?: T;
+  city?: T;
+  sourceUrl?: T;
+  sourceUpdatedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "la-biblia-articles_select".
+ */
+export interface LaBibliaArticlesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  bodyHtml?: T;
+  category?: T;
+  difficulty?: T;
+  reviewedAt?: T;
+  sourceUrl?: T;
+  sourceUpdatedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  bodyHtml?: T;
+  priceCLP?: T;
+  stockStatus?: T;
+  imageUrl?: T;
+  sourceUrl?: T;
+  sourceUpdatedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legacy-pages_select".
+ */
+export interface LegacyPagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  bodyHtml?: T;
+  legacyKind?: T;
+  sourceUrl?: T;
+  sourceUpdatedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

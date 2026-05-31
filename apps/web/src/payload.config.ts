@@ -7,8 +7,12 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 import { ActiveMemberships } from './collections/ActiveMemberships'
+import { Canchas } from './collections/Canchas'
+import { LaBibliaArticles } from './collections/LaBibliaArticles'
+import { LegacyPages } from './collections/LegacyPages'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Products } from './collections/Products'
 import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
@@ -21,8 +25,22 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, ActiveMemberships],
+  collections: [Users, Media, ActiveMemberships, Canchas, LaBibliaArticles, Products, LegacyPages],
   globals: [SiteSettings],
+  localization: {
+    defaultLocale: 'es',
+    fallback: true,
+    locales: [
+      {
+        code: 'es',
+        label: 'Español',
+      },
+      {
+        code: 'en',
+        label: 'English',
+      },
+    ],
+  },
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
