@@ -11,10 +11,19 @@ test.describe('Frontend', () => {
   test('can go on homepage', async () => {
     await page.goto('http://localhost:3000')
 
-    await expect(page).toHaveTitle(/Payload Blank Template/)
+    await expect(page).toHaveTitle(/MBQB/)
 
     const heading = page.locator('h1').first()
 
-    await expect(heading).toHaveText('Welcome to your new project.')
+    await expect(heading).toHaveText('Mas Bogeys Que Birdies')
+  })
+
+  test('can check invalid Bogeyficador input', async () => {
+    await page.goto('http://localhost:3000/bogeyficador')
+
+    await page.getByLabel('RUT').fill('123456789')
+    await page.getByRole('button', { name: 'Revisar membresia' }).click()
+
+    await expect(page.getByText('Revisa el RUT ingresado.')).toBeVisible()
   })
 })
