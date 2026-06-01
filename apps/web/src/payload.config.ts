@@ -9,7 +9,6 @@ import sharp from 'sharp'
 import { ActiveMemberships } from './collections/ActiveMemberships'
 import { Canchas } from './collections/Canchas'
 import { LaBibliaArticles } from './collections/LaBibliaArticles'
-import { LegacyPages } from './collections/LegacyPages'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Products } from './collections/Products'
@@ -25,7 +24,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, ActiveMemberships, Canchas, LaBibliaArticles, Products, LegacyPages],
+  collections: [Users, Media, ActiveMemberships, Canchas, LaBibliaArticles, Products],
   globals: [SiteSettings],
   localization: {
     defaultLocale: 'es',

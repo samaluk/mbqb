@@ -11,6 +11,8 @@ const navItems = [
   { href: '/canchas', label: 'Canchas' },
   { href: '/la-biblia', label: 'La Biblia' },
   { href: '/bogeyficador', label: 'Bogeyficador' },
+  { href: '/el-canal', label: 'El Canal' },
+  { href: '/convenios', label: 'Convenios' },
   { href: '/productos', label: 'Productos' },
   { href: '/sobre-nosotros', label: 'Sobre nosotros' },
 ]

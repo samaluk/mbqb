@@ -255,6 +255,21 @@ p {
   font-size: clamp(40px, 6vw, 72px);
 }
 
+.editorial-page {
+  display: grid;
+  align-content: start;
+}
+
+.editorial-copy {
+  display: grid;
+  gap: 18px;
+  max-width: 760px;
+}
+
+.editorial-copy p {
+  max-width: none;
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));

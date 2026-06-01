@@ -73,7 +73,6 @@ export interface Config {
     canchas: Cancha;
     'la-biblia-articles': LaBibliaArticle;
     products: Product;
-    'legacy-pages': LegacyPage;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -87,7 +86,6 @@ export interface Config {
     canchas: CanchasSelect<false> | CanchasSelect<true>;
     'la-biblia-articles': LaBibliaArticlesSelect<false> | LaBibliaArticlesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
-    'legacy-pages': LegacyPagesSelect<false> | LegacyPagesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -259,21 +257,6 @@ export interface Product {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "legacy-pages".
- */
-export interface LegacyPage {
-  id: number;
-  title: string;
-  slug: string;
-  bodyHtml: string;
-  legacyKind: 'page' | 'hub' | 'bogeyficador';
-  sourceUrl: string;
-  sourceUpdatedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -319,10 +302,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'products';
         value: number | Product;
-      } | null)
-    | ({
-        relationTo: 'legacy-pages';
-        value: number | LegacyPage;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -466,20 +445,6 @@ export interface ProductsSelect<T extends boolean = true> {
   priceCLP?: T;
   stockStatus?: T;
   imageUrl?: T;
-  sourceUrl?: T;
-  sourceUpdatedAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "legacy-pages_select".
- */
-export interface LegacyPagesSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  bodyHtml?: T;
-  legacyKind?: T;
   sourceUrl?: T;
   sourceUpdatedAt?: T;
   updatedAt?: T;

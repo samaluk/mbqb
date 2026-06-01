@@ -61,16 +61,6 @@ const privateCanchaHandles = new Set([
   'club-de-golf-valle-escondido',
 ])
 
-const legacyHubHandles = new Set([
-  'canchas-pay-and-play',
-  'canchas-privadas',
-  'el-bogeyficador',
-  'el-canal',
-  'la-biblia',
-  'nuestos-convenios',
-  'sobre-nosotros',
-])
-
 const articleHandles = new Set(['que-pelotas-necesito-segun-mi-nivel-y-presupuesto'])
 
 const fetchJson = async <T>(url: string): Promise<T> => {
@@ -207,7 +197,6 @@ const importPages = async (payload: Payload) => {
   const counters = {
     articles: 0,
     canchas: 0,
-    legacyPages: 0,
   }
 
   for (const sitemapPage of sitemapPages) {
@@ -250,18 +239,6 @@ const importPages = async (payload: Payload) => {
       continue
     }
 
-    if (legacyHubHandles.has(handle)) {
-      await upsert(payload, 'legacy-pages', handle, {
-        bodyHtml: page.body_html,
-        legacyKind:
-          handle === 'el-bogeyficador' ? 'bogeyficador' : handle === 'la-biblia' ? 'hub' : 'page',
-        slug: handle,
-        sourceUpdatedAt: toDate(page.updated_at || sitemapPage.lastmod),
-        sourceUrl: sitemapPage.loc,
-        title: page.title,
-      })
-      counters.legacyPages += 1
-    }
   }
 
   return counters
