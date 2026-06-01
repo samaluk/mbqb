@@ -1,5 +1,3 @@
-import { canchaLocations } from './canchaLocations'
-
 export const canchaAccessLabels = {
   private: 'Privada',
   'pay-and-play': 'Pay and play',
@@ -23,8 +21,6 @@ export const getCanchaLocation = (cancha: CanchaMapItem) => {
   if (typeof cancha.latitude === 'number' && typeof cancha.longitude === 'number') {
     return { latitude: cancha.latitude, longitude: cancha.longitude }
   }
-
-  return canchaLocations[cancha.slug]
 }
 
 export const getGoogleMapsUrl = (cancha: CanchaMapItem) => {
