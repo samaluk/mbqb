@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
 @theme {
   --color-ink: #101411;
@@ -9,9 +10,31 @@
   --color-lime: #c7e85b;
   --color-red: #9c2f2f;
   --color-white-soft: #fffdf7;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 :root {
+  --radius: 0.5rem;
   --ink: #101411;
   --muted: #5d665f;
   --paper: #faf8f1;
@@ -20,9 +43,30 @@
   --lime: #c7e85b;
   --red: #9c2f2f;
   --white: #fffdf7;
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--white);
+  --card-foreground: var(--ink);
+  --popover: var(--white);
+  --popover-foreground: var(--ink);
+  --primary: var(--green);
+  --primary-foreground: var(--white);
+  --secondary: color-mix(in oklch, var(--green) 8%, var(--paper));
+  --secondary-foreground: var(--green);
+  --muted-foreground: var(--muted);
+  --accent: var(--lime);
+  --accent-foreground: var(--ink);
+  --destructive: var(--red);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--lime);
 }
 
 @layer base {
+  * {
+    border-color: var(--border);
+  }
+
   html {
     min-height: 100%;
     background: var(--paper);
@@ -46,6 +90,11 @@
 
   a {
     color: currentColor;
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
   }
 }
 
