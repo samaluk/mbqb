@@ -65,6 +65,7 @@ export default async function CanchasPage({ searchParams }: PageProps) {
           canchas={canchaDocs}
           page={canchas.page ?? filters.page}
           pageSize={filters.pageSize}
+          searchParams={params}
           sort={filters.sort}
           totalDocs={canchas.totalDocs}
           totalPages={canchas.totalPages}
