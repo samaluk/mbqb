@@ -7,6 +7,14 @@ export const metadata = {
   title: 'MBQB',
 }
 
+const navItems = [
+  { href: '/canchas', label: 'Canchas' },
+  { href: '/la-biblia', label: 'La Biblia' },
+  { href: '/bogeyficador', label: 'Bogeyficador' },
+  { href: '/productos', label: 'Productos' },
+  { href: '/sobre-nosotros', label: 'Sobre nosotros' },
+]
+
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
@@ -17,13 +25,30 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           <Link className="brand" href="/">
             MBQB
           </Link>
-          <nav aria-label="Principal">
-            <Link href="/canchas">Canchas</Link>
-            <Link href="/la-biblia">La Biblia</Link>
-            <Link href="/bogeyficador">Bogeyficador</Link>
-            <Link href="/productos">Productos</Link>
-            <Link href="/sobre-nosotros">Sobre nosotros</Link>
+          <nav className="desktop-nav" aria-label="Principal">
+            {navItems.map((item) => (
+              <Link href={item.href} key={item.href}>
+                {item.label}
+              </Link>
+            ))}
           </nav>
+          <details className="mobile-menu">
+            <summary aria-label="Abrir navegacion">
+              <span></span>
+              <span></span>
+              <span></span>
+            </summary>
+            <div className="mobile-menu-panel">
+              <div className="mobile-menu-heading">Navegacion</div>
+              <nav aria-label="Principal movil">
+                {navItems.map((item) => (
+                  <Link href={item.href} key={item.href}>
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          </details>
         </header>
         <main>{children}</main>
       </body>
