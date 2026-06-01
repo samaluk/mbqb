@@ -11,6 +11,7 @@
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "import:mbqb": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/import-mbqb-shopify.ts",
+    "create:prod-user": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/create-payload-user.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
