@@ -6,10 +6,17 @@ import {
   checkActiveMembership,
   findActiveMembershipByLookupHash,
 } from '@/lib/bogeyficador'
+import { createMembershipLookupHash } from '@/lib/membershipLookupHash'
+import { normalizeRut } from '@/lib/rut'
 
 let payload: Payload
 
 const testRut = '12.345.678-5'
+const normalizedTestRut = normalizeRut(testRut) ?? testRut
+const testRutLookupHash = createMembershipLookupHash(
+  normalizedTestRut,
+  process.env.PAYLOAD_SECRET ?? 'development-secret',
+)
 
 describe('Bogeyficador membership integration', () => {
   beforeAll(async () => {
@@ -34,8 +41,11 @@ describe('Bogeyficador membership integration', () => {
       collection: 'active-memberships',
       data: {
         isActive: true,
+        normalizedRut: normalizedTestRut,
         rut: testRut,
+        rutLookupHash: testRutLookupHash,
       },
+      draft: false,
       overrideAccess: true,
     })
 
@@ -52,8 +62,11 @@ describe('Bogeyficador membership integration', () => {
       collection: 'active-memberships',
       data: {
         isActive: false,
+        normalizedRut: normalizedTestRut,
         rut: testRut,
+        rutLookupHash: testRutLookupHash,
       },
+      draft: false,
       overrideAccess: true,
     })
 
