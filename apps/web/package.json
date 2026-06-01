@@ -28,6 +28,7 @@
     "@payloadcms/richtext-lexical": "3.85.0",
     "@payloadcms/storage-vercel-blob": "3.85.0",
     "@payloadcms/ui": "3.85.0",
+    "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cross-env": "^7.0.3",
