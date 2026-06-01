@@ -2,6 +2,13 @@
 
 import { FormEvent, useState } from 'react'
 
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
+
 type CheckStatus = 'active' | 'invalid_rut' | 'not_found' | 'rate_limited'
 
 type CheckResponse = {
@@ -43,45 +50,51 @@ export function BogeyficadorForm() {
     setIsSubmitting(false)
   }
 
-  const resultClassName =
-    result?.status === 'active'
-      ? 'bg-lime/35 text-green'
-      : 'bg-red/10 text-red'
-
   return (
-    <form
-      className="rounded-lg border border-line bg-white-soft p-6 shadow-[0_18px_60px_rgb(16_20_17_/_8%)] max-[760px]:p-4"
-      onSubmit={onSubmit}
-    >
-      <div className="grid gap-2">
-        <label className="text-sm font-bold" htmlFor="rut">
-          RUT
-        </label>
-        <input
-          className="min-h-12 w-full rounded-md border border-line bg-paper px-3.5 text-ink uppercase focus:border-green focus:outline-[3px] focus:outline-lime/40"
-          autoComplete="off"
-          id="rut"
-          inputMode="text"
-          maxLength={12}
-          name="rut"
-          onChange={(event) => setRut(formatRutInput(event.target.value))}
-          placeholder="12.345.678-5"
-          required
-          value={rut}
-        />
-      </div>
-      <button
-        className="mt-4 min-h-12 w-full cursor-pointer rounded-md bg-green font-extrabold text-white-soft disabled:cursor-wait disabled:opacity-70"
-        disabled={isSubmitting}
-        type="submit"
-      >
-        {isSubmitting ? 'Revisando...' : 'Revisar membresia'}
-      </button>
-      {result ? (
-        <div className={`mt-4 rounded-md px-3.5 py-3 text-[15px] font-bold ${resultClassName}`}>
-          {result.message}
-        </div>
-      ) : null}
+    <form onSubmit={onSubmit}>
+      <Card className="shadow-[0_18px_60px_rgb(16_20_17_/_8%)]">
+        <CardContent>
+          <FieldGroup>
+            <Field>
+              <FieldLabel className="font-bold" htmlFor="rut">
+                RUT
+              </FieldLabel>
+              <Input
+                className="min-h-12 bg-paper px-3.5 uppercase"
+                autoComplete="off"
+                id="rut"
+                inputMode="text"
+                maxLength={12}
+                name="rut"
+                onChange={(event) => setRut(formatRutInput(event.target.value))}
+                placeholder="12.345.678-5"
+                required
+                value={rut}
+              />
+            </Field>
+          </FieldGroup>
+        </CardContent>
+        <CardFooter className="flex-col items-stretch gap-4 border-t-0 bg-transparent">
+          <Button className="min-h-12 w-full font-extrabold" disabled={isSubmitting} type="submit">
+            {isSubmitting ? (
+              <>
+                <Spinner data-icon="inline-start" />
+                Revisando...
+              </>
+            ) : (
+              'Revisar membresia'
+            )}
+          </Button>
+          {result ? (
+            <Badge
+              className="h-auto justify-start whitespace-normal px-3.5 py-3 text-[15px] font-bold"
+              variant={result.status === 'active' ? 'secondary' : 'destructive'}
+            >
+              {result.message}
+            </Badge>
+          ) : null}
+        </CardFooter>
+      </Card>
     </form>
   )
 }

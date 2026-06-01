@@ -2,6 +2,10 @@ import config from '@payload-config'
 import Link from 'next/link'
 import { getPayload } from 'payload'
 
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
 export const dynamic = 'force-dynamic'
 
 const categoryLabels = {
@@ -38,32 +42,26 @@ export default async function LaBibliaPage() {
       </p>
       <div className="mt-9 grid grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-[18px] max-[760px]:mt-[22px] max-[760px]:grid-cols-1 max-[760px]:gap-2.5">
         {articles.docs.map((article) => (
-          <article
-            className="grid min-w-0 content-start gap-3 rounded-lg border border-line bg-white-soft p-[18px] max-[760px]:gap-[9px] max-[760px]:p-[13px]"
-            key={article.id}
-          >
-            <div className="flex flex-wrap gap-2 text-[13px] font-extrabold uppercase text-green max-[760px]:gap-1.5 max-[760px]:text-[11px]">
-              <span className="rounded-full border border-green/20 px-2 py-[3px] max-[760px]:px-[7px] max-[760px]:py-0.5">
-                {categoryLabels[article.category]}
-              </span>
-              <span className="rounded-full border border-green/20 px-2 py-[3px] max-[760px]:px-[7px] max-[760px]:py-0.5">
-                {article.difficulty}
-              </span>
-            </div>
-            <h2 className="m-0 text-2xl leading-[1.15] max-[760px]:text-xl">
-              {article.title}
-            </h2>
-            <div
-              className="rich-snippet max-w-none text-base text-muted max-[760px]:text-sm max-[760px]:leading-[1.4]"
-              dangerouslySetInnerHTML={{ __html: article.bodyHtml }}
-            />
-            <Link
-              className="text-[15px] font-extrabold text-green"
-              href={`/la-biblia/${article.slug}`}
-            >
-              Leer articulo
-            </Link>
-          </article>
+          <Card className="min-w-0" key={article.id}>
+            <CardHeader>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline">{categoryLabels[article.category]}</Badge>
+                <Badge variant="outline">{article.difficulty}</Badge>
+              </div>
+              <CardTitle className="text-2xl leading-[1.15] max-[760px]:text-xl">
+                {article.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3 max-[760px]:gap-[9px]">
+              <div
+                className="rich-snippet max-w-none text-base text-muted max-[760px]:text-sm max-[760px]:leading-[1.4]"
+                dangerouslySetInnerHTML={{ __html: article.bodyHtml }}
+              />
+              <Button asChild className="w-fit font-extrabold" variant="link">
+                <Link href={`/la-biblia/${article.slug}`}>Leer articulo</Link>
+              </Button>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </section>

@@ -2,6 +2,10 @@ import config from '@payload-config'
 import Link from 'next/link'
 import { getPayload } from 'payload'
 
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
 export const dynamic = 'force-dynamic'
 
 const formatPrice = (value: number) =>
@@ -35,40 +39,32 @@ export default async function ProductosPage() {
       </p>
       <div className="mt-9 grid grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-[18px] max-[760px]:mt-[22px] max-[760px]:grid-cols-1 max-[760px]:gap-2.5">
         {products.docs.map((product) => (
-          <article
-            className="grid min-w-0 content-start gap-3 rounded-lg border border-line bg-white-soft p-[18px] max-[760px]:gap-[9px] max-[760px]:p-[13px]"
-            key={product.id}
-          >
+          <Card className="min-w-0" key={product.id}>
             {product.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
-                alt=""
-                className="aspect-4/3 w-full rounded-md object-cover"
-                src={product.imageUrl}
-              />
+              <img alt="" className="aspect-4/3 w-full object-cover" src={product.imageUrl} />
             ) : null}
-            <div className="flex flex-wrap gap-2 text-[13px] font-extrabold uppercase text-green max-[760px]:gap-1.5 max-[760px]:text-[11px]">
-              <span className="rounded-full border border-green/20 px-2 py-[3px] max-[760px]:px-[7px] max-[760px]:py-0.5">
-                {formatPrice(product.priceCLP)}
-              </span>
-              <span className="rounded-full border border-green/20 px-2 py-[3px] max-[760px]:px-[7px] max-[760px]:py-0.5">
-                {product.stockStatus === 'available' ? 'Disponible' : 'Agotado'}
-              </span>
-            </div>
-            <h2 className="m-0 text-2xl leading-[1.15] max-[760px]:text-xl">
-              {product.title}
-            </h2>
-            <div
-              className="rich-snippet max-w-none text-base text-muted max-[760px]:text-sm max-[760px]:leading-[1.4]"
-              dangerouslySetInnerHTML={{ __html: product.bodyHtml }}
-            />
-            <Link
-              className="text-[15px] font-extrabold text-green"
-              href={`/productos/${product.slug}`}
-            >
-              Ver producto
-            </Link>
-          </article>
+            <CardHeader>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline">{formatPrice(product.priceCLP)}</Badge>
+                <Badge variant={product.stockStatus === 'available' ? 'secondary' : 'destructive'}>
+                  {product.stockStatus === 'available' ? 'Disponible' : 'Agotado'}
+                </Badge>
+              </div>
+              <CardTitle className="text-2xl leading-[1.15] max-[760px]:text-xl">
+                {product.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3 max-[760px]:gap-[9px]">
+              <div
+                className="rich-snippet max-w-none text-base text-muted max-[760px]:text-sm max-[760px]:leading-[1.4]"
+                dangerouslySetInnerHTML={{ __html: product.bodyHtml }}
+              />
+              <Button asChild className="w-fit font-extrabold" variant="link">
+                <Link href={`/productos/${product.slug}`}>Ver producto</Link>
+              </Button>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </section>
