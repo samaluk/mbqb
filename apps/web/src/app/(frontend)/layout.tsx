@@ -23,28 +23,38 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="es-CL">
       <body>
-        <header className="site-header">
-          <Link className="brand" href="/">
+        <header className="mx-auto flex max-w-[1120px] items-center justify-between gap-6 p-6 max-[760px]:sticky max-[760px]:top-0 max-[760px]:z-[15] max-[760px]:gap-3 max-[760px]:border-b max-[760px]:border-line/70 max-[760px]:bg-paper/95 max-[760px]:p-3 max-[760px]:px-4 max-[760px]:backdrop-blur-[10px]">
+          <Link className="font-extrabold no-underline max-[760px]:text-lg" href="/">
             MBQB
           </Link>
-          <nav className="desktop-nav" aria-label="Principal">
+          <nav
+            className="flex flex-wrap justify-end gap-4 text-sm text-muted max-[760px]:hidden"
+            aria-label="Principal"
+          >
             {navItems.map((item) => (
-              <Link href={item.href} key={item.href}>
+              <Link className="no-underline" href={item.href} key={item.href}>
                 {item.label}
               </Link>
             ))}
           </nav>
-          <details className="mobile-menu">
-            <summary aria-label="Abrir navegacion">
-              <span></span>
-              <span></span>
-              <span></span>
+          <details className="mobile-menu hidden max-[760px]:block">
+            <summary
+              className="grid size-[42px] cursor-pointer list-none place-items-center rounded-md border border-line bg-white-soft open:fixed open:right-4 open:top-3 open:z-30"
+              aria-label="Abrir navegacion"
+            >
+              <span className="block h-0.5 w-[18px] rounded-full bg-ink transition-[opacity,transform] duration-100"></span>
+              <span className="block h-0.5 w-[18px] rounded-full bg-ink transition-[opacity,transform] duration-100"></span>
+              <span className="block h-0.5 w-[18px] rounded-full bg-ink transition-[opacity,transform] duration-100"></span>
             </summary>
-            <div className="mobile-menu-panel">
-              <div className="mobile-menu-heading">Navegacion</div>
-              <nav aria-label="Principal movil">
+            <div className="fixed right-0 top-0 z-20 grid h-dvh w-[min(82vw,320px)] content-start gap-[18px] border-l border-line bg-white-soft px-[22px] pb-[22px] pt-[54px] shadow-[-16px_0_48px_rgb(16_20_17_/_18%)]">
+              <div className="text-[13px] font-[850] uppercase text-green">Navegacion</div>
+              <nav className="grid gap-1" aria-label="Principal movil">
                 {navItems.map((item) => (
-                  <Link href={item.href} key={item.href}>
+                  <Link
+                    className="border-b border-line py-3.5 text-lg font-extrabold no-underline"
+                    href={item.href}
+                    key={item.href}
+                  >
                     {item.label}
                   </Link>
                 ))}

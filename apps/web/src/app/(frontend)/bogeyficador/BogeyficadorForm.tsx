@@ -43,11 +43,22 @@ export function BogeyficadorForm() {
     setIsSubmitting(false)
   }
 
+  const resultClassName =
+    result?.status === 'active'
+      ? 'bg-lime/35 text-green'
+      : 'bg-red/10 text-red'
+
   return (
-    <form className="check-panel" onSubmit={onSubmit}>
-      <div className="field">
-        <label htmlFor="rut">RUT</label>
+    <form
+      className="rounded-lg border border-line bg-white-soft p-6 shadow-[0_18px_60px_rgb(16_20_17_/_8%)] max-[760px]:p-4"
+      onSubmit={onSubmit}
+    >
+      <div className="grid gap-2">
+        <label className="text-sm font-bold" htmlFor="rut">
+          RUT
+        </label>
         <input
+          className="min-h-12 w-full rounded-md border border-line bg-paper px-3.5 text-ink uppercase focus:border-green focus:outline-[3px] focus:outline-lime/40"
           autoComplete="off"
           id="rut"
           inputMode="text"
@@ -59,10 +70,18 @@ export function BogeyficadorForm() {
           value={rut}
         />
       </div>
-      <button disabled={isSubmitting} type="submit">
+      <button
+        className="mt-4 min-h-12 w-full cursor-pointer rounded-md bg-green font-extrabold text-white-soft disabled:cursor-wait disabled:opacity-70"
+        disabled={isSubmitting}
+        type="submit"
+      >
         {isSubmitting ? 'Revisando...' : 'Revisar membresia'}
       </button>
-      {result ? <div className={`result ${result.status}`}>{result.message}</div> : null}
+      {result ? (
+        <div className={`mt-4 rounded-md px-3.5 py-3 text-[15px] font-bold ${resultClassName}`}>
+          {result.message}
+        </div>
+      ) : null}
     </form>
   )
 }
