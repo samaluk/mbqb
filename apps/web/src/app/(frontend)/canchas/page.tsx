@@ -2,14 +2,11 @@ import config from '@payload-config'
 import Link from 'next/link'
 import { getPayload } from 'payload'
 
-export const dynamic = 'force-dynamic'
+import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
 
-const accessLabels = {
-  private: 'Privada',
-  'pay-and-play': 'Pay and play',
-  restricted: 'Restringida',
-  unknown: 'Por confirmar',
-}
+import { CanchasMapLoader } from './CanchasMapLoader'
+
+export const dynamic = 'force-dynamic'
 
 export default async function CanchasPage() {
   const payload = await getPayload({ config })
@@ -20,6 +17,7 @@ export default async function CanchasPage() {
     locale: 'es',
     sort: 'title',
   })
+  const canchaDocs = canchas.docs as CanchaMapItem[]
 
   return (
     <section className="page-shell simple-page">
@@ -29,18 +27,30 @@ export default async function CanchasPage() {
         Guia editorial de canchas jugables, tipos de acceso, precios referenciales y datos utiles
         para planificar una salida.
       </p>
-      <div className="content-grid">
-        {canchas.docs.map((cancha) => (
-          <article className="content-card" key={cancha.id}>
-            <div className="card-meta">
-              <span>{accessLabels[cancha.accessType]}</span>
-              {cancha.region ? <span>{cancha.region}</span> : null}
-            </div>
-            <h2>{cancha.title}</h2>
-            {cancha.summary ? <p>{cancha.summary}</p> : null}
-            <Link href={`/canchas/${cancha.slug}`}>Ver ficha</Link>
-          </article>
-        ))}
+      <div className="canchas-layout">
+        <CanchasMapLoader canchas={canchaDocs} />
+        <div className="canchas-list" aria-label="Listado de canchas">
+          {canchaDocs.map((cancha, index) => (
+            <article className="content-card cancha-card" key={cancha.id}>
+              <div className="cancha-card-header">
+                <span className="map-index">{index + 1}</span>
+                <div className="card-meta">
+                  <span>{canchaAccessLabels[cancha.accessType]}</span>
+                  {cancha.region ? <span>{cancha.region}</span> : null}
+                  {cancha.city ? <span>{cancha.city}</span> : null}
+                </div>
+              </div>
+              <h2>{cancha.title}</h2>
+              {cancha.summary ? <p>{cancha.summary}</p> : null}
+              <div className="card-actions">
+                <Link href={`/canchas/${cancha.slug}`}>Ver ficha</Link>
+                <a href={getGoogleMapsUrl(cancha)} rel="noreferrer" target="_blank">
+                  Google Maps
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   )

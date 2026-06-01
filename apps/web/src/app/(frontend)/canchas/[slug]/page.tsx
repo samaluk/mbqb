@@ -3,14 +3,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
-export const dynamic = 'force-dynamic'
+import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
 
-const accessLabels = {
-  private: 'Privada',
-  'pay-and-play': 'Pay and play',
-  restricted: 'Restringida',
-  unknown: 'Por confirmar',
-}
+export const dynamic = 'force-dynamic'
 
 type PageProps = {
   params: Promise<{
@@ -36,6 +31,8 @@ export default async function CanchaDetailPage({ params }: PageProps) {
 
   if (!cancha) notFound()
 
+  const canchaItem = cancha as CanchaMapItem
+
   return (
     <article className="page-shell detail-page">
       <Link className="back-link" href="/canchas">
@@ -44,11 +41,19 @@ export default async function CanchaDetailPage({ params }: PageProps) {
       <div className="eyebrow">Cancha</div>
       <h1>{cancha.title}</h1>
       <div className="card-meta">
-        <span>{accessLabels[cancha.accessType]}</span>
+        <span>{canchaAccessLabels[cancha.accessType]}</span>
         {cancha.region ? <span>{cancha.region}</span> : null}
         {cancha.city ? <span>{cancha.city}</span> : null}
       </div>
       {cancha.summary ? <p className="lead">{cancha.summary}</p> : null}
+      <a
+        className="button secondary detail-map-link"
+        href={getGoogleMapsUrl(canchaItem)}
+        rel="noreferrer"
+        target="_blank"
+      >
+        Abrir en Google Maps
+      </a>
       <div className="rich-content" dangerouslySetInnerHTML={{ __html: cancha.bodyHtml }} />
     </article>
   )

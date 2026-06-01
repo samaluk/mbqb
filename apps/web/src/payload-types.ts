@@ -209,6 +209,8 @@ export interface Cancha {
   accessType: 'pay-and-play' | 'private' | 'restricted' | 'unknown';
   region?: string | null;
   city?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   sourceUrl: string;
   sourceUpdatedAt?: string | null;
   updatedAt: string;
@@ -430,6 +432,8 @@ export interface CanchasSelect<T extends boolean = true> {
   accessType?: T;
   region?: T;
   city?: T;
+  latitude?: T;
+  longitude?: T;
   sourceUrl?: T;
   sourceUpdatedAt?: T;
   updatedAt?: T;

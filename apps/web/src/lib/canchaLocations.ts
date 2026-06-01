@@ -1,0 +1,18 @@
+export const canchaLocations: Record<string, { latitude: number; longitude: number }> = {
+  'club-de-campo-coya': { latitude: -34.195, longitude: -70.56 },
+  'club-de-golf-aconcagua': { latitude: -32.897, longitude: -70.598 },
+  'club-de-golf-angostura': { latitude: -33.8, longitude: -70.71 },
+  'club-de-golf-costa-cachagua': { latitude: -32.584, longitude: -71.438 },
+  'club-de-golf-el-paico-alto': { latitude: -33.698, longitude: -71.006 },
+  'club-de-golf-el-principal-de-pirque': { latitude: -33.707, longitude: -70.535 },
+  'club-de-golf-hacienda-santa-martina': { latitude: -33.458, longitude: -70.502 },
+  'club-de-golf-huinganal-limache': { latitude: -32.983, longitude: -71.275 },
+  'club-de-golf-las-araucarias-de-buin': { latitude: -33.751, longitude: -70.735 },
+  'club-de-golf-las-brisas-de-chicureo': { latitude: -33.266, longitude: -70.658 },
+  'club-de-golf-las-palmas-del-oliveto': { latitude: -33.375, longitude: -70.784 },
+  'club-de-golf-mapocho': { latitude: -33.348, longitude: -70.758 },
+  'club-de-golf-papudo': { latitude: -32.509, longitude: -71.442 },
+  'club-de-golf-rio-blanco': { latitude: -32.904, longitude: -70.311 },
+  'club-de-golf-valle-escondido': { latitude: -33.337, longitude: -70.529 },
+  'santa-augusta-de-quintay': { latitude: -33.184, longitude: -71.699 },
+}

@@ -3,6 +3,8 @@ import 'dotenv/config'
 import config from '@payload-config'
 import { getPayload, type CollectionSlug, type Payload } from 'payload'
 
+import { canchaLocations } from '@/lib/canchaLocations'
+
 type ShopifyPage = {
   body_html: string
   handle: string
@@ -219,11 +221,14 @@ const importPages = async (payload: Payload) => {
 
     if (canchaHandles.has(handle)) {
       const city = inferCity(page.body_html)
+      const location = canchaLocations[handle]
 
       await upsert(payload, 'canchas', handle, {
         accessType: privateCanchaHandles.has(handle) ? 'private' : 'pay-and-play',
         bodyHtml: page.body_html,
         city,
+        latitude: location?.latitude,
+        longitude: location?.longitude,
         region: inferRegion(city),
         slug: handle,
         sourceUpdatedAt: toDate(page.updated_at || sitemapPage.lastmod),

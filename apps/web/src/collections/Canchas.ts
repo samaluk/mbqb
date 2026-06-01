@@ -78,6 +78,22 @@ export const Canchas: CollectionConfig = {
       label: 'City / comuna',
     },
     {
+      name: 'latitude',
+      type: 'number',
+      admin: {
+        step: 0.000001,
+      },
+      label: 'Latitude',
+    },
+    {
+      name: 'longitude',
+      type: 'number',
+      admin: {
+        step: 0.000001,
+      },
+      label: 'Longitude',
+    },
+    {
       name: 'sourceUrl',
       type: 'text',
       label: 'Original URL',
