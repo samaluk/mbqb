@@ -52,7 +52,7 @@ export function BogeyficadorForm() {
 
   return (
     <form onSubmit={onSubmit}>
-      <Card className="shadow-[0_18px_60px_rgb(16_20_17_/_8%)]">
+      <Card className="compact-card shadow-[0_12px_40px_rgb(16_20_17_/_8%)]">
         <CardContent>
           <FieldGroup>
             <Field>
@@ -60,7 +60,7 @@ export function BogeyficadorForm() {
                 RUT
               </FieldLabel>
               <Input
-                className="min-h-12 bg-paper px-3.5 uppercase"
+                className="min-h-10 bg-paper px-3 uppercase"
                 autoComplete="off"
                 id="rut"
                 inputMode="text"
@@ -74,8 +74,8 @@ export function BogeyficadorForm() {
             </Field>
           </FieldGroup>
         </CardContent>
-        <CardFooter className="flex-col items-stretch gap-4 border-t-0 bg-transparent">
-          <Button className="min-h-12 w-full font-extrabold" disabled={isSubmitting} type="submit">
+        <CardFooter className="flex-col items-stretch gap-3 border-t-0 bg-transparent">
+          <Button className="min-h-10 w-full font-extrabold" disabled={isSubmitting} type="submit">
             {isSubmitting ? (
               <>
                 <Spinner data-icon="inline-start" />
@@ -87,7 +87,7 @@ export function BogeyficadorForm() {
           </Button>
           {result ? (
             <Badge
-              className="h-auto justify-start whitespace-normal px-3.5 py-3 text-[15px] font-bold"
+              className="h-auto justify-start whitespace-normal px-3 py-2.5 text-sm font-bold"
               variant={result.status === 'active' ? 'secondary' : 'destructive'}
             >
               {result.message}

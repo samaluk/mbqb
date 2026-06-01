@@ -26,23 +26,23 @@ export default async function ProductosPage() {
   })
 
   return (
-    <section className="mx-auto min-h-[calc(100vh-86px)] w-[min(1120px,calc(100%_-_48px))] py-14 pb-24 max-[760px]:min-h-[calc(100vh-67px)] max-[760px]:w-[min(calc(100%_-_24px),1120px)] max-[760px]:py-7 max-[760px]:pb-14">
-      <div className="text-sm font-extrabold uppercase text-green max-[760px]:text-xs">
-        Productos
-      </div>
-      <h1 className="my-3 max-w-[780px] text-[clamp(40px,6vw,72px)] leading-none max-[760px]:my-2 max-[760px]:mb-3 max-[760px]:text-[clamp(34px,11vw,48px)]">
-        Merch MBQB.
-      </h1>
-      <p className="m-0 max-w-[640px] text-xl text-muted max-[760px]:text-base max-[760px]:leading-[1.45]">
+    <section className="page-shell">
+      <div className="page-kicker">Productos</div>
+      <h1 className="page-title">Merch MBQB.</h1>
+      <p className="page-lede">
         Catalogo simple de productos MBQB con detalles y contacto directo por WhatsApp para
         consultas.
       </p>
-      <div className="mt-9 grid grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-[18px] max-[760px]:mt-[22px] max-[760px]:grid-cols-1 max-[760px]:gap-2.5">
+      <div className="compact-grid">
         {products.docs.map((product) => (
-          <Card className="min-w-0" key={product.id}>
+          <Card className="compact-card min-w-0" key={product.id}>
             {product.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img alt="" className="aspect-4/3 w-full object-cover" src={product.imageUrl} />
+              <img
+                alt=""
+                className="aspect-[5/3] w-full object-cover max-[760px]:aspect-[16/9]"
+                src={product.imageUrl}
+              />
             ) : null}
             <CardHeader>
               <div className="flex flex-wrap gap-2">
@@ -51,11 +51,9 @@ export default async function ProductosPage() {
                   {product.stockStatus === 'available' ? 'Disponible' : 'Agotado'}
                 </Badge>
               </div>
-              <CardTitle className="text-2xl leading-[1.15] max-[760px]:text-xl">
-                {product.title}
-              </CardTitle>
+              <CardTitle className="compact-card-title">{product.title}</CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col gap-3 max-[760px]:gap-[9px]">
+            <CardContent className="flex flex-col gap-2">
               <div
                 className="rich-snippet max-w-none text-base text-muted max-[760px]:text-sm max-[760px]:leading-[1.4]"
                 dangerouslySetInnerHTML={{ __html: product.bodyHtml }}

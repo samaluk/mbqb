@@ -62,7 +62,7 @@ export default function CanchasMap({ canchas }: { canchas: CanchaMapItem[] }) {
   return (
     <MapContainer
       center={[-33.45, -70.66]}
-      className="sticky top-6 z-0 min-h-[680px] overflow-hidden rounded-lg border border-line bg-white-soft max-[760px]:relative max-[760px]:top-auto max-[760px]:min-h-80"
+      className="sticky top-6 z-0 min-h-[680px] overflow-hidden rounded-lg border border-line bg-white-soft max-[760px]:relative max-[760px]:top-auto max-[760px]:min-h-[220px]"
       scrollWheelZoom={false}
       zoom={8}
       zoomControl

@@ -37,29 +37,21 @@ export default async function ProductDetailPage({ params }: PageProps) {
   if (!product) notFound()
 
   return (
-    <article className="mx-auto grid w-[min(1120px,calc(100%_-_48px))] gap-[18px] py-14 pb-24 max-[760px]:w-[min(calc(100%_-_24px),1120px)] max-[760px]:py-7 max-[760px]:pb-14">
+    <article className="page-shell detail-shell">
       <Link className="w-fit text-[15px] font-extrabold text-green no-underline" href="/productos">
         Volver a productos
       </Link>
-      <div className="text-sm font-extrabold uppercase text-green max-[760px]:text-xs">
-        Producto
-      </div>
-      <h1 className="my-3 mb-0 max-w-[900px] text-[clamp(38px,6vw,74px)] leading-none max-[760px]:my-2 max-[760px]:mb-3 max-[760px]:text-[clamp(34px,11vw,48px)]">
-        {product.title}
-      </h1>
-      <div className="flex flex-wrap gap-2 text-[13px] font-extrabold uppercase text-green max-[760px]:gap-1.5 max-[760px]:text-[11px]">
-        <span className="rounded-full border border-green/20 px-2 py-[3px] max-[760px]:px-[7px] max-[760px]:py-0.5">
-          {formatPrice(product.priceCLP)}
-        </span>
-        <span className="rounded-full border border-green/20 px-2 py-[3px] max-[760px]:px-[7px] max-[760px]:py-0.5">
-          {product.stockStatus === 'available' ? 'Disponible' : 'Agotado'}
-        </span>
+      <div className="page-kicker">Producto</div>
+      <h1 className="page-title">{product.title}</h1>
+      <div className="meta-pills">
+        <span>{formatPrice(product.priceCLP)}</span>
+        <span>{product.stockStatus === 'available' ? 'Disponible' : 'Agotado'}</span>
       </div>
       {product.imageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           alt=""
-          className="aspect-4/3 h-auto w-[min(100%,720px)] rounded-lg object-cover"
+          className="aspect-[5/3] h-auto w-[min(100%,640px)] rounded-lg object-cover max-[760px]:aspect-[16/9]"
           src={product.imageUrl}
         />
       ) : null}

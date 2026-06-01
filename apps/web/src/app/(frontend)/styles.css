@@ -126,6 +126,102 @@
   max-width: none;
 }
 
+.page-shell {
+  width: min(1120px, calc(100% - 48px));
+  margin-inline: auto;
+  padding-block: 44px 80px;
+}
+
+.page-shell--hero {
+  display: grid;
+  min-height: calc(100vh - 86px);
+  align-content: center;
+  padding-block: 48px 72px;
+}
+
+.page-kicker {
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.page-title {
+  max-width: 820px;
+  margin: 8px 0 10px;
+  font-size: clamp(36px, 5vw, 62px);
+  line-height: 0.98;
+}
+
+.page-title--hero {
+  max-width: 820px;
+  font-size: clamp(44px, 7vw, 82px);
+}
+
+.page-lede {
+  max-width: 680px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.42;
+}
+
+.compact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.compact-card {
+  border-radius: 8px;
+  gap: 10px;
+  padding-block: 12px;
+}
+
+.compact-card :where([data-slot='card-header'], [data-slot='card-content']) {
+  padding-inline: 12px;
+}
+
+.compact-card [data-slot='card-header'] {
+  gap: 6px;
+}
+
+.compact-card-title {
+  font-size: 20px;
+  line-height: 1.12;
+}
+
+.compact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.detail-shell {
+  display: grid;
+  gap: 12px;
+}
+
+.meta-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.meta-pills span {
+  border: 1px solid color-mix(in oklch, var(--green) 20%, transparent);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+
 .club-map-marker {
   display: grid;
   place-items: center;
@@ -178,9 +274,9 @@
 
 .rich-content {
   display: grid;
-  gap: 16px;
+  gap: 12px;
   max-width: 780px;
-  margin-top: 12px;
+  margin-top: 4px;
   color: var(--ink);
 }
 
@@ -188,11 +284,12 @@
   max-width: none;
   margin: 0;
   color: var(--ink);
-  font-size: 18px;
+  font-size: 17px;
+  line-height: 1.48;
 }
 
 .rich-content :where(h2, h3, h4) {
-  margin: 18px 0 0;
+  margin: 12px 0 0;
   line-height: 1.1;
 }
 
@@ -208,15 +305,73 @@
 }
 
 @media (max-width: 760px) {
+  .page-shell {
+    width: min(calc(100% - 24px), 1120px);
+    padding-block: 22px 44px;
+  }
+
+  .page-shell--hero {
+    min-height: calc(100vh - 67px);
+    padding-block: 24px 40px;
+  }
+
+  .page-kicker {
+    font-size: 11px;
+  }
+
+  .page-title {
+    max-width: 100%;
+    margin: 6px 0 8px;
+    font-size: clamp(28px, 9vw, 40px);
+  }
+
+  .page-title--hero {
+    font-size: clamp(34px, 11vw, 46px);
+  }
+
+  .page-lede {
+    font-size: 15px;
+    line-height: 1.38;
+  }
+
+  .compact-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .compact-card {
+    gap: 8px;
+    padding-block: 10px;
+  }
+
+  .compact-card-title {
+    font-size: 18px;
+  }
+
+  .detail-shell {
+    gap: 9px;
+  }
+
+  .meta-pills {
+    gap: 5px;
+    font-size: 11px;
+  }
+
+  .meta-pills span {
+    padding: 2px 7px;
+  }
+
   .rich-snippet {
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
   }
 
   .rich-content {
-    gap: 12px;
+    gap: 10px;
   }
 
   .rich-content :where(p, ul, ol, blockquote) {
-    font-size: 16px;
+    font-size: 15px;
+    line-height: 1.42;
   }
 }
