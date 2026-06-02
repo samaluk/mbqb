@@ -55,6 +55,7 @@ export default buildConfig({
   sharp,
   plugins: [
     vercelBlobStorage({
+      clientUploads: true,
       enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
       collections: {
         media: true,
