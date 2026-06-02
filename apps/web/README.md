@@ -30,6 +30,27 @@ cd apps/web
 docker compose up postgres
 ```
 
+### Seed local data from production
+
+After pulling production env vars to the repo root (`.vercel/.env.production.local`):
+
+```sh
+cd apps/web
+vercel env pull ../../.vercel/.env.production.local --environment=production
+pnpm seed:dev-from-prod
+```
+
+This replaces your local `mbqb` database with a copy of production (schema and content), then applies any pending Payload migrations.
+
+### Production admin user
+
+```sh
+cd apps/web
+CMS_USER_EMAIL=you@example.com CMS_USER_PASSWORD="$(openssl rand -base64 32)" pnpm create:prod-user
+```
+
+Use `CMS_USER_UPDATE_EXISTING=true` to reset an existing user password. For production, ensure `DOTENV_CONFIG_PATH` points at pulled Vercel env (or rely on `.vercel/.env.production.local`) and set `NODE_ENV=production`.
+
 ## Current Foundation
 
 The app uses Payload with Postgres, Vercel Blob-backed media when `BLOB_READ_WRITE_TOKEN` is present, and built-in admin auth with `admin`, `editor`, and `validation-manager` staff roles.
