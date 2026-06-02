@@ -2,12 +2,12 @@ import { MigrateDownArgs, MigrateUpArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-    ALTER TABLE "payload_locked_documents_rels"
+    ALTER TABLE IF EXISTS "payload_locked_documents_rels"
       DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_legacy_pages_fk";
 
     DROP INDEX IF EXISTS "payload_locked_documents_rels_legacy_pages_id_idx";
 
-    ALTER TABLE "payload_locked_documents_rels"
+    ALTER TABLE IF EXISTS "payload_locked_documents_rels"
       DROP COLUMN IF EXISTS "legacy_pages_id";
 
     DROP TABLE IF EXISTS "legacy_pages_locales" CASCADE;
@@ -54,10 +54,10 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
     CREATE UNIQUE INDEX IF NOT EXISTS "legacy_pages_locales_locale_parent_id_unique"
       ON "legacy_pages_locales" USING btree ("_locale", "_parent_id");
 
-    ALTER TABLE "payload_locked_documents_rels"
+    ALTER TABLE IF EXISTS "payload_locked_documents_rels"
       ADD COLUMN IF NOT EXISTS "legacy_pages_id" integer;
 
-    ALTER TABLE "payload_locked_documents_rels"
+    ALTER TABLE IF EXISTS "payload_locked_documents_rels"
       ADD CONSTRAINT "payload_locked_documents_rels_legacy_pages_fk"
       FOREIGN KEY ("legacy_pages_id")
       REFERENCES "public"."legacy_pages"("id")

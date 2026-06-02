@@ -168,6 +168,23 @@
   line-height: 1.42;
 }
 
+.homepage-video {
+  width: min(100%, 860px);
+  margin-bottom: 22px;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--green) 14%, var(--line));
+  border-radius: 8px;
+  background: var(--ink);
+  aspect-ratio: 16 / 9;
+}
+
+.homepage-video__media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .compact-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
@@ -332,6 +349,10 @@
   .page-lede {
     font-size: 15px;
     line-height: 1.38;
+  }
+
+  .homepage-video {
+    margin-bottom: 16px;
   }
 
   .compact-grid {

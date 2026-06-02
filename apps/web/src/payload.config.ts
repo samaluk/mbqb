@@ -12,6 +12,7 @@ import { LaBibliaArticles } from './collections/LaBibliaArticles'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Products } from './collections/Products'
+import { HomePage } from './globals/HomePage'
 import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
@@ -25,7 +26,7 @@ export default buildConfig({
     },
   },
   collections: [Users, Media, ActiveMemberships, Canchas, LaBibliaArticles, Products],
-  globals: [SiteSettings],
+  globals: [SiteSettings, HomePage],
   localization: {
     defaultLocale: 'es',
     fallback: true,
