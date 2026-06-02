@@ -49,9 +49,8 @@ export default async function HomePage() {
   return (
     <section className="page-shell page-shell--hero">
       {heroVideoUrl ? (
-        <div className="homepage-video">
+        <div className="homepage-video" aria-hidden="true">
           <video
-            aria-label={homePage?.heroVideoAlt ?? 'Video destacado de Mas Bogeys Que Birdies'}
             autoPlay
             className="homepage-video__media"
             loop
@@ -62,18 +61,20 @@ export default async function HomePage() {
           />
         </div>
       ) : null}
-      <div className="page-kicker">Neo Golf Club</div>
-      <h1 className="page-title page-title--hero">Mas Bogeys Que Birdies</h1>
-      <p className="page-lede">
-        Comunidad chilena para jugar mas golf, encontrar canchas accesibles y aprender sin vueltas.
-      </p>
-      <div className="mt-5 flex flex-wrap gap-2">
-        <Button asChild className="min-h-10 px-4 font-bold">
-          <Link href="/bogeyficador">Bogeyficador</Link>
-        </Button>
-        <Button asChild className="min-h-10 px-4 font-bold" variant="outline">
-          <Link href="/canchas">Ver canchas</Link>
-        </Button>
+      <div className="homepage-hero-content">
+        <div className="page-kicker">Neo Golf Club</div>
+        <h1 className="page-title page-title--hero">Mas Bogeys Que Birdies</h1>
+        <p className="page-lede">
+          Comunidad chilena para jugar mas golf, encontrar canchas accesibles y aprender sin vueltas.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Button asChild className="min-h-10 px-4 font-bold">
+            <Link href="/bogeyficador">Bogeyficador</Link>
+          </Button>
+          <Button asChild className="min-h-10 px-4 font-bold" variant="outline">
+            <Link href="/canchas">Ver canchas</Link>
+          </Button>
+        </div>
       </div>
     </section>
   )
