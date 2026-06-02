@@ -3,8 +3,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
-export const dynamic = 'force-dynamic'
-
 const categoryLabels = {
   canchas: 'Canchas',
   'cultura-golf': 'Cultura golf',

@@ -11,8 +11,6 @@ import { CanchasDataTable, type CanchasSort } from './CanchasDataTable'
 import { CanchasMapLoader } from './CanchasMapLoader'
 import { CanchasViewControls } from './CanchasViewControls'
 
-export const dynamic = 'force-dynamic'
-
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }

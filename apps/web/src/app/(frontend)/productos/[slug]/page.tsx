@@ -3,8 +3,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
-export const dynamic = 'force-dynamic'
-
 const formatPrice = (value: number) =>
   new Intl.NumberFormat('es-CL', {
     currency: 'CLP',

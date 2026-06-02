@@ -5,8 +5,6 @@ import { getPayload } from 'payload'
 
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
 
-export const dynamic = 'force-dynamic'
-
 type PageProps = {
   params: Promise<{
     slug: string

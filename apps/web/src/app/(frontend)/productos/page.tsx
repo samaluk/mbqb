@@ -6,8 +6,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-export const dynamic = 'force-dynamic'
-
 const formatPrice = (value: number) =>
   new Intl.NumberFormat('es-CL', {
     currency: 'CLP',
