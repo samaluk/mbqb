@@ -20,13 +20,20 @@ export function CanchasLocationFilter() {
   const { isGeoPending, setUserGeo, userGeo } = useCanchasGeo()
   const [isLocating, setIsLocating] = React.useState(false)
   const [locationError, setLocationError] = React.useState<string | null>(null)
-  const sliderTimeout = React.useRef<number>(null)
+  const persistMaxKmTimeout = React.useRef<number>(null)
   const hasLocation = userGeo !== null
-  const activeMaxKm = userGeo?.maxKm ?? defaultMaxDistanceKm
+  const committedMaxKm = userGeo?.maxKm ?? defaultMaxDistanceKm
+  const [sliderMaxKm, setSliderMaxKm] = React.useState(committedMaxKm)
+  const [syncedCommittedMaxKm, setSyncedCommittedMaxKm] = React.useState(committedMaxKm)
+
+  if (committedMaxKm !== syncedCommittedMaxKm) {
+    setSyncedCommittedMaxKm(committedMaxKm)
+    setSliderMaxKm(committedMaxKm)
+  }
 
   React.useEffect(
     () => () => {
-      if (sliderTimeout.current) window.clearTimeout(sliderTimeout.current)
+      if (persistMaxKmTimeout.current) window.clearTimeout(persistMaxKmTimeout.current)
     },
     [],
   )
@@ -79,21 +86,59 @@ export function CanchasLocationFilter() {
     })
   }
 
-  const updateMaxDistance = (value: number) => {
-    if (!userGeo) {
-      notifyLocationRequired()
-      return
-    }
+  const persistMaxDistance = React.useCallback(
+    (value: number) => {
+      if (!userGeo) {
+        notifyLocationRequired()
+        return
+      }
 
-    if (sliderTimeout.current) window.clearTimeout(sliderTimeout.current)
+      if (persistMaxKmTimeout.current) window.clearTimeout(persistMaxKmTimeout.current)
 
-    sliderTimeout.current = window.setTimeout(() => {
       setUserGeo({
         ...userGeo,
         maxKm: value,
       })
-    }, 200)
-  }
+    },
+    [setUserGeo, userGeo],
+  )
+
+  const schedulePersistMaxDistance = React.useCallback(
+    (value: number) => {
+      if (!userGeo) {
+        notifyLocationRequired()
+        return
+      }
+
+      setSliderMaxKm(value)
+
+      if (persistMaxKmTimeout.current) window.clearTimeout(persistMaxKmTimeout.current)
+
+      persistMaxKmTimeout.current = window.setTimeout(() => {
+        persistMaxDistance(value)
+      }, 300)
+    },
+    [persistMaxDistance, userGeo],
+  )
+
+  const commitMaxDistance = React.useCallback(
+    (value: number) => {
+      if (!userGeo) {
+        notifyLocationRequired()
+        return
+      }
+
+      setSliderMaxKm(value)
+
+      if (persistMaxKmTimeout.current) {
+        window.clearTimeout(persistMaxKmTimeout.current)
+        persistMaxKmTimeout.current = null
+      }
+
+      persistMaxDistance(value)
+    },
+    [persistMaxDistance, userGeo],
+  )
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border bg-card p-4">
@@ -133,7 +178,7 @@ export function CanchasLocationFilter() {
       <div className="flex flex-col gap-3">
         {hasLocation ? (
           <p className="text-sm text-muted-foreground">
-            Mostrando canchas a hasta <strong className="text-foreground">{activeMaxKm} km</strong> de
+            Mostrando canchas a hasta <strong className="text-foreground">{sliderMaxKm} km</strong> de
             tu ubicación actual.
           </p>
         ) : (
@@ -143,7 +188,7 @@ export function CanchasLocationFilter() {
         )}
         <div className="flex flex-col gap-2">
           <Label className="text-xs font-normal text-muted-foreground" htmlFor="canchas-max-distance">
-            Distancia máxima: {activeMaxKm} km
+            Distancia máxima: {sliderMaxKm} km
           </Label>
           <div className="relative">
             <Slider
@@ -153,9 +198,12 @@ export function CanchasLocationFilter() {
               id="canchas-max-distance"
               max={maxMaxDistanceKm}
               min={minMaxDistanceKm}
-              onValueChange={(values) => updateMaxDistance(values[0] ?? defaultMaxDistanceKm)}
+              onValueChange={(values) =>
+                schedulePersistMaxDistance(values[0] ?? defaultMaxDistanceKm)
+              }
+              onValueCommit={(values) => commitMaxDistance(values[0] ?? defaultMaxDistanceKm)}
               step={5}
-              value={[activeMaxKm]}
+              value={[sliderMaxKm]}
             />
             {!hasLocation ? (
               <div
