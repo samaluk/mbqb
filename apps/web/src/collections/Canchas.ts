@@ -91,20 +91,9 @@ export const Canchas: CollectionConfig = {
       label: 'Public booking URL',
     },
     {
-      name: 'latitude',
-      type: 'number',
-      admin: {
-        step: 0.000001,
-      },
-      label: 'Latitude',
-    },
-    {
-      name: 'longitude',
-      type: 'number',
-      admin: {
-        step: 0.000001,
-      },
-      label: 'Longitude',
+      name: 'location',
+      type: 'point',
+      label: 'Location',
     },
     {
       name: 'sourceUrl',

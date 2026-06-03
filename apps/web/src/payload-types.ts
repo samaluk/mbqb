@@ -211,8 +211,11 @@ export interface Cancha {
   city?: string | null;
   holes?: number | null;
   publicBookingUrl?: string | null;
-  latitude?: number | null;
-  longitude?: number | null;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  location?: [number, number] | null;
   sourceUrl: string;
   sourceUpdatedAt?: string | null;
   updatedAt: string;
@@ -417,8 +420,7 @@ export interface CanchasSelect<T extends boolean = true> {
   city?: T;
   holes?: T;
   publicBookingUrl?: T;
-  latitude?: T;
-  longitude?: T;
+  location?: T;
   sourceUrl?: T;
   sourceUpdatedAt?: T;
   updatedAt?: T;
