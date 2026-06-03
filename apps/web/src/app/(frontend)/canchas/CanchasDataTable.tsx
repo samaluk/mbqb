@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
+import { formatDistanceKm } from '@/lib/canchasGeo'
 
 import { getCanchasHref } from './canchasSearchParams'
 import { CanchasColumnControls } from './CanchasColumnControls'
@@ -21,6 +22,7 @@ type CanchasDataTableProps = {
   page: number
   pageSize: number
   searchParams: Record<string, string | string[] | undefined>
+  showDistance?: boolean
   sort: CanchasSort
   totalDocs: number
   totalPages: number
@@ -35,6 +37,7 @@ const columnLabels = {
   accessType: 'Acceso',
   actions: 'Acciones',
   city: 'Ciudad',
+  distance: 'Distancia',
   region: 'Region',
   summary: 'Resumen',
   title: 'Cancha',
@@ -47,6 +50,7 @@ export function CanchasDataTable({
   page,
   pageSize,
   searchParams,
+  showDistance = false,
   sort,
   totalDocs,
   totalPages,
@@ -70,6 +74,9 @@ export function CanchasDataTable({
                   sortField="title"
                 />
               </TableHead>
+              {showDistance ? (
+                <TableHead data-column="distance">{columnLabels.distance}</TableHead>
+              ) : null}
               <TableHead data-column="accessType">
                 <SortLink
                   label={columnLabels.accessType}
@@ -113,6 +120,13 @@ export function CanchasDataTable({
                       <Link href={`/canchas/${cancha.slug}`}>{cancha.title}</Link>
                     </Button>
                   </TableCell>
+                  {showDistance ? (
+                    <TableCell data-column="distance">
+                      {'distanceKm' in cancha && typeof cancha.distanceKm === 'number'
+                        ? formatDistanceKm(cancha.distanceKm)
+                        : '—'}
+                    </TableCell>
+                  ) : null}
                   <TableCell data-column="accessType">
                     <Badge variant="outline">{canchaAccessLabels[cancha.accessType]}</Badge>
                   </TableCell>
@@ -140,7 +154,10 @@ export function CanchasDataTable({
               ))
             ) : (
               <TableRow>
-                <TableCell className="h-24 text-center text-muted-foreground" colSpan={6}>
+                <TableCell
+                  className="h-24 text-center text-muted-foreground"
+                  colSpan={showDistance ? 7 : 6}
+                >
                   no fields found for selected filters
                 </TableCell>
               </TableRow>

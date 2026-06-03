@@ -13,6 +13,7 @@ import {
   getGoogleMapsUrl,
   type CanchaMapItem,
 } from '@/lib/canchas'
+import { formatDistanceKm, type GeoPoint } from '@/lib/canchasGeo'
 
 const createClubIcon = (index: number, accessType: CanchaMapItem['accessType']) =>
   L.divIcon({
@@ -23,26 +24,45 @@ const createClubIcon = (index: number, accessType: CanchaMapItem['accessType']) 
     popupAnchor: [0, -18],
   })
 
+const userLocationIcon = L.divIcon({
+  className: 'club-map-marker user-location',
+  html: '<span aria-hidden="true">•</span>',
+  iconAnchor: [10, 10],
+  iconSize: [20, 20],
+})
+
 function FitClubBounds({
   locatedCanchas,
+  userLocation,
 }: {
   locatedCanchas: { location: { latitude: number; longitude: number } }[]
+  userLocation: GeoPoint | null
 }) {
   const map = useMap()
 
   useEffect(() => {
-    if (locatedCanchas.length === 0) return
+    const points = locatedCanchas.map(({ location }) => [location.latitude, location.longitude] as const)
 
-    const bounds = L.latLngBounds(
-      locatedCanchas.map(({ location }) => [location.latitude, location.longitude]),
-    )
+    if (userLocation) {
+      points.push([userLocation.latitude, userLocation.longitude])
+    }
+
+    if (points.length === 0) return
+
+    const bounds = L.latLngBounds(points)
     map.fitBounds(bounds, { padding: [28, 28] })
-  }, [locatedCanchas, map])
+  }, [locatedCanchas, map, userLocation])
 
   return null
 }
 
-export default function CanchasMap({ canchas }: { canchas: CanchaMapItem[] }) {
+export default function CanchasMap({
+  canchas,
+  userLocation,
+}: {
+  canchas: CanchaMapItem[]
+  userLocation: GeoPoint | null
+}) {
   const locatedCanchas = canchas
     .map((cancha, index) => ({
       cancha,
@@ -71,7 +91,17 @@ export default function CanchasMap({ canchas }: { canchas: CanchaMapItem[] }) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <FitClubBounds locatedCanchas={locatedCanchas} />
+      <FitClubBounds locatedCanchas={locatedCanchas} userLocation={userLocation} />
+      {userLocation ? (
+        <Marker icon={userLocationIcon} position={[userLocation.latitude, userLocation.longitude]}>
+          <Popup>
+            <div className="grid min-w-32 gap-1 text-ink">
+              <strong className="leading-[1.15]">Tu ubicación</strong>
+              <span className="text-[13px] text-muted">Centro del filtro por distancia</span>
+            </div>
+          </Popup>
+        </Marker>
+      ) : null}
       {locatedCanchas.map(({ cancha, index, location }) => (
         <Marker
           icon={createClubIcon(index, cancha.accessType)}
@@ -85,6 +115,11 @@ export default function CanchasMap({ canchas }: { canchas: CanchaMapItem[] }) {
               {cancha.city || cancha.region ? (
                 <span className="text-[13px] text-muted">
                   {[cancha.city, cancha.region].filter(Boolean).join(', ')}
+                </span>
+              ) : null}
+              {'distanceKm' in cancha && typeof cancha.distanceKm === 'number' ? (
+                <span className="text-[13px] font-semibold text-green">
+                  {formatDistanceKm(cancha.distanceKm)}
                 </span>
               ) : null}
               <div className="flex flex-wrap gap-3">

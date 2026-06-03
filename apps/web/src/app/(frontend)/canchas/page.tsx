@@ -1,17 +1,14 @@
 import config from '@payload-config'
-import Link from 'next/link'
+import { Suspense } from 'react'
 import { getPayload, type Where } from 'payload'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
+import type { CanchaMapItem } from '@/lib/canchas'
 
 import { clampNumber } from './canchasSearchParams'
-import { CanchasDataTable, type CanchasSort } from './CanchasDataTable'
-import { CanchasMapLoader } from './CanchasMapLoader'
-import { CanchasPagination } from './CanchasPagination'
+import { CanchasFilteredResults } from './CanchasFilteredResults'
+import { CanchasGeoProvider } from './CanchasGeoContext'
 import { CanchasViewControls } from './CanchasViewControls'
+import type { CanchasSort } from './CanchasDataTable'
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>
@@ -27,17 +24,16 @@ export default async function CanchasPage({ searchParams }: PageProps) {
   const view = filters.view === 'table' ? 'table' : 'cards'
   const payload = await getPayload({ config })
   const where = getCanchasWhere(filters)
-  const listQuery = {
-    collection: 'canchas' as const,
-    depth: 0,
-    limit: filters.pageSize,
-    locale: 'es' as const,
-    page: filters.page,
-    sort: getPayloadSort(filters.sort),
-    ...(where ? { where } : {}),
-  }
-  const [canchas, filterOptions, mapCanchas] = await Promise.all([
-    payload.find(listQuery),
+  const [canchaPool, filterOptions, tableCanchas] = await Promise.all([
+    payload.find({
+      collection: 'canchas',
+      depth: 0,
+      limit: 1000,
+      locale: 'es',
+      page: 1,
+      sort: 'title',
+      ...(where ? { where } : {}),
+    }),
     payload.find({
       collection: 'canchas',
       depth: 0,
@@ -45,16 +41,18 @@ export default async function CanchasPage({ searchParams }: PageProps) {
       locale: 'es',
       sort: 'title',
     }),
-    view === 'cards'
+    view === 'table'
       ? payload.find({
-          ...listQuery,
-          limit: 1000,
-          page: 1,
+          collection: 'canchas',
+          depth: 0,
+          limit: filters.pageSize,
+          locale: 'es',
+          page: filters.page,
+          sort: getPayloadSort(filters.sort),
+          ...(where ? { where } : {}),
         })
       : Promise.resolve(null),
   ])
-  const canchaDocs = canchas.docs as CanchaMapItem[]
-  const mapCanchaDocs = (mapCanchas?.docs ?? canchaDocs) as CanchaMapItem[]
   const optionDocs = filterOptions.docs as CanchaMapItem[]
 
   return (
@@ -65,76 +63,36 @@ export default async function CanchasPage({ searchParams }: PageProps) {
         Guia editorial de canchas jugables, tipos de acceso, precios referenciales y datos utiles
         para planificar una salida.
       </p>
-      <CanchasViewControls
-        accessTypes={getUniqueValues(optionDocs, 'accessType')}
-        cities={getUniqueValues(optionDocs, 'city')}
-        regions={getUniqueValues(optionDocs, 'region')}
-        view={view}
-      />
-      {view === 'table' ? (
-        <CanchasDataTable
-          canchas={canchaDocs}
-          page={canchas.page ?? filters.page}
-          pageSize={filters.pageSize}
-          searchParams={params}
-          sort={filters.sort}
-          totalDocs={canchas.totalDocs}
-          totalPages={canchas.totalPages}
-        />
-      ) : (
-        <div className="mt-6 flex flex-col gap-3">
-          <div className="grid grid-cols-[minmax(320px,0.85fr)_minmax(0,1.15fr)] items-start gap-4 max-[760px]:grid-cols-1 max-[760px]:gap-3">
-            <CanchasMapLoader canchas={mapCanchaDocs} />
-            <div
-              className="grid max-h-[680px] gap-2 overflow-auto pr-1 max-[760px]:max-h-none max-[760px]:overflow-visible max-[760px]:pr-0"
-              aria-label="Listado de canchas"
-            >
-              {canchaDocs.map((cancha, index) => (
-              <Card className="compact-card min-w-0" key={cancha.id}>
-                <CardHeader>
-                  <div className="flex items-start gap-2.5">
-                    <span className="grid size-7 shrink-0 place-items-center rounded-full bg-green text-[13px] font-black text-white-soft max-[760px]:size-6 max-[760px]:text-xs">
-                      {(filters.page - 1) * filters.pageSize + index + 1}
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="outline">{canchaAccessLabels[cancha.accessType]}</Badge>
-                      {cancha.region ? <Badge variant="outline">{cancha.region}</Badge> : null}
-                      {cancha.city ? <Badge variant="outline">{cancha.city}</Badge> : null}
-                    </div>
-                  </div>
-                  <CardTitle className="compact-card-title">{cancha.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-2">
-                  {cancha.summary ? (
-                    <p className="max-w-none text-base text-muted max-[760px]:text-sm max-[760px]:leading-[1.4]">
-                      {cancha.summary}
-                    </p>
-                  ) : null}
-                  <div className="compact-actions">
-                    <Button asChild className="font-extrabold" variant="link">
-                      <Link href={`/canchas/${cancha.slug}`}>Ver ficha</Link>
-                    </Button>
-                    <Button asChild className="font-extrabold" variant="link">
-                      <a href={getGoogleMapsUrl(cancha)} rel="noreferrer" target="_blank">
-                        Google Maps
-                      </a>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              ))}
-            </div>
-          </div>
-          <CanchasPagination
-            page={canchas.page ?? filters.page}
-            pageSize={filters.pageSize}
-            searchParams={params}
-            totalDocs={canchas.totalDocs}
-            totalPages={canchas.totalPages}
-            view="cards"
+      <Suspense fallback={null}>
+        <CanchasGeoProvider>
+          <CanchasViewControls
+            accessTypes={getUniqueValues(optionDocs, 'accessType')}
+            cities={getUniqueValues(optionDocs, 'city')}
+            regions={getUniqueValues(optionDocs, 'region')}
+            view={view}
           />
-        </div>
-      )}
+          <CanchasFilteredResults
+            canchaPool={canchaPool.docs as CanchaMapItem[]}
+            filters={{
+              page: filters.page,
+              pageSize: filters.pageSize,
+              sort: filters.sort,
+            }}
+            searchParams={params}
+            serverTable={
+              tableCanchas
+                ? {
+                    canchas: tableCanchas.docs as CanchaMapItem[],
+                    page: tableCanchas.page ?? filters.page,
+                    totalDocs: tableCanchas.totalDocs,
+                    totalPages: tableCanchas.totalPages,
+                  }
+                : undefined
+            }
+            view={view}
+          />
+        </CanchasGeoProvider>
+      </Suspense>
     </section>
   )
 }

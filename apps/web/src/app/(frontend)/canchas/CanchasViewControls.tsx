@@ -18,6 +18,9 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { canchaAccessLabels } from "@/lib/canchas"
 
+import { useCanchasGeo } from "./CanchasGeoContext"
+import { CanchasLocationFilter } from "./CanchasLocationFilter"
+
 type CanchasViewControlsProps = {
   accessTypes: string[]
   cities: string[]
@@ -34,6 +37,7 @@ export function CanchasViewControls({
   regions,
   view,
 }: CanchasViewControlsProps) {
+  const { hasGeoFilter, setUserGeo } = useCanchasGeo()
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -86,7 +90,8 @@ export function CanchasViewControls({
     Boolean(query) ||
     Boolean(searchParams.get("accessType")) ||
     Boolean(searchParams.get("region")) ||
-    Boolean(searchParams.get("city"))
+    Boolean(searchParams.get("city")) ||
+    hasGeoFilter
 
   return (
     <div className="mt-6 flex flex-col gap-3">
@@ -110,7 +115,8 @@ export function CanchasViewControls({
         </ToggleGroup>
         {hasFilters ? (
           <Button
-            onClick={() =>
+            onClick={() => {
+              setUserGeo(null)
               updateParams({
                 accessType: null,
                 city: null,
@@ -118,7 +124,7 @@ export function CanchasViewControls({
                 q: null,
                 region: null,
               })
-            }
+            }}
             type="button"
             variant="outline"
           >
@@ -126,6 +132,7 @@ export function CanchasViewControls({
           </Button>
         ) : null}
       </div>
+      <CanchasLocationFilter />
       <div className="grid grid-cols-[minmax(220px,1.4fr)_repeat(3,minmax(160px,1fr))] gap-2 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1">
         <div className="flex flex-col gap-1.5">
           <Label className="text-xs font-normal text-muted-foreground" htmlFor="canchas-search">

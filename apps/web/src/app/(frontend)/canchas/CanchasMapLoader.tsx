@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic'
 
 import type { CanchaMapItem } from '@/lib/canchas'
+import type { GeoPoint } from '@/lib/canchasGeo'
 
 const CanchasMap = dynamic(() => import('./CanchasMap'), {
   loading: () => (
@@ -13,6 +14,12 @@ const CanchasMap = dynamic(() => import('./CanchasMap'), {
   ssr: false,
 })
 
-export function CanchasMapLoader({ canchas }: { canchas: CanchaMapItem[] }) {
-  return <CanchasMap canchas={canchas} />
+export function CanchasMapLoader({
+  canchas,
+  userLocation,
+}: {
+  canchas: CanchaMapItem[]
+  userLocation?: GeoPoint | null
+}) {
+  return <CanchasMap canchas={canchas} userLocation={userLocation ?? null} />
 }

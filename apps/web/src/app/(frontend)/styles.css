@@ -302,6 +302,11 @@
   background: var(--muted);
 }
 
+.club-map-marker.user-location {
+  background: #1d4ed8;
+  font-size: 18px;
+}
+
 .club-map-marker span {
   display: block;
   line-height: 1;
