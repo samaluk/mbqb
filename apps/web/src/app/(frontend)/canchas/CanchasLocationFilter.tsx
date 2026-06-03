@@ -2,6 +2,7 @@
 
 import { LocateFixedIcon, LocateOffIcon } from "lucide-react"
 import * as React from "react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -72,8 +73,17 @@ export function CanchasLocationFilter() {
     setUserGeo(null)
   }
 
+  const notifyLocationRequired = () => {
+    toast("Comparte tu ubicación para ajustar la distancia máxima.", {
+      id: "canchas-location-required",
+    })
+  }
+
   const updateMaxDistance = (value: number) => {
-    if (!userGeo) return
+    if (!userGeo) {
+      notifyLocationRequired()
+      return
+    }
 
     if (sliderTimeout.current) window.clearTimeout(sliderTimeout.current)
 
@@ -120,19 +130,26 @@ export function CanchasLocationFilter() {
         </div>
       </div>
       {locationError ? <p className="text-sm text-destructive">{locationError}</p> : null}
-      {hasLocation ? (
-        <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3">
+        {hasLocation ? (
           <p className="text-sm text-muted-foreground">
             Mostrando canchas a hasta <strong className="text-foreground">{activeMaxKm} km</strong> de
             tu ubicación actual.
           </p>
-          <div className="flex flex-col gap-2">
-            <Label className="text-xs font-normal text-muted-foreground" htmlFor="canchas-max-distance">
-              Distancia máxima: {activeMaxKm} km
-            </Label>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Usa el botón de arriba para compartir tu ubicación y filtrar canchas por distancia.
+          </p>
+        )}
+        <div className="flex flex-col gap-2">
+          <Label className="text-xs font-normal text-muted-foreground" htmlFor="canchas-max-distance">
+            Distancia máxima: {activeMaxKm} km
+          </Label>
+          <div className="relative">
             <Slider
+              aria-disabled={!hasLocation || isGeoPending}
               aria-label="Distancia máxima en kilómetros"
-              disabled={isGeoPending}
+              disabled={!hasLocation || isGeoPending}
               id="canchas-max-distance"
               max={maxMaxDistanceKm}
               min={minMaxDistanceKm}
@@ -140,13 +157,23 @@ export function CanchasLocationFilter() {
               step={5}
               value={[activeMaxKm]}
             />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{minMaxDistanceKm} km</span>
-              <span>{maxMaxDistanceKm} km</span>
-            </div>
+            {!hasLocation ? (
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 cursor-not-allowed"
+                onPointerDown={(event) => {
+                  event.preventDefault()
+                  notifyLocationRequired()
+                }}
+              />
+            ) : null}
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>{minMaxDistanceKm} km</span>
+            <span>{maxMaxDistanceKm} km</span>
           </div>
         </div>
-      ) : null}
+      </div>
     </div>
   )
 }
