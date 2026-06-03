@@ -27,6 +27,13 @@ export function CanchasGeoProvider({
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isGeoPending, startTransition] = React.useTransition()
+  const [userGeo, setUserGeoState] = React.useState(initialUserGeo)
+  const [syncedInitialUserGeo, setSyncedInitialUserGeo] = React.useState(initialUserGeo)
+
+  if (initialUserGeo !== syncedInitialUserGeo) {
+    setSyncedInitialUserGeo(initialUserGeo)
+    setUserGeoState(initialUserGeo)
+  }
 
   const resetPageAndRefresh = React.useCallback(() => {
     const params = new URLSearchParams(searchParams.toString())
@@ -38,6 +45,8 @@ export function CanchasGeoProvider({
 
   const setUserGeo = React.useCallback(
     (geo: StoredUserGeo | null) => {
+      setUserGeoState(geo)
+
       startTransition(async () => {
         if (geo) {
           await setCanchasUserGeo(geo)
@@ -53,12 +62,12 @@ export function CanchasGeoProvider({
 
   const value = React.useMemo(
     () => ({
-      hasGeoFilter: initialUserGeo !== null,
+      hasGeoFilter: userGeo !== null,
       isGeoPending,
       setUserGeo,
-      userGeo: initialUserGeo,
+      userGeo,
     }),
-    [initialUserGeo, isGeoPending, setUserGeo],
+    [isGeoPending, setUserGeo, userGeo],
   )
 
   return <CanchasGeoContext value={value}>{children}</CanchasGeoContext>
