@@ -1,45 +1,12 @@
-import { existsSync, readFileSync } from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-import dotenv from 'dotenv'
 import { getPayload } from 'payload'
+
+import { loadScriptEnv } from './loadScriptEnv.js'
+
+loadScriptEnv()
 
 type StaffRole = 'admin' | 'editor' | 'validation-manager'
 
 const validRoles = new Set<StaffRole>(['admin', 'editor', 'validation-manager'])
-
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
-const defaultProductionEnvPath = path.resolve(dirname, '../../../.vercel/.env.production.local')
-
-const envPath =
-  process.env.DOTENV_CONFIG_PATH ||
-  (process.env.DATABASE_URL?.trim()
-    ? undefined
-    : existsSync(defaultProductionEnvPath)
-      ? defaultProductionEnvPath
-      : undefined)
-
-if (envPath) {
-  dotenv.config({ path: envPath })
-}
-
-if (process.env.DATABASE_URL_UNPOOLED?.trim()) {
-  process.env.DATABASE_URL = process.env.DATABASE_URL_UNPOOLED
-}
-
-const localEnvPath = path.resolve(dirname, '../.env')
-if (existsSync(localEnvPath)) {
-  if (envPath) {
-    const localEnv = dotenv.parse(readFileSync(localEnvPath))
-    if (!process.env.PAYLOAD_SECRET?.trim() && localEnv.PAYLOAD_SECRET?.trim()) {
-      process.env.PAYLOAD_SECRET = localEnv.PAYLOAD_SECRET
-    }
-  } else {
-    dotenv.config({ path: localEnvPath, override: true })
-  }
-}
 
 const getRequiredEnv = (name: string) => {
   const value = process.env[name]?.trim()
