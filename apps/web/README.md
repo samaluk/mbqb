@@ -51,6 +51,20 @@ CMS_USER_EMAIL=you@example.com CMS_USER_PASSWORD="$(openssl rand -base64 32)" pn
 
 Use `CMS_USER_UPDATE_EXISTING=true` to reset an existing user password. For production, ensure `DOTENV_CONFIG_PATH` points at pulled Vercel env (or rely on `.vercel/.env.production.local`) and set `NODE_ENV=production`.
 
+### Import public content from mbqb.cl into production
+
+Pull production env vars first, then import canchas, products, La Biblia articles, and site settings from the live Shopify storefront:
+
+```sh
+cd apps/web
+vercel env pull ../../.vercel/.env.production.local --environment=production
+pnpm import:mbqb:prod
+```
+
+The importer upserts by slug and does not modify `users` or `home-page` media. Re-running is safe: it refreshes Shopify HTML fields but keeps existing cancha coordinates, hole counts, booking URLs, and any site settings you already set in admin. Expect roughly 16 canchas, 1 product, and 1+ La Biblia articles (depending on what is linked from the live hub page).
+
+For local database targets, use `pnpm import:mbqb` with `apps/web/.env` configured.
+
 ## Current Foundation
 
 The app uses Payload with Postgres, Vercel Blob-backed media when `BLOB_READ_WRITE_TOKEN` is present, and built-in admin auth with `admin`, `editor`, and `validation-manager` staff roles.
