@@ -1,14 +1,5 @@
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronsLeftIcon,
-  ChevronsRightIcon,
-  ExternalLinkIcon,
-} from 'lucide-react'
+import { ChevronDownIcon, ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
-import type { ReactNode } from 'react'
-
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,8 +12,9 @@ import {
 } from '@/components/ui/table'
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
 
+import { getCanchasHref } from './canchasSearchParams'
 import { CanchasColumnControls } from './CanchasColumnControls'
-import { CanchasPageSizeSelect } from './CanchasPageSizeSelect'
+import { CanchasPagination } from './CanchasPagination'
 
 type CanchasDataTableProps = {
   canchas: CanchaMapItem[]
@@ -59,15 +51,9 @@ export function CanchasDataTable({
   totalDocs,
   totalPages,
 }: CanchasDataTableProps) {
-  const firstRow = totalDocs === 0 ? 0 : (page - 1) * pageSize + 1
-  const lastRow = Math.min(page * pageSize, totalDocs)
-
   return (
     <div className="mt-4 flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-3">
-        <div className="text-sm text-muted-foreground">
-          {firstRow}-{lastRow} de {totalDocs} canchas
-        </div>
+      <div className="flex items-center justify-end gap-3">
         <CanchasColumnControls
           columns={hideableColumns.map((id) => ({ id, label: columnLabels[id] }))}
         />
@@ -162,44 +148,14 @@ export function CanchasDataTable({
           </TableBody>
         </Table>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">Filas</span>
-          <CanchasPageSizeSelect pageSize={pageSize} searchParams={searchParams} />
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="text-sm font-medium">
-            Pagina {page} de {Math.max(totalPages, 1)}
-          </div>
-          <div className="flex items-center gap-1">
-            <PaginationButton disabled={page <= 1} href={getTableHref(searchParams, { page: '1' })}>
-              <ChevronsLeftIcon />
-              <span className="sr-only">Primera pagina</span>
-            </PaginationButton>
-            <PaginationButton
-              disabled={page <= 1}
-              href={getTableHref(searchParams, { page: `${page - 1}` })}
-            >
-              <ChevronLeftIcon />
-              <span className="sr-only">Pagina anterior</span>
-            </PaginationButton>
-            <PaginationButton
-              disabled={page >= totalPages}
-              href={getTableHref(searchParams, { page: `${page + 1}` })}
-            >
-              <ChevronRightIcon />
-              <span className="sr-only">Pagina siguiente</span>
-            </PaginationButton>
-            <PaginationButton
-              disabled={page >= totalPages}
-              href={getTableHref(searchParams, { page: `${totalPages}` })}
-            >
-              <ChevronsRightIcon />
-              <span className="sr-only">Ultima pagina</span>
-            </PaginationButton>
-          </div>
-        </div>
-      </div>
+      <CanchasPagination
+        page={page}
+        pageSize={pageSize}
+        searchParams={searchParams}
+        totalDocs={totalDocs}
+        totalPages={totalPages}
+        view="table"
+      />
     </div>
   )
 }
@@ -221,10 +177,14 @@ function SortLink({
   return (
     <Button asChild className="px-0" size="sm" type="button" variant="ghost">
       <Link
-        href={getTableHref(searchParams, {
-          page: null,
-          sort: `${nextDirection === 'desc' ? '-' : ''}${sortField}`,
-        })}
+        href={getCanchasHref(
+          searchParams,
+          {
+            page: null,
+            sort: `${nextDirection === 'desc' ? '-' : ''}${sortField}`,
+          },
+          { view: 'table' },
+        )}
       >
         {label}
         <ChevronDownIcon
@@ -236,52 +196,3 @@ function SortLink({
   )
 }
 
-function PaginationButton({
-  children,
-  disabled,
-  href,
-}: {
-  children: ReactNode
-  disabled: boolean
-  href: string
-}) {
-  if (disabled) {
-    return (
-      <Button disabled size="icon-sm" type="button" variant="outline">
-        {children}
-      </Button>
-    )
-  }
-
-  return (
-    <Button asChild size="icon-sm" variant="outline">
-      <Link href={href}>{children}</Link>
-    </Button>
-  )
-}
-
-function getTableHref(
-  searchParams: Record<string, string | string[] | undefined>,
-  updates: Record<string, null | string>,
-) {
-  const params = new URLSearchParams()
-
-  for (const [key, value] of Object.entries(searchParams)) {
-    const paramValue = Array.isArray(value) ? value[0] : value
-    if (paramValue) params.set(key, paramValue)
-  }
-
-  params.set('view', 'table')
-
-  for (const [key, value] of Object.entries(updates)) {
-    if (value) {
-      params.set(key, value)
-    } else {
-      params.delete(key)
-    }
-  }
-
-  const query = params.toString()
-
-  return query ? `/canchas?${query}` : '/canchas'
-}

@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
 
+import { clampNumber } from './canchasSearchParams'
 import { CanchasDataTable, type CanchasSort } from './CanchasDataTable'
 import { CanchasMapLoader } from './CanchasMapLoader'
+import { CanchasPagination } from './CanchasPagination'
 import { CanchasViewControls } from './CanchasViewControls'
 
 type PageProps = {
@@ -22,27 +24,38 @@ const sortableFields = new Set(['accessType', 'city', 'region', 'title'])
 export default async function CanchasPage({ searchParams }: PageProps) {
   const params = await searchParams
   const filters = parseFilters(params)
+  const view = filters.view === 'table' ? 'table' : 'cards'
   const payload = await getPayload({ config })
   const where = getCanchasWhere(filters)
-  const canchas = await payload.find({
-    collection: 'canchas',
+  const listQuery = {
+    collection: 'canchas' as const,
     depth: 0,
     limit: filters.pageSize,
-    locale: 'es',
+    locale: 'es' as const,
     page: filters.page,
     sort: getPayloadSort(filters.sort),
     ...(where ? { where } : {}),
-  })
-  const filterOptions = await payload.find({
-    collection: 'canchas',
-    depth: 0,
-    limit: 1000,
-    locale: 'es',
-    sort: 'title',
-  })
+  }
+  const [canchas, filterOptions, mapCanchas] = await Promise.all([
+    payload.find(listQuery),
+    payload.find({
+      collection: 'canchas',
+      depth: 0,
+      limit: 1000,
+      locale: 'es',
+      sort: 'title',
+    }),
+    view === 'cards'
+      ? payload.find({
+          ...listQuery,
+          limit: 1000,
+          page: 1,
+        })
+      : Promise.resolve(null),
+  ])
   const canchaDocs = canchas.docs as CanchaMapItem[]
+  const mapCanchaDocs = (mapCanchas?.docs ?? canchaDocs) as CanchaMapItem[]
   const optionDocs = filterOptions.docs as CanchaMapItem[]
-  const view = filters.view === 'table' ? 'table' : 'cards'
 
   return (
     <section className="page-shell">
@@ -69,13 +82,14 @@ export default async function CanchasPage({ searchParams }: PageProps) {
           totalPages={canchas.totalPages}
         />
       ) : (
-        <div className="mt-6 grid grid-cols-[minmax(320px,0.85fr)_minmax(0,1.15fr)] items-start gap-4 max-[760px]:mt-4 max-[760px]:grid-cols-1 max-[760px]:gap-3">
-          <CanchasMapLoader canchas={canchaDocs} />
-          <div
-            className="grid max-h-[680px] gap-2 overflow-auto pr-1 max-[760px]:max-h-none max-[760px]:overflow-visible max-[760px]:pr-0"
-            aria-label="Listado de canchas"
-          >
-            {canchaDocs.map((cancha, index) => (
+        <div className="mt-6 flex flex-col gap-3">
+          <div className="grid grid-cols-[minmax(320px,0.85fr)_minmax(0,1.15fr)] items-start gap-4 max-[760px]:grid-cols-1 max-[760px]:gap-3">
+            <CanchasMapLoader canchas={mapCanchaDocs} />
+            <div
+              className="grid max-h-[680px] gap-2 overflow-auto pr-1 max-[760px]:max-h-none max-[760px]:overflow-visible max-[760px]:pr-0"
+              aria-label="Listado de canchas"
+            >
+              {canchaDocs.map((cancha, index) => (
               <Card className="compact-card min-w-0" key={cancha.id}>
                 <CardHeader>
                   <div className="flex items-start gap-2.5">
@@ -108,8 +122,17 @@ export default async function CanchasPage({ searchParams }: PageProps) {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              ))}
+            </div>
           </div>
+          <CanchasPagination
+            page={canchas.page ?? filters.page}
+            pageSize={filters.pageSize}
+            searchParams={params}
+            totalDocs={canchas.totalDocs}
+            totalPages={canchas.totalPages}
+            view="cards"
+          />
         </div>
       )}
     </section>
@@ -135,14 +158,6 @@ function getParam(value: string | string[] | undefined) {
   if (Array.isArray(value)) return value[0] ?? ''
 
   return value ?? ''
-}
-
-function clampNumber(value: string, min: number, max: number, fallback: number) {
-  const number = Number(value)
-
-  if (!Number.isInteger(number)) return fallback
-
-  return Math.min(Math.max(number, min), max)
 }
 
 function parseSort(value: string): CanchasSort {

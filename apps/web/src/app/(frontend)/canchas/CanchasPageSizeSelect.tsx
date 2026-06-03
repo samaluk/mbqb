@@ -14,9 +14,10 @@ import {
 type CanchasPageSizeSelectProps = {
   pageSize: number
   searchParams: Record<string, string | string[] | undefined>
+  view: 'cards' | 'table'
 }
 
-export function CanchasPageSizeSelect({ pageSize, searchParams }: CanchasPageSizeSelectProps) {
+export function CanchasPageSizeSelect({ pageSize, searchParams, view }: CanchasPageSizeSelectProps) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -30,7 +31,11 @@ export function CanchasPageSizeSelect({ pageSize, searchParams }: CanchasPageSiz
           if (value) params.set(key, value)
         }
 
-        params.set('view', 'table')
+        if (view === 'table') {
+          params.set('view', 'table')
+        } else {
+          params.delete('view')
+        }
         params.set('pageSize', value)
         params.delete('page')
 
