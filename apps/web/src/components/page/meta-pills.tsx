@@ -15,10 +15,10 @@ function MetaPills({ className, items, ...props }: MetaPillsProps) {
       )}
       {...props}
     >
-      {items.map((item) => (
+      {items.map((item, index) => (
         <span
           className="rounded-full border border-green/20 px-2 py-0.5 max-[760px]:px-[7px] max-[760px]:py-0.5"
-          key={item}
+          key={`${item}-${index}`}
         >
           {item}
         </span>
