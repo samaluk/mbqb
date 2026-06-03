@@ -3,6 +3,14 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
+import {
+  MetaPills,
+  PageDetail,
+  PageKicker,
+  PageLede,
+  PageTitle,
+  RichContent,
+} from '@/components/page'
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
 
 type PageProps = {
@@ -30,24 +38,21 @@ export default async function CanchaDetailPage({ params }: PageProps) {
   if (!cancha) notFound()
 
   const canchaItem = cancha as CanchaMapItem
+  const metaItems = [
+    canchaAccessLabels[cancha.accessType],
+    ...(cancha.region ? [cancha.region] : []),
+    ...(cancha.city ? [cancha.city] : []),
+  ]
 
   return (
-    <article className="page-shell detail-shell">
+    <PageDetail>
       <Link className="w-fit text-[15px] font-extrabold text-green no-underline" href="/canchas">
         Volver a canchas
       </Link>
-      <div className="page-kicker">Cancha</div>
-      <h1 className="page-title">{cancha.title}</h1>
-      <div className="meta-pills">
-        <span>{canchaAccessLabels[cancha.accessType]}</span>
-        {cancha.region ? (
-          <span>{cancha.region}</span>
-        ) : null}
-        {cancha.city ? <span>{cancha.city}</span> : null}
-      </div>
-      {cancha.summary ? (
-        <p className="page-lede max-w-[780px]">{cancha.summary}</p>
-      ) : null}
+      <PageKicker>Cancha</PageKicker>
+      <PageTitle>{cancha.title}</PageTitle>
+      <MetaPills items={metaItems} />
+      {cancha.summary ? <PageLede className="max-w-[780px]">{cancha.summary}</PageLede> : null}
       <a
         className="inline-flex min-h-10 w-fit items-center justify-center rounded-md border border-green bg-transparent px-4 font-bold text-green no-underline"
         href={getGoogleMapsUrl(canchaItem)}
@@ -56,7 +61,7 @@ export default async function CanchaDetailPage({ params }: PageProps) {
       >
         Abrir en Google Maps
       </a>
-      <div className="rich-content" dangerouslySetInnerHTML={{ __html: cancha.bodyHtml }} />
-    </article>
+      <RichContent html={cancha.bodyHtml} />
+    </PageDetail>
   )
 }

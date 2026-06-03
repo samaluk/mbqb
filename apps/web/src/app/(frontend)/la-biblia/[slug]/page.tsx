@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
+import { MetaPills, PageDetail, PageKicker, PageTitle, RichContent } from '@/components/page'
+
 const categoryLabels = {
   canchas: 'Canchas',
   'cultura-golf': 'Cultura golf',
@@ -38,17 +40,16 @@ export default async function ArticleDetailPage({ params }: PageProps) {
   if (!article) notFound()
 
   return (
-    <article className="page-shell detail-shell">
+    <PageDetail>
       <Link className="w-fit text-[15px] font-extrabold text-green no-underline" href="/la-biblia">
         Volver a La Biblia
       </Link>
-      <div className="page-kicker">La Biblia</div>
-      <h1 className="page-title">{article.title}</h1>
-      <div className="meta-pills">
-        <span>{categoryLabels[article.category]}</span>
-        <span>{article.difficulty}</span>
-      </div>
-      <div className="rich-content" dangerouslySetInnerHTML={{ __html: article.bodyHtml }} />
-    </article>
+      <PageKicker>La Biblia</PageKicker>
+      <PageTitle>{article.title}</PageTitle>
+      <MetaPills
+        items={[categoryLabels[article.category], article.difficulty]}
+      />
+      <RichContent html={article.bodyHtml} />
+    </PageDetail>
   )
 }

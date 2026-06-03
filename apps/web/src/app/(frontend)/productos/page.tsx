@@ -2,6 +2,14 @@ import config from '@payload-config'
 import Link from 'next/link'
 import { getPayload } from 'payload'
 
+import {
+  PageGrid,
+  PageKicker,
+  PageLede,
+  PageShell,
+  PageTitle,
+  RichSnippet,
+} from '@/components/page'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,14 +32,14 @@ export default async function ProductosPage() {
   })
 
   return (
-    <section className="page-shell">
-      <div className="page-kicker">Productos</div>
-      <h1 className="page-title">Merch MBQB.</h1>
-      <p className="page-lede">
+    <PageShell>
+      <PageKicker>Productos</PageKicker>
+      <PageTitle>Merch MBQB.</PageTitle>
+      <PageLede>
         Catalogo simple de productos MBQB con detalles y contacto directo por WhatsApp para
         consultas.
-      </p>
-      <div className="compact-grid">
+      </PageLede>
+      <PageGrid>
         {products.docs.map((product) => (
           <Card className="min-w-0" key={product.id} size="compact">
             {product.imageUrl ? (
@@ -52,17 +60,14 @@ export default async function ProductosPage() {
               <CardTitle>{product.title}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
-              <div
-                className="rich-snippet max-w-none text-base text-muted max-[760px]:text-sm max-[760px]:leading-[1.4]"
-                dangerouslySetInnerHTML={{ __html: product.bodyHtml }}
-              />
+              <RichSnippet html={product.bodyHtml} />
               <Button asChild className="w-fit font-extrabold" variant="link">
                 <Link href={`/productos/${product.slug}`}>Ver producto</Link>
               </Button>
             </CardContent>
           </Card>
         ))}
-      </div>
-    </section>
+      </PageGrid>
+    </PageShell>
   )
 }

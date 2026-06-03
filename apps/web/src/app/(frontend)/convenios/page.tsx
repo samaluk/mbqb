@@ -1,9 +1,11 @@
+import { EditorialBody, PageKicker, PageShell, PageTitle } from '@/components/page'
+
 export default function ConveniosPage() {
   return (
-    <section className="page-shell grid content-start">
-      <div className="page-kicker">Convenios</div>
-      <h1 className="page-title">Beneficios para jugar mas.</h1>
-      <div className="editorial-copy grid max-w-[760px] gap-3 text-[17px] leading-[1.48] max-[760px]:text-[15px] max-[760px]:leading-[1.42]">
+    <PageShell className="grid content-start">
+      <PageKicker>Convenios</PageKicker>
+      <PageTitle>Beneficios para jugar mas.</PageTitle>
+      <EditorialBody>
         <p>
           MBQB es una comunidad de jugadores que quieren conocer mas, jugar mas y compartir mas. Por
           eso trabajamos con clubes amigos para abrir condiciones preferentes a miembros activos.
@@ -17,7 +19,7 @@ export default function ConveniosPage() {
           Para usarlos, la persona debe aparecer con membresia MBQB activa. El Bogeyficador permite
           revisar ese estado sin exponer datos personales ni detalles internos.
         </p>
-      </div>
-    </section>
+      </EditorialBody>
+    </PageShell>
   )
 }

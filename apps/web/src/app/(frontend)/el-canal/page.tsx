@@ -1,9 +1,11 @@
+import { EditorialBody, PageKicker, PageShell, PageTitle } from '@/components/page'
+
 export default function ElCanalPage() {
   return (
-    <section className="page-shell grid content-start">
-      <div className="page-kicker">El Canal</div>
-      <h1 className="page-title">Golf chileno contado desde la cancha.</h1>
-      <div className="editorial-copy grid max-w-[760px] gap-3 text-[17px] leading-[1.48] max-[760px]:text-[15px] max-[760px]:leading-[1.42]">
+    <PageShell className="grid content-start">
+      <PageKicker>El Canal</PageKicker>
+      <PageTitle>Golf chileno contado desde la cancha.</PageTitle>
+      <EditorialBody>
         <p>
           MBQB partio como un canal para documentar el progreso de un golfista aficionado y abrir
           una conversacion que faltaba entre clubes, jugadores, marcas y la gente que rodea el golf.
@@ -17,7 +19,7 @@ export default function ElCanalPage() {
           Si estas partiendo, los videos son una forma practica de conocer donde jugar, que esperar
           en una cancha y como moverte con mas confianza dentro de la comunidad.
         </p>
-      </div>
-    </section>
+      </EditorialBody>
+    </PageShell>
   )
 }

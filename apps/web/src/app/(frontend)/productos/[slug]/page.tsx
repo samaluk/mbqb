@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
+import { MetaPills, PageDetail, PageKicker, PageTitle, RichContent } from '@/components/page'
+
 const formatPrice = (value: number) =>
   new Intl.NumberFormat('es-CL', {
     currency: 'CLP',
@@ -35,16 +37,18 @@ export default async function ProductDetailPage({ params }: PageProps) {
   if (!product) notFound()
 
   return (
-    <article className="page-shell detail-shell">
+    <PageDetail>
       <Link className="w-fit text-[15px] font-extrabold text-green no-underline" href="/productos">
         Volver a productos
       </Link>
-      <div className="page-kicker">Producto</div>
-      <h1 className="page-title">{product.title}</h1>
-      <div className="meta-pills">
-        <span>{formatPrice(product.priceCLP)}</span>
-        <span>{product.stockStatus === 'available' ? 'Disponible' : 'Agotado'}</span>
-      </div>
+      <PageKicker>Producto</PageKicker>
+      <PageTitle>{product.title}</PageTitle>
+      <MetaPills
+        items={[
+          formatPrice(product.priceCLP),
+          product.stockStatus === 'available' ? 'Disponible' : 'Agotado',
+        ]}
+      />
       {product.imageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -53,7 +57,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           src={product.imageUrl}
         />
       ) : null}
-      <div className="rich-content" dangerouslySetInnerHTML={{ __html: product.bodyHtml }} />
-    </article>
+      <RichContent html={product.bodyHtml} />
+    </PageDetail>
   )
 }

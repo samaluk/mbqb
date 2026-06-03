@@ -1,9 +1,11 @@
+import { EditorialBody, PageKicker, PageShell, PageTitle } from '@/components/page'
+
 export default function SobreNosotrosPage() {
   return (
-    <section className="page-shell grid content-start">
-      <div className="page-kicker">Sobre nosotros</div>
-      <h1 className="page-title">Una comunidad para jugar mas golf.</h1>
-      <div className="editorial-copy grid max-w-[760px] gap-3 text-[17px] leading-[1.48] max-[760px]:text-[15px] max-[760px]:leading-[1.42]">
+    <PageShell className="grid content-start">
+      <PageKicker>Sobre nosotros</PageKicker>
+      <PageTitle>Una comunidad para jugar mas golf.</PageTitle>
+      <EditorialBody>
         <p>
           MBQB nacio desde la experiencia de aprender golf sin venir de una familia de golf ni de un
           club tradicional. Entender donde jugar, que palos comprar, como federarse y como moverse en
@@ -18,7 +20,7 @@ export default function SobreNosotrosPage() {
           Hoy MBQB acerca el golf a personas que quieren aprender, jugar y sentirse parte sin las
           barreras tradicionales del deporte.
         </p>
-      </div>
-    </section>
+      </EditorialBody>
+    </PageShell>
   )
 }

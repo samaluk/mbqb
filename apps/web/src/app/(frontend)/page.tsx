@@ -2,6 +2,14 @@ import Link from 'next/link'
 import config from '@payload-config'
 import { getPayload } from 'payload'
 
+import {
+  HomeHeroContent,
+  HomeHeroVideo,
+  PageKicker,
+  PageLede,
+  PageShell,
+  PageTitle,
+} from '@/components/page'
 import { Button } from '@/components/ui/button'
 import type { HomePage as HomePageGlobal, Media } from '@/payload-types'
 
@@ -47,26 +55,14 @@ export default async function HomePage() {
   const heroVideoUrl = getMediaUrl(homePage?.heroVideo)
 
   return (
-    <section className="page-shell page-shell--hero">
-      {heroVideoUrl ? (
-        <div className="homepage-video" aria-hidden="true">
-          <video
-            autoPlay
-            className="homepage-video__media"
-            loop
-            muted
-            playsInline
-            preload="metadata"
-            src={heroVideoUrl}
-          />
-        </div>
-      ) : null}
-      <div className="homepage-hero-content">
-        <div className="page-kicker">Neo Golf Club</div>
-        <h1 className="page-title page-title--hero">Mas Bogeys Que Birdies</h1>
-        <p className="page-lede">
+    <PageShell variant="hero">
+      {heroVideoUrl ? <HomeHeroVideo src={heroVideoUrl} /> : null}
+      <HomeHeroContent>
+        <PageKicker tone="hero">Neo Golf Club</PageKicker>
+        <PageTitle size="hero">Mas Bogeys Que Birdies</PageTitle>
+        <PageLede>
           Comunidad chilena para jugar mas golf, encontrar canchas accesibles y aprender sin vueltas.
-        </p>
+        </PageLede>
         <div className="mt-5 flex flex-wrap gap-2">
           <Button asChild className="min-h-10 px-4 font-bold">
             <Link href="/bogeyficador">Bogeyficador</Link>
@@ -75,7 +71,7 @@ export default async function HomePage() {
             <Link href="/canchas">Ver canchas</Link>
           </Button>
         </div>
-      </div>
-    </section>
+      </HomeHeroContent>
+    </PageShell>
   )
 }

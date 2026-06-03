@@ -7,6 +7,8 @@ import { annotateCanchasWithDistance, paginateCanchas, type CanchaWithDistance }
 import { readCanchasUserGeoCookie } from '@/lib/canchasGeoCookie'
 import { getCanchasWhere } from '@/lib/canchasQuery'
 
+import { PageKicker, PageLede, PageShell, PageTitle } from '@/components/page'
+
 import { clampNumber } from './canchasSearchParams'
 import { CanchasFilteredResults } from './CanchasFilteredResults'
 import { CanchasGeoProvider } from './CanchasGeoContext'
@@ -70,13 +72,13 @@ export default async function CanchasPage({ searchParams }: PageProps) {
   const tableDocs = tableResult ? annotatePool(tableResult.docs as CanchaMapItem[], userGeo) : []
 
   return (
-    <section className="page-shell">
-      <div className="page-kicker">Canchas</div>
-      <h1 className="page-title">Donde jugar golf en Chile.</h1>
-      <p className="page-lede">
+    <PageShell>
+      <PageKicker>Canchas</PageKicker>
+      <PageTitle>Donde jugar golf en Chile.</PageTitle>
+      <PageLede>
         Guia editorial de canchas jugables, tipos de acceso, precios referenciales y datos utiles
         para planificar una salida.
-      </p>
+      </PageLede>
       <Suspense fallback={null}>
         <CanchasGeoProvider initialUserGeo={userGeo}>
           <CanchasViewControls
@@ -120,7 +122,7 @@ export default async function CanchasPage({ searchParams }: PageProps) {
           />
         </CanchasGeoProvider>
       </Suspense>
-    </section>
+    </PageShell>
   )
 }
 
