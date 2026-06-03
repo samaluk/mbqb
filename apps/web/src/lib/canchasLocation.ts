@@ -46,10 +46,13 @@ export function getCanchaLocationFromPoint(
 const metersPerKm = 1000
 
 export function getCanchasNearWhere(origin: GeoCoordinates, maxKm: number) {
+  const [longitude, latitude] = toCanchaLocationPoint(origin)
+
+  // Payload point `near` is [longitude, latitude, maxDistanceMeters, minDistanceMeters?]
+  // — not a sibling `maxDistance` key (rejected as location.maxDistance).
   return {
     location: {
-      near: toCanchaLocationPoint(origin),
-      maxDistance: maxKm * metersPerKm,
+      near: [longitude, latitude, maxKm * metersPerKm],
     },
   } as const
 }
