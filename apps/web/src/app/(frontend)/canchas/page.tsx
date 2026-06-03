@@ -1,8 +1,11 @@
 import config from '@payload-config'
 import { Suspense } from 'react'
-import { getPayload, type Where } from 'payload'
+import { getPayload } from 'payload'
 
 import type { CanchaMapItem } from '@/lib/canchas'
+import { annotateCanchasWithDistance, paginateCanchas, type CanchaWithDistance } from '@/lib/canchasGeo'
+import { readCanchasUserGeoCookie } from '@/lib/canchasGeoCookie'
+import { getCanchasWhere } from '@/lib/canchasQuery'
 
 import { clampNumber } from './canchasSearchParams'
 import { CanchasFilteredResults } from './CanchasFilteredResults'
@@ -16,24 +19,18 @@ type PageProps = {
 
 const defaultPageSize = 10
 const maxPageSize = 50
+const geoFetchLimit = 1000
 const sortableFields = new Set(['accessType', 'city', 'region', 'title'])
 
 export default async function CanchasPage({ searchParams }: PageProps) {
   const params = await searchParams
   const filters = parseFilters(params)
   const view = filters.view === 'table' ? 'table' : 'cards'
+  const userGeo = await readCanchasUserGeoCookie()
   const payload = await getPayload({ config })
-  const where = getCanchasWhere(filters)
-  const [canchaPool, filterOptions, tableCanchas] = await Promise.all([
-    payload.find({
-      collection: 'canchas',
-      depth: 0,
-      limit: 1000,
-      locale: 'es',
-      page: 1,
-      sort: 'title',
-      ...(where ? { where } : {}),
-    }),
+  const where = getCanchasWhere(filters, userGeo)
+
+  const [filterOptions, tableResult, poolResult] = await Promise.all([
     payload.find({
       collection: 'canchas',
       depth: 0,
@@ -48,12 +45,29 @@ export default async function CanchasPage({ searchParams }: PageProps) {
           limit: filters.pageSize,
           locale: 'es',
           page: filters.page,
-          sort: getPayloadSort(filters.sort),
+          sort: userGeo ? undefined : getPayloadSort(filters.sort),
+          ...(where ? { where } : {}),
+        })
+      : Promise.resolve(null),
+    view === 'cards'
+      ? payload.find({
+          collection: 'canchas',
+          depth: 0,
+          limit: geoFetchLimit,
+          locale: 'es',
+          page: 1,
+          sort: userGeo ? undefined : 'title',
           ...(where ? { where } : {}),
         })
       : Promise.resolve(null),
   ])
+
   const optionDocs = filterOptions.docs as CanchaMapItem[]
+  const poolDocs = poolResult ? annotatePool(poolResult.docs as CanchaMapItem[], userGeo) : []
+  const cardsPagination = poolResult
+    ? paginateCanchas(poolDocs, filters.page, filters.pageSize)
+    : null
+  const tableDocs = tableResult ? annotatePool(tableResult.docs as CanchaMapItem[], userGeo) : []
 
   return (
     <section className="page-shell">
@@ -64,7 +78,7 @@ export default async function CanchasPage({ searchParams }: PageProps) {
         para planificar una salida.
       </p>
       <Suspense fallback={null}>
-        <CanchasGeoProvider>
+        <CanchasGeoProvider initialUserGeo={userGeo}>
           <CanchasViewControls
             accessTypes={getUniqueValues(optionDocs, 'accessType')}
             cities={getUniqueValues(optionDocs, 'city')}
@@ -72,29 +86,48 @@ export default async function CanchasPage({ searchParams }: PageProps) {
             view={view}
           />
           <CanchasFilteredResults
-            canchaPool={canchaPool.docs as CanchaMapItem[]}
-            filters={{
-              page: filters.page,
-              pageSize: filters.pageSize,
-              sort: filters.sort,
-            }}
-            searchParams={params}
-            serverTable={
-              tableCanchas
+            mapCanchas={userGeo && view === 'cards' ? poolDocs : undefined}
+            pagination={
+              view === 'table' && tableResult
                 ? {
-                    canchas: tableCanchas.docs as CanchaMapItem[],
-                    page: tableCanchas.page ?? filters.page,
-                    totalDocs: tableCanchas.totalDocs,
-                    totalPages: tableCanchas.totalPages,
+                    canchas: tableDocs,
+                    page: tableResult.page ?? filters.page,
+                    pageSize: filters.pageSize,
+                    totalDocs: tableResult.totalDocs,
+                    totalPages: tableResult.totalPages,
                   }
-                : undefined
+                : cardsPagination
+                  ? {
+                      canchas: cardsPagination.docs,
+                      page: cardsPagination.page,
+                      pageSize: filters.pageSize,
+                      totalDocs: cardsPagination.totalDocs,
+                      totalPages: cardsPagination.totalPages,
+                    }
+                  : {
+                      canchas: [],
+                      page: 1,
+                      pageSize: filters.pageSize,
+                      totalDocs: 0,
+                      totalPages: 1,
+                    }
             }
+            searchParams={params}
+            showDistance={userGeo !== null}
+            sort={filters.sort}
+            userGeo={userGeo}
             view={view}
           />
         </CanchasGeoProvider>
       </Suspense>
     </section>
   )
+}
+
+function annotatePool(docs: CanchaMapItem[], userGeo: Awaited<ReturnType<typeof readCanchasUserGeoCookie>>) {
+  if (!userGeo) return docs
+
+  return annotateCanchasWithDistance(docs, userGeo) as CanchaWithDistance[]
 }
 
 function parseFilters(params: Record<string, string | string[] | undefined>) {
@@ -137,56 +170,6 @@ function parseSort(value: string): CanchasSort {
 
 function getPayloadSort(sort: CanchasSort) {
   return `${sort.direction === 'desc' ? '-' : ''}${sort.field}`
-}
-
-function getCanchasWhere(filters: ReturnType<typeof parseFilters>) {
-  const and: Where[] = []
-
-  if (filters.q) {
-    and.push({
-      or: [
-        {
-          title: {
-            contains: filters.q,
-          },
-        },
-        {
-          summary: {
-            contains: filters.q,
-          },
-        },
-      ],
-    })
-  }
-
-  if (filters.accessType) {
-    and.push({
-      accessType: {
-        equals: filters.accessType,
-      },
-    })
-  }
-
-  if (filters.region) {
-    and.push({
-      region: {
-        equals: filters.region,
-      },
-    })
-  }
-
-  if (filters.city) {
-    and.push({
-      city: {
-        equals: filters.city,
-      },
-    })
-  }
-
-  if (and.length === 0) return undefined
-  if (and.length === 1) return and[0]
-
-  return { and }
 }
 
 function getUniqueValues(docs: CanchaMapItem[], key: keyof CanchaMapItem): string[] {
