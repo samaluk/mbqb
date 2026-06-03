@@ -52,7 +52,7 @@ export function BogeyficadorForm() {
 
   return (
     <form onSubmit={onSubmit}>
-      <Card className="compact-card shadow-[0_12px_40px_rgb(16_20_17_/_8%)]">
+      <Card className="shadow-[0_12px_40px_rgb(16_20_17_/_8%)]" size="compact">
         <CardContent>
           <FieldGroup>
             <Field>

@@ -36,13 +36,13 @@ export default async function LaBibliaPage() {
       </p>
       <div className="compact-grid">
         {articles.docs.map((article) => (
-          <Card className="compact-card min-w-0" key={article.id}>
+          <Card className="min-w-0" key={article.id} size="compact">
             <CardHeader>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline">{categoryLabels[article.category]}</Badge>
                 <Badge variant="outline">{article.difficulty}</Badge>
               </div>
-              <CardTitle className="compact-card-title">{article.title}</CardTitle>
+              <CardTitle>{article.title}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
               <div

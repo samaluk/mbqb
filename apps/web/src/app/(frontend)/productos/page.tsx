@@ -33,7 +33,7 @@ export default async function ProductosPage() {
       </p>
       <div className="compact-grid">
         {products.docs.map((product) => (
-          <Card className="compact-card min-w-0" key={product.id}>
+          <Card className="min-w-0" key={product.id} size="compact">
             {product.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -49,7 +49,7 @@ export default async function ProductosPage() {
                   {product.stockStatus === 'available' ? 'Disponible' : 'Agotado'}
                 </Badge>
               </div>
-              <CardTitle className="compact-card-title">{product.title}</CardTitle>
+              <CardTitle>{product.title}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
               <div
