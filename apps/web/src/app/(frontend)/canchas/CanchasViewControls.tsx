@@ -6,6 +6,7 @@ import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -25,6 +26,7 @@ type CanchasViewControlsProps = {
 }
 
 const allValue = "__all__"
+const allOptionLabel = "Cualquiera"
 
 export function CanchasViewControls({
   accessTypes,
@@ -125,22 +127,28 @@ export function CanchasViewControls({
         ) : null}
       </div>
       <div className="grid grid-cols-[minmax(220px,1.4fr)_repeat(3,minmax(160px,1fr))] gap-2 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1">
-        <label className="relative block">
-          <span className="sr-only">Buscar cancha</span>
-          <SearchIcon
-            aria-hidden="true"
-            className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
-            data-icon="inline-start"
-          />
-          <Input
-            className="pl-8"
-            defaultValue={query}
-            key={query}
-            onChange={(event) => updateSearch(event.target.value)}
-            placeholder="Buscar cancha"
-          />
-        </label>
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-xs font-normal text-muted-foreground" htmlFor="canchas-search">
+            Buscar cancha
+          </Label>
+          <div className="relative">
+            <SearchIcon
+              aria-hidden="true"
+              className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+              data-icon="inline-start"
+            />
+            <Input
+              className="pl-8"
+              defaultValue={query}
+              id="canchas-search"
+              key={query}
+              onChange={(event) => updateSearch(event.target.value)}
+              placeholder="Nombre o dirección"
+            />
+          </div>
+        </div>
         <FilterSelect
+          id="canchas-filter-access-type"
           label="Tipo de acceso"
           onValueChange={(value) => updateFilter("accessType", value)}
           options={accessTypes.map((accessType) => ({
@@ -150,12 +158,14 @@ export function CanchasViewControls({
           value={searchParams.get("accessType") ?? allValue}
         />
         <FilterSelect
-          label="Region"
+          id="canchas-filter-region"
+          label="Región"
           onValueChange={(value) => updateFilter("region", value)}
           options={regions.map((region) => ({ label: region, value: region }))}
           value={searchParams.get("region") ?? allValue}
         />
         <FilterSelect
+          id="canchas-filter-city"
           label="Ciudad"
           onValueChange={(value) => updateFilter("city", value)}
           options={cities.map((city) => ({ label: city, value: city }))}
@@ -167,31 +177,38 @@ export function CanchasViewControls({
 }
 
 function FilterSelect({
+  id,
   label,
   onValueChange,
   options,
   value,
 }: {
+  id: string
   label: string
   onValueChange: (value: string) => void
   options: { label: string; value: string }[]
   value: string
 }) {
   return (
-    <Select onValueChange={onValueChange} value={value}>
-      <SelectTrigger aria-label={label} className="w-full">
-        <SelectValue placeholder={label} />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectItem value={allValue}>{label}</SelectItem>
-          {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+    <div className="flex flex-col gap-1.5">
+      <Label className="text-xs font-normal text-muted-foreground" htmlFor={id}>
+        {label}
+      </Label>
+      <Select onValueChange={onValueChange} value={value}>
+        <SelectTrigger className="w-full" id={id}>
+          <SelectValue placeholder={allOptionLabel} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem value={allValue}>{allOptionLabel}</SelectItem>
+            {options.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </div>
   )
 }
