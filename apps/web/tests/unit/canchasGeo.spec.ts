@@ -14,10 +14,9 @@ const santiagoOrigin = { latitude: -33.4489, longitude: -70.6693 }
 const sampleCancha = (overrides: Partial<CanchaMapItem> = {}): CanchaMapItem => ({
   accessType: 'pay-and-play',
   id: 1,
+  location: [-70.6, -33.4],
   slug: 'sample',
   title: 'Sample',
-  latitude: -33.4,
-  longitude: -70.6,
   ...overrides,
 })
 
@@ -47,10 +46,10 @@ describe('formatDistanceKm', () => {
 describe('geo filtering helpers', () => {
   it('annotates, filters, and sorts canchas by distance', () => {
     const canchas = [
-      sampleCancha({ id: 1, latitude: -33.4, longitude: -70.6 }),
-      sampleCancha({ id: 2, latitude: -33.5, longitude: -70.75 }),
-      sampleCancha({ id: 3, latitude: -34.2, longitude: -71.1 }),
-      sampleCancha({ id: 4, title: 'Sin coordenadas', latitude: null, longitude: null }),
+      sampleCancha({ id: 1, location: [-70.6, -33.4] }),
+      sampleCancha({ id: 2, location: [-70.75, -33.5] }),
+      sampleCancha({ id: 3, location: [-71.1, -34.2] }),
+      sampleCancha({ id: 4, title: 'Sin coordenadas', location: null }),
     ]
 
     const annotated = annotateCanchasWithDistance(canchas, santiagoOrigin)
