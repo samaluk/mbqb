@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react'
 
+import { sanitizeHtml } from '@/lib/sanitizeHtml'
 import { cn } from '@/lib/utils'
 
 type RichContentProps = Omit<ComponentProps<'div'>, 'children'> & {
@@ -24,7 +25,7 @@ function RichContent({ className, html, ...props }: RichContentProps) {
         'max-[760px]:[&_ul]:text-[15px] max-[760px]:[&_ul]:leading-[1.42]',
         className,
       )}
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
       {...props}
     />
   )

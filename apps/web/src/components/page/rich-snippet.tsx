@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react'
 
+import { sanitizeHtml } from '@/lib/sanitizeHtml'
 import { cn } from '@/lib/utils'
 
 type RichSnippetProps = Omit<ComponentProps<'div'>, 'children'> & {
@@ -16,7 +17,7 @@ function RichSnippet({ className, html, ...props }: RichSnippetProps) {
         '[&_span]:m-0 [&_span]:!font-[inherit] [&_span]:!text-[inherit]',
         className,
       )}
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
       {...props}
     />
   )
