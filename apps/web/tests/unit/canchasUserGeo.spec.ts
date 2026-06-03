@@ -1,12 +1,8 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { createStoredUserGeo, parseStoredUserGeo } from '../../src/lib/canchasLocationStorage'
+import { createStoredUserGeo, parseStoredUserGeo } from '../../src/lib/canchasUserGeo'
 
-describe('canchasLocationStorage', () => {
-  afterEach(() => {
-    window.sessionStorage.clear()
-  })
-
+describe('canchasUserGeo', () => {
   it('creates valid stored geo objects', () => {
     expect(createStoredUserGeo(-33.45, -70.66, 40)).toEqual({
       latitude: -33.45,
