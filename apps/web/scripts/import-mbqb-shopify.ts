@@ -1,7 +1,8 @@
-import 'dotenv/config'
-
-import config from '@payload-config'
 import { getPayload, type CollectionSlug, type Payload } from 'payload'
+
+import { loadScriptEnv } from './loadScriptEnv.js'
+
+loadScriptEnv()
 
 type ShopifyPage = {
   body_html: string
@@ -61,7 +62,13 @@ const privateCanchaHandles = new Set([
   'club-de-golf-valle-escondido',
 ])
 
-const articleHandles = new Set(['que-pelotas-necesito-segun-mi-nivel-y-presupuesto'])
+const defaultArticleHandles = new Set(['que-pelotas-necesito-segun-mi-nivel-y-presupuesto'])
+
+const siteSettingsDefaults = {
+  brandName: 'Mas Bogeys Que Birdies',
+  instagramUrl: 'https://www.instagram.com/masbogeysquebirdies/',
+  whatsappUrl: 'https://wa.me/56941175839',
+}
 
 const fetchJson = async <T>(url: string): Promise<T> => {
   const response = await fetch(url)
@@ -93,6 +100,91 @@ const extractSitemapUrls = async () => {
     lastmod: match[2],
     loc: match[1],
   }))
+}
+
+const extractArticleHandlesFromHub = (bodyHtml: string) => {
+  const handles = new Set<string>()
+  const pattern = new RegExp(`${siteUrl.replace(/\./g, '\\.')}/pages/([a-z0-9-]+)`, 'gi')
+
+  for (const match of bodyHtml.matchAll(pattern)) {
+    const handle = match[1]
+    if (handle && handle !== 'la-biblia') {
+      handles.add(handle)
+    }
+  }
+
+  return handles
+}
+
+const discoverArticleHandles = async () => {
+  const handles = new Set(defaultArticleHandles)
+
+  try {
+    const { page } = await fetchJson<{ page: ShopifyPage }>(`${siteUrl}/pages/la-biblia.json`)
+    for (const handle of extractArticleHandlesFromHub(page.body_html)) {
+      handles.add(handle)
+    }
+  } catch (error) {
+    console.warn(
+      'Could not fetch la-biblia hub for article discovery:',
+      error instanceof Error ? error.message : error,
+    )
+  }
+
+  return handles
+}
+
+const buildHandleTargets = (
+  articleHandles: Set<string>,
+  sitemapByHandle?: Map<string, { lastmod?: string; loc: string }>,
+) => {
+  const targets = new Map<string, { handle: string; lastmod?: string; loc: string }>()
+
+  const addTarget = (handle: string) => {
+    const fromSitemap = sitemapByHandle?.get(handle)
+    targets.set(handle, {
+      handle,
+      lastmod: fromSitemap?.lastmod,
+      loc: fromSitemap?.loc ?? `${siteUrl}/pages/${handle}`,
+    })
+  }
+
+  for (const handle of canchaHandles) addTarget(handle)
+  for (const handle of articleHandles) addTarget(handle)
+
+  return [...targets.values()]
+}
+
+const resolvePageTargets = async () => {
+  const articleHandles = await discoverArticleHandles()
+
+  try {
+    const sitemapPages = await extractSitemapUrls()
+    const sitemapByHandle = new Map<string, { lastmod?: string; loc: string }>()
+
+    for (const sitemapPage of sitemapPages) {
+      const handle = sitemapPage.loc.split('/').pop()
+      if (!handle) continue
+      sitemapByHandle.set(handle, { lastmod: sitemapPage.lastmod, loc: sitemapPage.loc })
+    }
+
+    return {
+      articleHandles,
+      source: 'sitemap' as const,
+      targets: buildHandleTargets(articleHandles, sitemapByHandle),
+    }
+  } catch (error) {
+    console.warn(
+      'Sitemap unavailable, using direct handle list:',
+      error instanceof Error ? error.message : error,
+    )
+  }
+
+  return {
+    articleHandles,
+    source: 'handles' as const,
+    targets: buildHandleTargets(articleHandles),
+  }
 }
 
 const stripTags = (html: string) =>
@@ -192,76 +284,175 @@ const importProducts = async (payload: Payload) => {
   return count
 }
 
-const importPages = async (payload: Payload) => {
-  const sitemapPages = await extractSitemapUrls()
-  const counters = {
-    articles: 0,
-    canchas: 0,
+const canchaManualFields = ['latitude', 'longitude', 'holes', 'publicBookingUrl'] as const
+
+const preserveCanchaManualFields = (
+  data: Record<string, unknown>,
+  existing?: Record<string, unknown> | null,
+) => {
+  if (!existing) return data
+
+  for (const field of canchaManualFields) {
+    const value = existing[field]
+    if (value != null && value !== '') {
+      data[field] = value
+    }
   }
 
-  for (const sitemapPage of sitemapPages) {
-    const handle = sitemapPage.loc.split('/').pop()
+  return data
+}
 
-    if (!handle) continue
+const importCancha = async (
+  payload: Payload,
+  handle: string,
+  page: ShopifyPage,
+  sourceUrl: string,
+  lastmod?: string,
+) => {
+  const city = inferCity(page.body_html)
+  const existing = await payload.find({
+    collection: 'canchas',
+    limit: 1,
+    locale: 'es',
+    overrideAccess: true,
+    pagination: false,
+    where: {
+      slug: {
+        equals: handle,
+      },
+    },
+  })
 
-    const { page } = await fetchJson<{ page: ShopifyPage }>(`${siteUrl}/pages/${handle}.json`)
-
-    if (canchaHandles.has(handle)) {
-      const city = inferCity(page.body_html)
-
-      await upsert(payload, 'canchas', handle, {
+  await upsert(
+    payload,
+    'canchas',
+    handle,
+    preserveCanchaManualFields(
+      {
         accessType: privateCanchaHandles.has(handle) ? 'private' : 'pay-and-play',
         bodyHtml: page.body_html,
         city,
         region: inferRegion(city),
         slug: handle,
-        sourceUpdatedAt: toDate(page.updated_at || sitemapPage.lastmod),
-        sourceUrl: sitemapPage.loc,
+        sourceUpdatedAt: toDate(page.updated_at || lastmod),
+        sourceUrl,
         summary: firstSentence(page.body_html),
         title: page.title,
-      })
-      counters.canchas += 1
-      continue
-    }
+      },
+      existing.docs[0] as Record<string, unknown> | undefined,
+    ),
+  )
+}
 
-    if (articleHandles.has(handle)) {
-      await upsert(payload, 'la-biblia-articles', handle, {
-        bodyHtml: page.body_html,
-        category: 'equipo',
-        difficulty: 'principiante',
-        reviewedAt: toDate(page.updated_at || sitemapPage.lastmod),
-        slug: handle,
-        sourceUpdatedAt: toDate(page.updated_at || sitemapPage.lastmod),
-        sourceUrl: sitemapPage.loc,
-        title: page.title,
-      })
-      counters.articles += 1
-      continue
-    }
+const importArticle = async (
+  payload: Payload,
+  handle: string,
+  page: ShopifyPage,
+  sourceUrl: string,
+  lastmod?: string,
+) => {
+  await upsert(payload, 'la-biblia-articles', handle, {
+    bodyHtml: page.body_html,
+    category: 'equipo',
+    difficulty: 'principiante',
+    reviewedAt: toDate(page.updated_at || lastmod),
+    slug: handle,
+    sourceUpdatedAt: toDate(page.updated_at || lastmod),
+    sourceUrl,
+    title: page.title,
+  })
+}
 
+const importPages = async (payload: Payload) => {
+  const { articleHandles, source, targets } = await resolvePageTargets()
+  const counters = {
+    articles: 0,
+    canchas: 0,
+    errors: [] as string[],
+    pageSource: source,
+  }
+
+  for (const target of targets) {
+    const { handle, lastmod, loc } = target
+    const isCancha = canchaHandles.has(handle)
+    const isArticle = articleHandles.has(handle)
+
+    if (!isCancha && !isArticle) continue
+
+    try {
+      const { page } = await fetchJson<{ page: ShopifyPage }>(`${siteUrl}/pages/${handle}.json`)
+
+      if (isCancha) {
+        await importCancha(payload, handle, page, loc, lastmod)
+        counters.canchas += 1
+      }
+
+      if (isArticle) {
+        await importArticle(payload, handle, page, loc, lastmod)
+        counters.articles += 1
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      counters.errors.push(`${handle}: ${message}`)
+      console.warn(`Skipped page ${handle}: ${message}`)
+    }
   }
 
   return counters
 }
 
+const importSiteSettings = async (payload: Payload) => {
+  const existing = await payload.findGlobal({
+    slug: 'site-settings',
+    overrideAccess: true,
+  })
+
+  await payload.updateGlobal({
+    slug: 'site-settings',
+    data: {
+      brandName: existing.brandName?.trim() || siteSettingsDefaults.brandName,
+      instagramUrl: existing.instagramUrl?.trim() || siteSettingsDefaults.instagramUrl,
+      whatsappUrl: existing.whatsappUrl?.trim() || siteSettingsDefaults.whatsappUrl,
+    },
+    overrideAccess: true,
+  })
+
+  return existing.brandName?.trim() ? 'preserved' : 'seeded'
+}
+
 const main = async () => {
+  const { default: config } = await import('@payload-config')
   const payload = await getPayload({ config })
 
-  const [productCount, pageCounts] = await Promise.all([importProducts(payload), importPages(payload)])
+  const [productCount, pageCounts, siteSettings] = await Promise.all([
+    importProducts(payload),
+    importPages(payload),
+    importSiteSettings(payload),
+  ])
 
   console.log(
     JSON.stringify(
       {
         imported: {
           products: productCount,
-          ...pageCounts,
+          canchas: pageCounts.canchas,
+          articles: pageCounts.articles,
+          siteSettings,
+          pageSource: pageCounts.pageSource,
         },
+        errors: pageCounts.errors.length > 0 ? pageCounts.errors : undefined,
       },
       null,
       2,
     ),
   )
+
+  if (pageCounts.errors.length > 0) {
+    process.exit(1)
+  }
 }
 
-await main()
-process.exit(0)
+main().catch((error) => {
+  console.error(error instanceof Error ? error.message : error)
+  process.exit(1)
+})
