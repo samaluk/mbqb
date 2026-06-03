@@ -1,5 +1,8 @@
 import Link from 'next/link'
 import React from 'react'
+
+import { Toaster } from '@/components/ui/sonner'
+
 import './styles.css'
 
 export const metadata = {
@@ -63,6 +66,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           </details>
         </header>
         <main>{children}</main>
+        <Toaster />
       </body>
     </html>
   )
