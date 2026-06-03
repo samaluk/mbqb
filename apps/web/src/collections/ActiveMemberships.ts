@@ -66,6 +66,9 @@ export const ActiveMemberships: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      access: {
+        read: () => false,
+      },
       admin: {
         hidden: true,
         readOnly: true,
