@@ -1,5 +1,7 @@
 import { getPayload, type CollectionSlug, type Payload } from 'payload'
 
+import type { Cancha } from '@/payload-types'
+
 import { loadScriptEnv } from './loadScriptEnv.js'
 
 loadScriptEnv()
@@ -286,9 +288,11 @@ const importProducts = async (payload: Payload) => {
 
 const canchaManualFields = ['location', 'holes', 'publicBookingUrl'] as const
 
+type CanchaManualFields = Pick<Cancha, (typeof canchaManualFields)[number]>
+
 const preserveCanchaManualFields = (
   data: Record<string, unknown>,
-  existing?: Record<string, unknown> | null,
+  existing?: CanchaManualFields | null,
 ) => {
   if (!existing) return data
 
@@ -339,7 +343,7 @@ const importCancha = async (
         summary: firstSentence(page.body_html),
         title: page.title,
       },
-      existing.docs[0] as Record<string, unknown> | undefined,
+      existing.docs[0],
     ),
   )
 }
