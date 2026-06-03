@@ -4,6 +4,8 @@ import * as migration_20260602_120000_sync_missing_payload_schema from './202606
 import * as migration_20260603_131600_canchas_coordinates from './20260603_131600_canchas_coordinates'
 import * as migration_20260603_140000_canchas_booking_fields from './20260603_140000_canchas_booking_fields'
 import * as migration_20260603_150000_canchas_location_point from './20260603_150000_canchas_location_point'
+import * as migration_20260604_010000_cms_drafts_schema from './20260604_010000_cms_drafts_schema'
+import * as migration_20260604_020000_publish_existing_cms_content from './20260604_020000_publish_existing_cms_content'
 
 export const migrations = [
   {
@@ -35,5 +37,15 @@ export const migrations = [
     down: migration_20260603_150000_canchas_location_point.down,
     name: '20260603_150000_canchas_location_point',
     up: migration_20260603_150000_canchas_location_point.up,
+  },
+  {
+    down: migration_20260604_010000_cms_drafts_schema.down,
+    name: '20260604_010000_cms_drafts_schema',
+    up: migration_20260604_010000_cms_drafts_schema.up,
+  },
+  {
+    down: migration_20260604_020000_publish_existing_cms_content.down,
+    name: '20260604_020000_publish_existing_cms_content',
+    up: migration_20260604_020000_publish_existing_cms_content.up,
   },
 ]
