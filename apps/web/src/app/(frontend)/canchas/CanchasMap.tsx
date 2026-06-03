@@ -15,9 +15,21 @@ import {
 } from '@/lib/canchas'
 import { formatDistanceKm, type GeoPoint } from '@/lib/canchasGeo'
 
+const clubMarkerBase =
+  'grid place-items-center rounded-full border-2 border-white-soft text-[13px] font-black text-white-soft shadow-[0_8px_24px_rgb(16_20_17/22%)] [&_span]:block [&_span]:leading-none'
+
+const clubMarkerClassByAccess: Record<CanchaMapItem['accessType'], string> = {
+  private: `${clubMarkerBase} bg-red`,
+  'pay-and-play': `${clubMarkerBase} bg-green`,
+  restricted: `${clubMarkerBase} bg-[#286784]`,
+  unknown: `${clubMarkerBase} bg-muted`,
+}
+
+const userLocationMarkerClass = `${clubMarkerBase} bg-[#1d4ed8] text-lg`
+
 const createClubIcon = (index: number, accessType: CanchaMapItem['accessType']) =>
   L.divIcon({
-    className: `club-map-marker ${accessType}`,
+    className: clubMarkerClassByAccess[accessType],
     html: `<span>${index + 1}</span>`,
     iconAnchor: [16, 16],
     iconSize: [32, 32],
@@ -25,7 +37,7 @@ const createClubIcon = (index: number, accessType: CanchaMapItem['accessType']) 
   })
 
 const userLocationIcon = L.divIcon({
-  className: 'club-map-marker user-location',
+  className: userLocationMarkerClass,
   html: '<span aria-hidden="true">•</span>',
   iconAnchor: [10, 10],
   iconSize: [20, 20],
@@ -85,7 +97,7 @@ export default function CanchasMap({
   return (
     <MapContainer
       center={[-33.45, -70.66]}
-      className="sticky top-6 z-0 min-h-[680px] overflow-hidden rounded-lg border border-line bg-white-soft max-[760px]:relative max-[760px]:top-auto max-[760px]:min-h-[220px]"
+      className="sticky top-6 z-0 min-h-[680px] overflow-hidden rounded-lg border border-line bg-white-soft max-[760px]:relative max-[760px]:top-auto max-[760px]:min-h-[220px] [&_.leaflet-container]:font-[inherit] [&_.leaflet-control-attribution]:text-[11px]"
       scrollWheelZoom={false}
       zoom={8}
       zoomControl
