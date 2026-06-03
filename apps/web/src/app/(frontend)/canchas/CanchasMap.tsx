@@ -41,7 +41,10 @@ function FitClubBounds({
   const map = useMap()
 
   useEffect(() => {
-    const points = locatedCanchas.map(({ location }) => [location.latitude, location.longitude] as const)
+    const points: [number, number][] = locatedCanchas.map(({ location }) => [
+      location.latitude,
+      location.longitude,
+    ])
 
     if (userLocation) {
       points.push([userLocation.latitude, userLocation.longitude])
