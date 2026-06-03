@@ -284,7 +284,7 @@ const importProducts = async (payload: Payload) => {
   return count
 }
 
-const canchaManualFields = ['latitude', 'longitude', 'holes', 'publicBookingUrl'] as const
+const canchaManualFields = ['location', 'holes', 'publicBookingUrl'] as const
 
 const preserveCanchaManualFields = (
   data: Record<string, unknown>,

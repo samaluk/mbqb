@@ -1,4 +1,5 @@
 import { getCanchaLocation, type CanchaMapItem } from '@/lib/canchas'
+import type { GeoCoordinates } from '@/lib/canchasLocation'
 
 const earthRadiusKm = 6371
 
@@ -6,10 +7,7 @@ export const defaultMaxDistanceKm = 50
 export const minMaxDistanceKm = 5
 export const maxMaxDistanceKm = 250
 
-export type GeoPoint = {
-  latitude: number
-  longitude: number
-}
+export type GeoPoint = GeoCoordinates
 
 export type CanchaWithDistance = CanchaMapItem & {
   distanceKm: number

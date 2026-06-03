@@ -1,0 +1,55 @@
+import type { Cancha } from '@/payload-types'
+
+/** Payload point fields are `[longitude, latitude]`. */
+export type CanchaLocationPoint = [number, number]
+
+export type GeoCoordinates = {
+  latitude: number
+  longitude: number
+}
+
+export function isCanchaLocationPoint(value: unknown): value is CanchaLocationPoint {
+  if (!Array.isArray(value) || value.length !== 2) return false
+
+  const [longitude, latitude] = value
+
+  return (
+    typeof longitude === 'number' &&
+    Number.isFinite(longitude) &&
+    longitude >= -180 &&
+    longitude <= 180 &&
+    typeof latitude === 'number' &&
+    Number.isFinite(latitude) &&
+    latitude >= -90 &&
+    latitude <= 90
+  )
+}
+
+export function toGeoCoordinates(point: CanchaLocationPoint): GeoCoordinates {
+  const [longitude, latitude] = point
+
+  return { latitude, longitude }
+}
+
+export function toCanchaLocationPoint({ latitude, longitude }: GeoCoordinates): CanchaLocationPoint {
+  return [longitude, latitude]
+}
+
+export function getCanchaLocationFromPoint(
+  location: Cancha['location'],
+): GeoCoordinates | undefined {
+  if (!isCanchaLocationPoint(location)) return undefined
+
+  return toGeoCoordinates(location)
+}
+
+const metersPerKm = 1000
+
+export function getCanchasNearWhere(origin: GeoCoordinates, maxKm: number) {
+  return {
+    location: {
+      near: toCanchaLocationPoint(origin),
+      maxDistance: maxKm * metersPerKm,
+    },
+  } as const
+}

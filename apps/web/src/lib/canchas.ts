@@ -5,23 +5,16 @@ export const canchaAccessLabels = {
   unknown: 'Por confirmar',
 }
 
-export type CanchaMapItem = {
-  accessType: keyof typeof canchaAccessLabels
-  city?: null | string
-  id: number | string
-  latitude?: null | number
-  longitude?: null | number
-  region?: null | string
-  slug: string
-  summary?: null | string
-  title: string
-}
+import type { Cancha } from '@/payload-types'
 
-export const getCanchaLocation = (cancha: CanchaMapItem) => {
-  if (typeof cancha.latitude === 'number' && typeof cancha.longitude === 'number') {
-    return { latitude: cancha.latitude, longitude: cancha.longitude }
-  }
-}
+import { getCanchaLocationFromPoint } from '@/lib/canchasLocation'
+
+export type CanchaMapItem = Pick<
+  Cancha,
+  'accessType' | 'city' | 'id' | 'location' | 'region' | 'slug' | 'summary' | 'title'
+>
+
+export const getCanchaLocation = (cancha: CanchaMapItem) => getCanchaLocationFromPoint(cancha.location)
 
 export const getGoogleMapsUrl = (cancha: CanchaMapItem) => {
   const location = getCanchaLocation(cancha)
