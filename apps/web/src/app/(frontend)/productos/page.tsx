@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getCmsQueryOptions } from '@/lib/cmsQuery'
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat('es-CL', {
@@ -23,12 +24,14 @@ const formatPrice = (value: number) =>
 
 export default async function ProductosPage() {
   const payload = await getPayload({ config })
+  const cmsQuery = await getCmsQueryOptions()
   const products = await payload.find({
     collection: 'products',
     depth: 0,
     limit: 20,
     locale: 'es',
     sort: 'title',
+    ...cmsQuery,
   })
 
   return (

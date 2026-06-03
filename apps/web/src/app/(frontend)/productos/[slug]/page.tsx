@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
 import { MetaPills, PageDetail, PageKicker, PageTitle, RichContent } from '@/components/page'
+import { getCmsQueryOptions } from '@/lib/cmsQuery'
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat('es-CL', {
@@ -21,11 +22,13 @@ type PageProps = {
 export default async function ProductDetailPage({ params }: PageProps) {
   const { slug } = await params
   const payload = await getPayload({ config })
+  const cmsQuery = await getCmsQueryOptions()
   const products = await payload.find({
     collection: 'products',
     depth: 0,
     limit: 1,
     locale: 'es',
+    ...cmsQuery,
     where: {
       slug: {
         equals: slug,

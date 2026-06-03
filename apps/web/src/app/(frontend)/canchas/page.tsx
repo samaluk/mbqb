@@ -6,6 +6,7 @@ import type { CanchaMapItem } from '@/lib/canchas'
 import { annotateCanchasWithDistance, paginateCanchas, type CanchaWithDistance } from '@/lib/canchasGeo'
 import { readCanchasUserGeoCookie } from '@/lib/canchasGeoCookie'
 import { getCanchasWhere } from '@/lib/canchasQuery'
+import { getCmsQueryOptions } from '@/lib/cmsQuery'
 
 import { PageKicker, PageLede, PageShell, PageTitle } from '@/components/page'
 
@@ -30,6 +31,7 @@ export default async function CanchasPage({ searchParams }: PageProps) {
   const view = filters.view === 'table' ? 'table' : 'cards'
   const userGeo = await readCanchasUserGeoCookie()
   const payload = await getPayload({ config })
+  const cmsQuery = await getCmsQueryOptions()
   const where = getCanchasWhere(filters, userGeo)
 
   const [filterOptions, tableResult, poolResult] = await Promise.all([
@@ -39,6 +41,7 @@ export default async function CanchasPage({ searchParams }: PageProps) {
       limit: 1000,
       locale: 'es',
       sort: 'title',
+      ...cmsQuery,
     }),
     view === 'table'
       ? payload.find({
@@ -48,6 +51,7 @@ export default async function CanchasPage({ searchParams }: PageProps) {
           locale: 'es',
           page: filters.page,
           sort: userGeo ? undefined : getPayloadSort(filters.sort),
+          ...cmsQuery,
           ...(where ? { where } : {}),
         })
       : Promise.resolve(null),
@@ -58,6 +62,7 @@ export default async function CanchasPage({ searchParams }: PageProps) {
           limit: geoFetchLimit,
           locale: 'es',
           page: 1,
+          ...cmsQuery,
           sort: userGeo ? undefined : 'title',
           ...(where ? { where } : {}),
         })

@@ -32,10 +32,16 @@ docker compose up postgres
 
 ### Seed local data from production
 
-After pulling production env vars to the repo root (`.vercel/.env.production.local`):
+Local Postgres should match production (Postgres 17 + PostGIS). Use the Compose service (port **5433** so it does not clash with a Homebrew Postgres on 5432):
 
 ```sh
 cd apps/web
+docker compose up -d postgres
+```
+
+After pulling production env vars to the repo root (`.vercel/.env.production.local`):
+
+```sh
 vercel env pull ../../.vercel/.env.production.local --environment=production
 pnpm seed:dev-from-prod
 ```
@@ -70,3 +76,22 @@ For local database targets, use `pnpm import:mbqb` with `apps/web/.env` configur
 The app uses Payload with Postgres, Vercel Blob-backed media when `BLOB_READ_WRITE_TOKEN` is present, and built-in admin auth with `admin`, `editor`, and `validation-manager` staff roles.
 
 Current CMS foundation includes `users`, `media`, `active-memberships`, and `site-settings`.
+
+## Live preview (server-rendered)
+
+Editors can preview draft CMS content in the admin panel (Live Preview) and via the Preview button. The frontend uses Next.js draft mode plus `router.refresh()` on autosave.
+
+Set in `apps/web/.env`:
+
+- `NEXT_PUBLIC_SERVER_URL` — public app URL (e.g. `http://localhost:3000`)
+- `PREVIEW_SECRET` — random string; must match production Vercel env
+
+After enabling drafts on collections, generate and run the schema migration (interactive prompts are normal if Payload asks about column changes):
+
+```sh
+cd apps/web
+pnpm payload migrate:create drafts_live_preview
+pnpm migrate
+```
+
+Migration `20260604_020000_publish_existing_cms_content` (runs after `20260604_010000_cms_drafts_schema`) marks existing canchas, La Biblia articles, products, and the home page global as published so the public site keeps serving current content.

@@ -220,6 +220,7 @@ export interface Cancha {
   sourceUpdatedAt?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -244,6 +245,7 @@ export interface LaBibliaArticle {
   sourceUpdatedAt?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -261,6 +263,7 @@ export interface Product {
   sourceUpdatedAt?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -425,6 +428,7 @@ export interface CanchasSelect<T extends boolean = true> {
   sourceUpdatedAt?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -441,6 +445,7 @@ export interface LaBibliaArticlesSelect<T extends boolean = true> {
   sourceUpdatedAt?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -457,6 +462,7 @@ export interface ProductsSelect<T extends boolean = true> {
   sourceUpdatedAt?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -518,6 +524,7 @@ export interface HomePage {
   id: number;
   heroVideo: number | Media;
   heroVideoAlt: string;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -540,6 +547,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
 export interface HomePageSelect<T extends boolean = true> {
   heroVideo?: T;
   heroVideoAlt?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

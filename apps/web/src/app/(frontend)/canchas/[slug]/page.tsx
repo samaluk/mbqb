@@ -12,6 +12,7 @@ import {
   RichContent,
 } from '@/components/page'
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
+import { getCmsQueryOptions } from '@/lib/cmsQuery'
 
 type PageProps = {
   params: Promise<{
@@ -22,11 +23,13 @@ type PageProps = {
 export default async function CanchaDetailPage({ params }: PageProps) {
   const { slug } = await params
   const payload = await getPayload({ config })
+  const cmsQuery = await getCmsQueryOptions()
   const canchas = await payload.find({
     collection: 'canchas',
     depth: 0,
     limit: 1,
     locale: 'es',
+    ...cmsQuery,
     where: {
       slug: {
         equals: slug,

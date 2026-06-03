@@ -1,6 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
+import { publishedOrStaff } from '@/access/publishedOrStaff'
 import { isEditorOrAdmin } from '@/access/roles'
+import { buildPreviewUrl, draftVersions } from '@/lib/preview'
 
 export const LaBibliaArticles: CollectionConfig = {
   slug: 'la-biblia-articles',
@@ -10,14 +12,45 @@ export const LaBibliaArticles: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['title', 'category', 'difficulty', 'reviewedAt'],
+    livePreview: {
+      url: ({ data, locale }) => {
+        const slug = typeof data?.slug === 'string' ? data.slug : ''
+
+        if (!slug) {
+          return null
+        }
+
+        return buildPreviewUrl({
+          collection: 'la-biblia-articles',
+          locale,
+          path: `/la-biblia/${slug}`,
+          slug,
+        })
+      },
+    },
+    preview: (data, { locale }) => {
+      const slug = typeof data?.slug === 'string' ? data.slug : ''
+
+      if (!slug) {
+        return null
+      }
+
+      return buildPreviewUrl({
+        collection: 'la-biblia-articles',
+        locale,
+        path: `/la-biblia/${slug}`,
+        slug,
+      })
+    },
     useAsTitle: 'title',
   },
   access: {
     create: isEditorOrAdmin,
     delete: isEditorOrAdmin,
-    read: () => true,
+    read: publishedOrStaff,
     update: isEditorOrAdmin,
   },
+  versions: draftVersions,
   fields: [
     {
       name: 'title',

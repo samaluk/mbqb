@@ -20,6 +20,16 @@ const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
+    livePreview: {
+      breakpoints: [
+        {
+          height: 667,
+          label: 'Mobile',
+          name: 'mobile',
+          width: 375,
+        },
+      ],
+    },
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
@@ -43,6 +53,7 @@ export default buildConfig({
   },
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
+  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },

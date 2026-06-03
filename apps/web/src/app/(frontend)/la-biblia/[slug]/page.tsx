@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
 import { MetaPills, PageDetail, PageKicker, PageTitle, RichContent } from '@/components/page'
+import { getCmsQueryOptions } from '@/lib/cmsQuery'
 
 const categoryLabels = {
   canchas: 'Canchas',
@@ -24,11 +25,13 @@ type PageProps = {
 export default async function ArticleDetailPage({ params }: PageProps) {
   const { slug } = await params
   const payload = await getPayload({ config })
+  const cmsQuery = await getCmsQueryOptions()
   const articles = await payload.find({
     collection: 'la-biblia-articles',
     depth: 0,
     limit: 1,
     locale: 'es',
+    ...cmsQuery,
     where: {
       slug: {
         equals: slug,

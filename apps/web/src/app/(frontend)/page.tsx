@@ -11,6 +11,7 @@ import {
   PageTitle,
 } from '@/components/page'
 import { Button } from '@/components/ui/button'
+import { getCmsQueryOptions } from '@/lib/cmsQuery'
 import type { HomePage as HomePageGlobal, Media } from '@/payload-types'
 
 export const revalidate = 900
@@ -26,10 +27,12 @@ function getMediaUrl(media: number | Media | null | undefined) {
 async function getHomePageContent(): Promise<HomePageGlobal | null> {
   try {
     const payload = await getPayload({ config })
+    const cmsQuery = await getCmsQueryOptions()
 
     return await payload.findGlobal({
       slug: 'home-page',
       depth: 1,
+      ...cmsQuery,
     })
   } catch (error) {
     if (!isMissingRelationError(error)) {

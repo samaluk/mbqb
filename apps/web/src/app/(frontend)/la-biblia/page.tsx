@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getCmsQueryOptions } from '@/lib/cmsQuery'
 
 const categoryLabels = {
   canchas: 'Canchas',
@@ -26,12 +27,14 @@ const categoryLabels = {
 
 export default async function LaBibliaPage() {
   const payload = await getPayload({ config })
+  const cmsQuery = await getCmsQueryOptions()
   const articles = await payload.find({
     collection: 'la-biblia-articles',
     depth: 0,
     limit: 20,
     locale: 'es',
     sort: 'title',
+    ...cmsQuery,
   })
 
   return (
