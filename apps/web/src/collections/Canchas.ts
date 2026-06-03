@@ -78,6 +78,19 @@ export const Canchas: CollectionConfig = {
       label: 'City / comuna',
     },
     {
+      name: 'holes',
+      type: 'number',
+      admin: {
+        step: 1,
+      },
+      label: 'Holes',
+    },
+    {
+      name: 'publicBookingUrl',
+      type: 'text',
+      label: 'Public booking URL',
+    },
+    {
       name: 'latitude',
       type: 'number',
       admin: {
