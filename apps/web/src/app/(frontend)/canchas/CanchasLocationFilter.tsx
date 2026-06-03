@@ -6,17 +6,17 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
-import { createStoredUserGeo } from "@/lib/canchasLocationStorage"
 import {
   defaultMaxDistanceKm,
   maxMaxDistanceKm,
   minMaxDistanceKm,
 } from "@/lib/canchasGeo"
+import { createStoredUserGeo } from "@/lib/canchasUserGeo"
 
 import { useCanchasGeo } from "./CanchasGeoContext"
 
 export function CanchasLocationFilter() {
-  const { setUserGeo, userGeo } = useCanchasGeo()
+  const { isGeoPending, setUserGeo, userGeo } = useCanchasGeo()
   const [isLocating, setIsLocating] = React.useState(false)
   const [locationError, setLocationError] = React.useState<string | null>(null)
   const sliderTimeout = React.useRef<number>(null)
@@ -93,17 +93,26 @@ export function CanchasLocationFilter() {
             Cerca de ti
           </Label>
           <p className="max-w-prose text-sm text-muted-foreground">
-            Tu ubicación se guarda solo en este navegador y no se incluye al compartir el enlace de
-            la página.
+            Tu ubicación se guarda en una cookie de sesión segura en este navegador. No se incluye al
+            compartir el enlace de la página.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button disabled={isLocating} onClick={requestLocation} type="button" variant="outline">
+          <Button
+            disabled={isLocating || isGeoPending}
+            onClick={requestLocation}
+            type="button"
+            variant="outline"
+          >
             <LocateFixedIcon data-icon="inline-start" />
-            {isLocating ? "Obteniendo ubicación..." : hasLocation ? "Actualizar ubicación" : "Usar mi ubicación"}
+            {isLocating
+              ? "Obteniendo ubicación..."
+              : hasLocation
+                ? "Actualizar ubicación"
+                : "Usar mi ubicación"}
           </Button>
           {hasLocation ? (
-            <Button onClick={clearLocation} type="button" variant="ghost">
+            <Button disabled={isGeoPending} onClick={clearLocation} type="button" variant="ghost">
               <LocateOffIcon data-icon="inline-start" />
               Quitar ubicación
             </Button>
@@ -123,6 +132,7 @@ export function CanchasLocationFilter() {
             </Label>
             <Slider
               aria-label="Distancia máxima en kilómetros"
+              disabled={isGeoPending}
               id="canchas-max-distance"
               max={maxMaxDistanceKm}
               min={minMaxDistanceKm}

@@ -1,101 +1,58 @@
 "use client"
 
 import Link from "next/link"
-import * as React from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from "@/lib/canchas"
-import {
-  annotateCanchasWithDistance,
-  filterCanchasWithinRadius,
-  formatDistanceKm,
-  paginateCanchas,
-  sortCanchasByDistance,
-} from "@/lib/canchasGeo"
+import { formatDistanceKm } from "@/lib/canchasGeo"
+import type { StoredUserGeo } from "@/lib/canchasUserGeo"
 
-import { useCanchasGeo } from "./CanchasGeoContext"
 import { CanchasDataTable, type CanchasSort } from "./CanchasDataTable"
 import { CanchasMapLoader } from "./CanchasMapLoader"
 import { CanchasPagination } from "./CanchasPagination"
 
 type CanchasFilteredResultsProps = {
-  canchaPool: CanchaMapItem[]
-  filters: {
-    page: number
-    pageSize: number
-    sort: CanchasSort
-  }
-  searchParams: Record<string, string | string[] | undefined>
-  serverTable?: {
+  mapCanchas?: CanchaMapItem[]
+  pagination: {
     canchas: CanchaMapItem[]
     page: number
+    pageSize: number
     totalDocs: number
     totalPages: number
   }
+  searchParams: Record<string, string | string[] | undefined>
+  showDistance: boolean
+  sort: CanchasSort
+  userGeo: StoredUserGeo | null
   view: "cards" | "table"
 }
 
 export function CanchasFilteredResults({
-  canchaPool,
-  filters,
+  mapCanchas,
+  pagination,
   searchParams,
-  serverTable,
+  showDistance,
+  sort,
+  userGeo,
   view,
 }: CanchasFilteredResultsProps) {
-  const { hasGeoFilter, userGeo } = useCanchasGeo()
-
-  const geoFilteredCanchas = React.useMemo(() => {
-    if (!userGeo) return null
-
-    return sortCanchasByDistance(
-      filterCanchasWithinRadius(
-        annotateCanchasWithDistance(canchaPool, userGeo),
-        userGeo.maxKm,
-      ),
-    )
-  }, [canchaPool, userGeo])
-
-  const paginatedCanchas = React.useMemo(() => {
-    if (hasGeoFilter && geoFilteredCanchas) {
-      return paginateCanchas(geoFilteredCanchas, filters.page, filters.pageSize)
-    }
-
-    if (view === "table" && serverTable) {
-      return {
-        docs: serverTable.canchas,
-        page: serverTable.page,
-        totalDocs: serverTable.totalDocs,
-        totalPages: serverTable.totalPages,
-      }
-    }
-
-    return paginateCanchas(canchaPool, filters.page, filters.pageSize)
-  }, [
-    filters.page,
-    filters.pageSize,
-    geoFilteredCanchas,
-    hasGeoFilter,
-    canchaPool,
-    serverTable,
-    view,
-  ])
-
-  const canchaDocs = paginatedCanchas.docs
-  const mapCanchaDocs = hasGeoFilter && geoFilteredCanchas ? geoFilteredCanchas : canchaPool
+  const canchaDocs = pagination.canchas
+  const mapCanchaDocs = mapCanchas ?? canchaDocs
 
   if (view === "table") {
     return (
       <CanchasDataTable
         canchas={canchaDocs}
-        page={paginatedCanchas.page}
-        pageSize={filters.pageSize}
+        geoSortActive={showDistance}
+        page={pagination.page}
+        pageSize={pagination.pageSize}
         searchParams={searchParams}
-        showDistance={hasGeoFilter}
-        sort={filters.sort}
-        totalDocs={paginatedCanchas.totalDocs}
-        totalPages={paginatedCanchas.totalPages}
+        showDistance={showDistance}
+        sort={sort}
+        totalDocs={pagination.totalDocs}
+        totalPages={pagination.totalPages}
       />
     )
   }
@@ -117,7 +74,7 @@ export function CanchasFilteredResults({
                 <CardHeader>
                   <div className="flex items-start gap-2.5">
                     <span className="grid size-7 shrink-0 place-items-center rounded-full bg-green text-[13px] font-black text-white-soft max-[760px]:size-6 max-[760px]:text-xs">
-                      {(filters.page - 1) * filters.pageSize + index + 1}
+                      {(pagination.page - 1) * pagination.pageSize + index + 1}
                     </span>
                     <div className="flex flex-wrap gap-2">
                       <Badge variant="outline">{canchaAccessLabels[cancha.accessType]}</Badge>
@@ -152,7 +109,7 @@ export function CanchasFilteredResults({
           ) : (
             <Card className="compact-card min-w-0">
               <CardContent className="py-6 text-sm text-muted-foreground">
-                {hasGeoFilter
+                {showDistance
                   ? "No hay canchas con coordenadas dentro del radio elegido. Prueba aumentar la distancia máxima."
                   : "No hay canchas para los filtros seleccionados."}
               </CardContent>
@@ -161,11 +118,11 @@ export function CanchasFilteredResults({
         </div>
       </div>
       <CanchasPagination
-        page={paginatedCanchas.page}
-        pageSize={filters.pageSize}
+        page={pagination.page}
+        pageSize={pagination.pageSize}
         searchParams={searchParams}
-        totalDocs={paginatedCanchas.totalDocs}
-        totalPages={paginatedCanchas.totalPages}
+        totalDocs={pagination.totalDocs}
+        totalPages={pagination.totalPages}
         view="cards"
       />
     </div>

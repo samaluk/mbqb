@@ -3,60 +3,62 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import * as React from "react"
 
-import {
-  canchasGeoChangedEvent,
-  readStoredUserGeo,
-  writeStoredUserGeo,
-  type StoredUserGeo,
-} from "@/lib/canchasLocationStorage"
+import type { StoredUserGeo } from "@/lib/canchasUserGeo"
+
+import { clearCanchasUserGeo, setCanchasUserGeo } from "./actions"
 
 type CanchasGeoContextValue = {
   hasGeoFilter: boolean
+  isGeoPending: boolean
   setUserGeo: (geo: StoredUserGeo | null) => void
   userGeo: StoredUserGeo | null
 }
 
 const CanchasGeoContext = React.createContext<CanchasGeoContextValue | null>(null)
 
-function subscribeToStoredUserGeo(onStoreChange: () => void) {
-  window.addEventListener(canchasGeoChangedEvent, onStoreChange)
-
-  return () => window.removeEventListener(canchasGeoChangedEvent, onStoreChange)
-}
-
-function getStoredUserGeoSnapshot() {
-  return readStoredUserGeo()
-}
-
-export function CanchasGeoProvider({ children }: { children: React.ReactNode }) {
+export function CanchasGeoProvider({
+  children,
+  initialUserGeo,
+}: {
+  children: React.ReactNode
+  initialUserGeo: StoredUserGeo | null
+}) {
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const userGeo = React.useSyncExternalStore(
-    subscribeToStoredUserGeo,
-    getStoredUserGeoSnapshot,
-    () => null,
-  )
+  const [isGeoPending, startTransition] = React.useTransition()
+
+  const resetPageAndRefresh = React.useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete("page")
+    const nextQuery = params.toString()
+    router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname)
+    router.refresh()
+  }, [pathname, router, searchParams])
 
   const setUserGeo = React.useCallback(
     (geo: StoredUserGeo | null) => {
-      writeStoredUserGeo(geo)
+      startTransition(async () => {
+        if (geo) {
+          await setCanchasUserGeo(geo)
+        } else {
+          await clearCanchasUserGeo()
+        }
 
-      const params = new URLSearchParams(searchParams.toString())
-      params.delete("page")
-      const nextQuery = params.toString()
-      router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname)
+        resetPageAndRefresh()
+      })
     },
-    [pathname, router, searchParams],
+    [resetPageAndRefresh],
   )
 
   const value = React.useMemo(
     () => ({
-      hasGeoFilter: userGeo !== null,
+      hasGeoFilter: initialUserGeo !== null,
+      isGeoPending,
       setUserGeo,
-      userGeo,
+      userGeo: initialUserGeo,
     }),
-    [setUserGeo, userGeo],
+    [initialUserGeo, isGeoPending, setUserGeo],
   )
 
   return <CanchasGeoContext value={value}>{children}</CanchasGeoContext>
