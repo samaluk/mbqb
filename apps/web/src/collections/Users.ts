@@ -1,11 +1,19 @@
 import type { CollectionConfig } from 'payload'
 
+import { isAdmin, isAdminField, ownerOrAdmin } from '@/access/roles'
+
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
     useAsTitle: 'email',
   },
   auth: true,
+  access: {
+    read: ownerOrAdmin,
+    create: isAdmin,
+    update: ownerOrAdmin,
+    delete: isAdmin,
+  },
   fields: [
     {
       name: 'role',
@@ -26,6 +34,10 @@ export const Users: CollectionConfig = {
           value: 'validation-manager',
         },
       ],
+      access: {
+        create: isAdminField,
+        update: isAdminField,
+      },
     },
   ],
 }
