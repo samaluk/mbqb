@@ -74,13 +74,28 @@ dump_production() {
     exit 1
   fi
 
-  docker run --rm -e "DATABASE_URL=${production_database_url}" postgres:17-alpine \
+  docker run --rm -e "DATABASE_URL=${production_database_url}" imresamu/postgis:17-3.5 \
     sh -c 'pg_dump "$DATABASE_URL" --format=plain --no-owner --no-privileges --clean --if-exists' \
     > "${dump_file}"
 }
 
+wait_for_local_postgres() {
+  for _ in $(seq 1 30); do
+    if psql "${local_database_url}" -v ON_ERROR_STOP=1 -c 'SELECT 1' >/dev/null 2>&1; then
+      return
+    fi
+    sleep 1
+  done
+
+  echo "Local database is not reachable at ${local_database_url}." >&2
+  echo "Start it with: cd apps/web && docker compose up -d postgres" >&2
+  exit 1
+}
+
 echo "Dumping production database..."
 dump_production
+
+wait_for_local_postgres
 
 echo "Resetting local database..."
 psql "${local_database_url}" -v ON_ERROR_STOP=1 -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
