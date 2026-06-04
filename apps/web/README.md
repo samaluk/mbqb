@@ -35,7 +35,7 @@ pnpm env:pull:production   # → .env.production.local
 vercel env ls              # inspect remote values
 ```
 
-Configure the Vercel **Development** environment with a local Docker `DATABASE_URL` (`postgres://postgres:postgres@127.0.0.1:5433/mbqb`), `NEXT_PUBLIC_SERVER_URL=http://localhost:3000`, `PAYLOAD_SECRET`, `PREVIEW_SECRET`, and `BLOB_READ_WRITE_TOKEN` (optional). Do not point Development `DATABASE_URL` at production.
+Configure the Vercel **Development** environment with a local Docker `POSTGRES_URL` (`postgres://postgres:postgres@127.0.0.1:5433/mbqb`), `NEXT_PUBLIC_SERVER_URL=http://localhost:3000`, `PAYLOAD_SECRET`, `PREVIEW_SECRET`, and `BLOB_READ_WRITE_TOKEN` (optional). Do not point Development `POSTGRES_URL` at production. Production uses Neon’s `POSTGRES_URL` from the Vercel integration — use that name only; do not add a separate `DATABASE_URL`.
 
 If you run `pnpm seed:dev-from-prod`, set Development `PAYLOAD_SECRET` to the **same value as Production** in the Vercel dashboard so membership lookup hashes match the copied data.
 
@@ -55,7 +55,7 @@ cd apps/web
 docker compose up -d postgres
 ```
 
-Postgres 17 + PostGIS on port **5433** (avoids clashing with a local Postgres on 5432). Set `DATABASE_URL` in Vercel Development, then `pnpm env:pull`.
+Postgres 17 + PostGIS on port **5433** (avoids clashing with a local Postgres on 5432). Set `POSTGRES_URL` in Vercel Development, then `pnpm env:pull`.
 
 ### Seed local data from production
 
@@ -132,7 +132,7 @@ Schema history starts from `20260604_000000_baseline` (includes drafts/version t
 
 ```sh
 cd apps/web
-DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5433/mbqb pnpm migrate:fresh
+POSTGRES_URL=postgres://postgres:postgres@127.0.0.1:5433/mbqb pnpm migrate:fresh
 ```
 
 **Local — match production:** `pnpm seed:dev-from-prod` (restores prod dump, then `payload migrate`).
