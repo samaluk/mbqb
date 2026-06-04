@@ -103,7 +103,11 @@ psql "${local_database_url}" -v ON_ERROR_STOP=1 -c "DROP SCHEMA public CASCADE; 
 echo "Restoring production snapshot into local database..."
 grep -v 'transaction_timeout' "${dump_file}" | psql "${local_database_url}" -v ON_ERROR_STOP=1
 
-echo "Applying pending Payload migrations locally..."
+echo "Aligning Payload migration history with squashed baseline..."
+psql "${local_database_url}" -v ON_ERROR_STOP=1 \
+  -f "${app_dir}/scripts/reset-payload-migrations-to-baseline.sql"
+
+echo "Applying any pending Payload migrations locally..."
 (
   cd "${app_dir}"
   set -a
@@ -114,4 +118,4 @@ echo "Applying pending Payload migrations locally..."
     printf 'y\n' | npx payload migrate
 )
 
-echo "Local database now mirrors production content and schema migrations."
+echo "Local database now mirrors production content and migration history."

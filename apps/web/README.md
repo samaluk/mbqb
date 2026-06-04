@@ -86,12 +86,29 @@ Set in `apps/web/.env`:
 - `NEXT_PUBLIC_SERVER_URL` — public app URL (e.g. `http://localhost:3000`)
 - `PREVIEW_SECRET` — random string; must match production Vercel env
 
-After enabling drafts on collections, generate and run the schema migration (interactive prompts are normal if Payload asks about column changes):
+### Migrations (squashed baseline)
+
+Schema history is a single migration: `20260604_000000_baseline` (includes drafts/version tables and Lexical `body` jsonb columns). One-off data backfills (publish drafts, Lexical body content) live in scripts, not migrations.
+
+**Local / CI — empty database:**
 
 ```sh
 cd apps/web
-pnpm payload migrate:create drafts_live_preview
-pnpm migrate
+yes | DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5433/mbqb npx payload migrate:fresh
 ```
 
-Migration `20260604_020000_publish_existing_cms_content` (runs after `20260604_010000_cms_drafts_schema`) marks existing canchas, La Biblia articles, products, and the home page global as published so the public site keeps serving current content.
+**Local — match production:** `pnpm seed:dev-from-prod` (restores prod dump, then `payload migrate`).
+
+**After deploying the squash to production** (schema already correct; Lexical shipped):
+
+1. Take a production `pg_dump` backup.
+2. Deploy this commit.
+3. Run `scripts/reset-payload-migrations-to-baseline.sql` against production (resets only `payload_migrations`, not content).
+4. Confirm the next deploy’s `pnpm migrate` reports no pending migrations.
+
+Regenerate the baseline from a DB that matches prod:
+
+```sh
+cd apps/web
+node scripts/build-baseline-migration.mjs
+```

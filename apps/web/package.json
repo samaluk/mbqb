@@ -19,6 +19,7 @@
     "seed:dev-from-prod": "bash scripts/seed-dev-from-production.sh",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "migrate": "printf 'y\\n' | cross-env NODE_ENV=production NODE_OPTIONS=\"--no-deprecation -r dotenv/config\" payload migrate",
+    "migrate:baseline": "node scripts/build-baseline-migration.mjs",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:unit",
