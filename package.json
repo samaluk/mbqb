@@ -9,7 +9,7 @@
     "build": "pnpm --filter @mbqb/web build",
     "dev": "pnpm --filter @mbqb/web dev",
     "fallow": "fallow",
-    "fallow:audit": "fallow audit --base master",
+    "fallow:audit": "fallow audit --base origin/master",
     "fallow:baseline": "fallow dead-code --save-baseline fallow-baselines/dead-code.json; fallow health --save-baseline fallow-baselines/health.json; fallow dupes --save-baseline fallow-baselines/dupes.json",
     "fallow:baseline:check": "bash scripts/check-fallow-baselines.sh",
     "generate:types": "pnpm --filter @mbqb/web generate:types",
