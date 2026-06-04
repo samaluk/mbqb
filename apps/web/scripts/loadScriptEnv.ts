@@ -1,41 +1,40 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import dotenv from 'dotenv'
 
-const filename = fileURLToPath(import.meta.url)
-const scriptsDir = path.dirname(filename)
-const defaultProductionEnvPath = path.resolve(scriptsDir, '../../../.vercel/.env.production.local')
+import { applyProductionDatabaseUrl } from './databaseUrl.js'
 
-export const loadScriptEnv = () => {
-  const envPath =
-    process.env.DOTENV_CONFIG_PATH ||
-    (process.env.DATABASE_URL?.trim()
-      ? undefined
-      : existsSync(defaultProductionEnvPath)
-        ? defaultProductionEnvPath
-        : undefined)
+const appDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
-  if (envPath) {
-    dotenv.config({ path: envPath })
-  } else {
-    dotenv.config()
+const requireEnvFile = (relativePath: string, pullHint: string) => {
+  const file = path.join(appDir, relativePath)
+  if (!existsSync(file)) {
+    throw new Error(`Missing ${file}. Run: ${pullHint}`)
+  }
+  dotenv.config({ path: file })
+}
+
+/** Local dev / tests: Vercel Development env → `pnpm env:pull` → `.env.local`. */
+export const loadLocalEnv = () =>
+  requireEnvFile('.env.local', 'cd apps/web && pnpm env:pull')
+
+/** Production DB scripts: `pnpm env:pull:production` → `.env.production.local`. */
+export const loadProductionEnv = () => {
+  const configured = process.env.DOTENV_CONFIG_PATH ?? '.env.production.local'
+  const file = path.isAbsolute(configured) ? configured : path.join(appDir, configured)
+
+  if (!existsSync(file)) {
+    throw new Error(`Missing ${file}. Run: cd apps/web && pnpm env:pull:production`)
   }
 
-  if (process.env.DATABASE_URL_UNPOOLED?.trim()) {
-    process.env.DATABASE_URL = process.env.DATABASE_URL_UNPOOLED
-  }
+  dotenv.config({ path: file })
+  applyProductionDatabaseUrl()
+}
 
-  const localEnvPath = path.resolve(scriptsDir, '../.env')
-  if (existsSync(localEnvPath)) {
-    if (envPath) {
-      const localEnv = dotenv.parse(readFileSync(localEnvPath))
-      if (!process.env.PAYLOAD_SECRET?.trim() && localEnv.PAYLOAD_SECRET?.trim()) {
-        process.env.PAYLOAD_SECRET = localEnv.PAYLOAD_SECRET
-      }
-    } else {
-      dotenv.config({ path: localEnvPath, override: true })
-    }
-  }
+/** Payload/DB scripts: production env when `NODE_ENV=production`, else local. */
+export const loadEnvForScript = () => {
+  if (process.env.NODE_ENV === 'production') loadProductionEnv()
+  else loadLocalEnv()
 }

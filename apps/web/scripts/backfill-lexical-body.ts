@@ -1,4 +1,3 @@
-import config from '@payload-config'
 import { sql } from '@payloadcms/db-postgres'
 import { createHash } from 'crypto'
 import path from 'path'
@@ -9,6 +8,8 @@ import {
   canConvertHTMLToLexicalBody,
   convertHTMLToLexicalBody,
 } from '@/lib/convertHTMLToLexicalBody'
+
+import { loadEnvForScript } from './loadScriptEnv.js'
 
 type BodyCollection = 'canchas' | 'la-biblia-articles' | 'products'
 
@@ -214,6 +215,10 @@ async function backfillCollection(payload: Payload, collection: BodyCollection) 
 }
 
 async function main() {
+  loadEnvForScript()
+  await import('../src/env.js')
+
+  const { default: config } = await import('@payload-config')
   const payload = await getPayload({ config })
   let failed = 0
 

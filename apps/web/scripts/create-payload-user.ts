@@ -1,8 +1,9 @@
 import { getPayload } from 'payload'
 
-import { loadScriptEnv } from './loadScriptEnv.js'
+import { loadEnvForScript } from './loadScriptEnv.js'
 
-loadScriptEnv()
+loadEnvForScript()
+await import('../src/env.js')
 
 type StaffRole = 'admin' | 'editor' | 'validation-manager'
 

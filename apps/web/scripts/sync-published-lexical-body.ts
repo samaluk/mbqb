@@ -12,6 +12,8 @@
  */
 import { sql } from '@payloadcms/db-postgres'
 
+import { loadEnvForScript } from './loadScriptEnv.js'
+
 const collections = [
   {
     collection: 'canchas',
@@ -126,14 +128,8 @@ async function syncCollection(
 }
 
 async function main() {
-  if (!process.env.PAYLOAD_SECRET) {
-    process.env.PAYLOAD_SECRET = 'sync-published-lexical-body-script'
-  }
-
-  if (!process.env.DATABASE_URL) {
-    console.error('DATABASE_URL is required')
-    process.exit(1)
-  }
+  loadEnvForScript()
+  await import('../src/env.js')
 
   const { default: config } = await import('@payload-config')
   const { getPayload } = await import('payload')

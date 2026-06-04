@@ -1,4 +1,12 @@
-// Any setup scripts you might need go here
+import { loadLocalEnv } from './scripts/loadScriptEnv'
 
-// Load .env files
-import 'dotenv/config'
+process.env.VITEST = 'true'
+loadLocalEnv()
+
+if (!process.env.PAYLOAD_SECRET?.trim()) {
+  process.env.PAYLOAD_SECRET = 'development-secret'
+}
+
+if (!process.env.PREVIEW_SECRET?.trim()) {
+  process.env.PREVIEW_SECRET = 'development-preview-secret'
+}
