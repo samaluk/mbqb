@@ -16,8 +16,8 @@ const migrationsDir = path.join(appDir, 'src/migrations')
 const migrationName = '20260604_000000_baseline'
 const migrationPath = path.join(migrationsDir, `${migrationName}.ts`)
 
-const localDatabaseUrl =
-  process.env.DATABASE_URL || 'postgres://postgres:postgres@127.0.0.1:5433/mbqb'
+const localPostgresUrl =
+  process.env.POSTGRES_URL || 'postgres://postgres:postgres@127.0.0.1:5433/mbqb'
 
 function dumpSchema() {
   const docker = spawnSync(
@@ -26,11 +26,11 @@ function dumpSchema() {
       'run',
       '--rm',
       '-e',
-      `DATABASE_URL=${localDatabaseUrl.replace('127.0.0.1', 'host.docker.internal')}`,
+      `POSTGRES_URL=${localPostgresUrl.replace('127.0.0.1', 'host.docker.internal')}`,
       'imresamu/postgis:17-3.5',
       'sh',
       '-c',
-      'pg_dump "$DATABASE_URL" --schema-only --no-owner --no-privileges --schema=public',
+      'pg_dump "$POSTGRES_URL" --schema-only --no-owner --no-privileges --schema=public',
     ],
     { encoding: 'utf8' },
   )
@@ -41,7 +41,7 @@ function dumpSchema() {
 
   const pgDump = spawnSync(
     'pg_dump',
-    [localDatabaseUrl, '--schema-only', '--no-owner', '--no-privileges', '--schema=public'],
+    [localPostgresUrl, '--schema-only', '--no-owner', '--no-privileges', '--schema=public'],
     { encoding: 'utf8' },
   )
 
@@ -82,7 +82,7 @@ function escapeForTemplateLiteral(sql) {
 const baselineSql = sanitizeDump(dumpSchema())
 
 if (!baselineSql.includes('payload_migrations')) {
-  console.error('Dump is missing payload_migrations — is DATABASE_URL pointed at a migrated DB?')
+  console.error('Dump is missing payload_migrations — is POSTGRES_URL pointed at a migrated DB?')
   process.exit(1)
 }
 

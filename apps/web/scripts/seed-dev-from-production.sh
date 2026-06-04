@@ -31,21 +31,21 @@ if [[ ! -f "${local_env}" ]]; then
   exit 1
 fi
 
-resolve_database_url() {
-  pnpm exec tsx "${script_dir}/resolve-database-url.ts" "$1" "$2"
+resolve_postgres_url() {
+  pnpm exec tsx "${script_dir}/resolve-postgres-url.ts" "$1"
 }
 
-local_database_url="$(resolve_database_url "${local_env}" local)"
-production_database_url="$(resolve_database_url "${production_env}" production)"
+local_postgres_url="$(resolve_postgres_url "${local_env}")"
+production_postgres_url="$(resolve_postgres_url "${production_env}")"
 
-if [[ "${local_database_url}" == "${production_database_url}" ]]; then
-  echo "Refusing to seed: local and production DATABASE_URL are identical." >&2
+if [[ "${local_postgres_url}" == "${production_postgres_url}" ]]; then
+  echo "Refusing to seed: local and production POSTGRES_URL are identical." >&2
   exit 1
 fi
 
 dump_production() {
   if command -v pg_dump >/dev/null 2>&1; then
-    if pg_dump "${production_database_url}" \
+    if pg_dump "${production_postgres_url}" \
       --format=plain \
       --no-owner \
       --no-privileges \
@@ -61,20 +61,20 @@ dump_production() {
     exit 1
   fi
 
-  docker run --rm -e "DATABASE_URL=${production_database_url}" imresamu/postgis:17-3.5 \
-    sh -c 'pg_dump "$DATABASE_URL" --format=plain --no-owner --no-privileges --clean --if-exists' \
+  docker run --rm -e "POSTGRES_URL=${production_postgres_url}" imresamu/postgis:17-3.5 \
+    sh -c 'pg_dump "$POSTGRES_URL" --format=plain --no-owner --no-privileges --clean --if-exists' \
     > "${dump_file}"
 }
 
 wait_for_local_postgres() {
   for _ in $(seq 1 30); do
-    if psql "${local_database_url}" -v ON_ERROR_STOP=1 -c 'SELECT 1' >/dev/null 2>&1; then
+    if psql "${local_postgres_url}" -v ON_ERROR_STOP=1 -c 'SELECT 1' >/dev/null 2>&1; then
       return
     fi
     sleep 1
   done
 
-  echo "Local database is not reachable at ${local_database_url}." >&2
+  echo "Local database is not reachable at ${local_postgres_url}." >&2
   echo "Start it with: cd apps/web && docker compose up -d postgres" >&2
   exit 1
 }
@@ -85,13 +85,13 @@ dump_production
 wait_for_local_postgres
 
 echo "Resetting local database..."
-psql "${local_database_url}" -v ON_ERROR_STOP=1 -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+psql "${local_postgres_url}" -v ON_ERROR_STOP=1 -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
 
 echo "Restoring production snapshot into local database..."
-grep -v 'transaction_timeout' "${dump_file}" | psql "${local_database_url}" -v ON_ERROR_STOP=1
+grep -v 'transaction_timeout' "${dump_file}" | psql "${local_postgres_url}" -v ON_ERROR_STOP=1
 
 echo "Aligning Payload migration history with squashed baseline..."
-psql "${local_database_url}" -v ON_ERROR_STOP=1 \
+psql "${local_postgres_url}" -v ON_ERROR_STOP=1 \
   -f "${app_dir}/scripts/reset-payload-migrations-to-baseline.sql"
 
 echo "Applying any pending Payload migrations locally..."

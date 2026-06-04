@@ -4,8 +4,6 @@ import { fileURLToPath } from 'node:url'
 
 import dotenv from 'dotenv'
 
-import { applyProductionDatabaseUrl, databaseUrlFromEnv } from './databaseUrl.js'
-
 const appDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 const requireEnvFile = (relativePath: string, pullHint: string) => {
@@ -27,13 +25,11 @@ export const loadProductionEnv = () => {
 
   if (existsSync(file)) {
     dotenv.config({ path: file })
-  } else if (process.env.VERCEL || databaseUrlFromEnv(process.env, 'production')) {
+  } else if (process.env.VERCEL || process.env.POSTGRES_URL?.trim()) {
     // Vercel (and similar CI) inject env at build time — no pulled file on disk.
   } else {
     throw new Error(`Missing ${file}. Run: cd apps/web && pnpm env:pull:production`)
   }
-
-  applyProductionDatabaseUrl()
 }
 
 /** Payload/DB scripts: production env when `NODE_ENV=production`, else local. */
