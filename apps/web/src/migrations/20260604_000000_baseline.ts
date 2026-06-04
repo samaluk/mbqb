@@ -161,7 +161,6 @@ ALTER SEQUENCE public._canchas_v_id_seq OWNED BY public._canchas_v.id;
 CREATE TABLE public._canchas_v_locales (
     version_title character varying,
     version_summary character varying,
-    version_body_html character varying,
     id integer NOT NULL,
     _locale public._locales NOT NULL,
     _parent_id integer NOT NULL,
@@ -226,7 +225,6 @@ CREATE SEQUENCE public._la_biblia_articles_v_id_seq
 ALTER SEQUENCE public._la_biblia_articles_v_id_seq OWNED BY public._la_biblia_articles_v.id;
 CREATE TABLE public._la_biblia_articles_v_locales (
     version_title character varying,
-    version_body_html character varying,
     id integer NOT NULL,
     _locale public._locales NOT NULL,
     _parent_id integer NOT NULL,
@@ -269,7 +267,6 @@ CREATE SEQUENCE public._products_v_id_seq
 ALTER SEQUENCE public._products_v_id_seq OWNED BY public._products_v.id;
 CREATE TABLE public._products_v_locales (
     version_title character varying,
-    version_body_html character varying,
     id integer NOT NULL,
     _locale public._locales NOT NULL,
     _parent_id integer NOT NULL,
@@ -327,7 +324,6 @@ ALTER SEQUENCE public.canchas_id_seq OWNED BY public.canchas.id;
 CREATE TABLE public.canchas_locales (
     title character varying NOT NULL,
     summary character varying NOT NULL,
-    body_html character varying NOT NULL,
     id integer NOT NULL,
     _locale public._locales NOT NULL,
     _parent_id integer NOT NULL,
@@ -379,7 +375,6 @@ CREATE SEQUENCE public.la_biblia_articles_id_seq
 ALTER SEQUENCE public.la_biblia_articles_id_seq OWNED BY public.la_biblia_articles.id;
 CREATE TABLE public.la_biblia_articles_locales (
     title character varying NOT NULL,
-    body_html character varying NOT NULL,
     id integer NOT NULL,
     _locale public._locales NOT NULL,
     _parent_id integer NOT NULL,
@@ -530,7 +525,6 @@ CREATE SEQUENCE public.products_id_seq
 ALTER SEQUENCE public.products_id_seq OWNED BY public.products.id;
 CREATE TABLE public.products_locales (
     title character varying NOT NULL,
-    body_html character varying NOT NULL,
     id integer NOT NULL,
     _locale public._locales NOT NULL,
     _parent_id integer NOT NULL,

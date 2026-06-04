@@ -126,7 +126,7 @@ pnpm migrate
 
 ### Squashed baseline
 
-Schema history starts from `20260604_000000_baseline` (includes drafts/version tables and Lexical `body` jsonb columns). One-off data backfills live in scripts, not migrations.
+Schema history starts from `20260604_000000_baseline` (includes drafts/version tables and Lexical `body` jsonb columns). The legacy HTML-to-Lexical body import has already been applied and is no longer part of the app interface.
 
 **Local / CI — empty database:**
 
@@ -139,45 +139,9 @@ POSTGRES_URL=postgres://postgres:postgres@127.0.0.1:5433/mbqb pnpm migrate:fresh
 
 **Local — match production:** `pnpm seed:dev-from-prod` (restores prod dump, then `payload migrate`).
 
-### Lexical body cleanup
+### Baseline migration reset
 
-The final content shape stores editorial rich text in Lexical `body` only. The legacy Shopify importer has been removed.
-
-Before applying the generated migration that drops legacy `body_html` columns:
-
-1. Take a production `pg_dump` backup.
-2. Deploy this code while the database still has the legacy `body_html` columns.
-3. Run the raw-column data backfill:
-
-   ```sh
-   cd apps/web
-   pnpm env:pull:production
-   LEGACY_IMAGE_BASE_URL=https://mbqb.cl \
-   LEGACY_IMAGE_ALLOWED_HOSTS=mbqb.cl,cdn.shopify.com,cdn.shopifycdn.net \
-   pnpm backfill:lexical-body:prod
-   ```
-
-4. Verify the script reports zero failures.
-5. Sync Lexical `body` into published version snapshots (required for the public site when drafts are enabled):
-
-   ```sh
-   cd apps/web
-   pnpm sync:published-lexical-body:prod -- --dry-run
-   pnpm sync:published-lexical-body:prod
-   ```
-
-   The HTML backfill updates `*_locales.body` only. Payload serves anonymous reads from `_collection_v_locales.version_body` on the published snapshot, so the storefront can stay empty while admin looks correct until this step runs.
-
-6. Finish the feature, then generate the drop-column migration with Payload:
-
-   ```sh
-   cd apps/web
-   pnpm payload migrate:create remove-body-html
-   ```
-
-7. Review and commit the generated migration.
-
-**After deploying the squash to production** (schema already correct; Lexical shipped):
+After deploying the squash to production (schema already correct; Lexical shipped):
 
 1. Take a production `pg_dump` backup.
 2. Deploy this commit.
