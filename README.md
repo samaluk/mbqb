@@ -2,6 +2,8 @@
 
 Monorepo for the MBQB public site and CMS.
 
+CI runs on GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): lint, format, typecheck, fallow checks, unit tests, production build (with migrations), integration tests, and Playwright E2E tests against PostGIS.
+
 ## Development
 
 ```sh
