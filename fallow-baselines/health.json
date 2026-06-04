@@ -19,6 +19,9 @@
       }
     },
     "apps/web/src/app/(frontend)/bogeyficador/BogeyficadorForm.tsx": {
+      "crap_high": {
+        "count": 1
+      },
       "crap_moderate": {
         "count": 1
       }
