@@ -8,7 +8,7 @@ echo "pre-commit: lint"
 pnpm --filter @mbqb/web lint
 
 echo "pre-commit: typecheck"
-pnpm --filter @mbqb/web exec tsc --noEmit
+pnpm typecheck
 
 echo "pre-commit: fallow baseline check"
 pnpm fallow:baseline:check

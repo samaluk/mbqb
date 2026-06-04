@@ -14,7 +14,7 @@
     "test": "pnpm --filter @mbqb/web test",
     "test:int": "pnpm --filter @mbqb/web test:int",
     "test:unit": "pnpm --filter @mbqb/web test:unit",
-    "typecheck": "pnpm --filter @mbqb/web exec tsc --noEmit"
+    "typecheck": "pnpm --filter @mbqb/web typecheck"
   },
   "devDependencies": {
     "fallow": "^2.88.3"
