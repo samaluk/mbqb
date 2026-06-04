@@ -1,0 +1,13 @@
+apps/web/.next/**
+apps/web/node_modules/**
+**/coverage/**
+**/dist/**
+**/build/**
+apps/web/src/payload-types.ts
+apps/web/src/payload-generated-schema.ts
+apps/web/src/migrations/**
+apps/web/public/**
+apps/web/src/components/ui/**
+apps/web/tests/**
+**/*.test.ts
+**/*.test.tsx

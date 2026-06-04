@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 100,
+  "singleQuote": true,
+  "semi": false,
+  "trailingComma": "all",
+  "sortTailwindcss": false,
+  "ignorePatterns": [
+    "*.md",
+    "apps/web/src/payload-types.ts",
+    "apps/web/src/payload-generated-schema.ts",
+    "apps/web/src/components/ui/**",
+    "apps/web/src/migrations/**"
+  ]
+}
