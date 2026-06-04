@@ -39,10 +39,10 @@ cd apps/web
 docker compose up -d postgres
 ```
 
-After pulling production env vars to the repo root (`.vercel/.env.production.local`):
+After pulling production env vars to `apps/web/.env.production.local`:
 
 ```sh
-vercel env pull ../../.vercel/.env.production.local --environment=production
+vercel env pull .env.production.local --environment=production
 pnpm seed:dev-from-prod
 ```
 
@@ -55,21 +55,7 @@ cd apps/web
 CMS_USER_EMAIL=you@example.com CMS_USER_PASSWORD="$(openssl rand -base64 32)" pnpm create:prod-user
 ```
 
-Use `CMS_USER_UPDATE_EXISTING=true` to reset an existing user password. For production, ensure `DOTENV_CONFIG_PATH` points at pulled Vercel env (or rely on `.vercel/.env.production.local`) and set `NODE_ENV=production`.
-
-### Import public content from mbqb.cl into production
-
-Pull production env vars first, then import canchas, products, La Biblia articles, and site settings from the live Shopify storefront:
-
-```sh
-cd apps/web
-vercel env pull ../../.vercel/.env.production.local --environment=production
-pnpm import:mbqb:prod
-```
-
-The importer upserts by slug and does not modify `users` or `home-page` media. Re-running is safe: it refreshes Shopify HTML fields but keeps existing cancha coordinates, hole counts, booking URLs, and any site settings you already set in admin. Expect roughly 16 canchas, 1 product, and 1+ La Biblia articles (depending on what is linked from the live hub page).
-
-For local database targets, use `pnpm import:mbqb` with `apps/web/.env` configured.
+Use `CMS_USER_UPDATE_EXISTING=true` to reset an existing user password. For production, ensure `DOTENV_CONFIG_PATH` points at pulled Vercel env (or rely on `apps/web/.env.production.local`) and set `NODE_ENV=production`.
 
 ## Current Foundation
 
@@ -116,7 +102,7 @@ pnpm migrate:fresh
 
 ### Squashed baseline
 
-Schema history is a single migration: `20260604_000000_baseline` (includes drafts/version tables and Lexical `body` jsonb columns). One-off data backfills (publish drafts, Lexical body content) live in scripts, not migrations.
+Schema history starts from `20260604_000000_baseline` (includes drafts/version tables and Lexical `body` jsonb columns). One-off data backfills live in scripts, not migrations.
 
 **Local / CI — empty database:**
 
@@ -126,6 +112,33 @@ DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5433/mbqb pnpm migrate:fresh
 ```
 
 **Local — match production:** `pnpm seed:dev-from-prod` (restores prod dump, then `payload migrate`).
+
+### Lexical body cleanup
+
+The final content shape stores editorial rich text in Lexical `body` only. The legacy Shopify importer has been removed.
+
+Before applying the generated migration that drops legacy `body_html` columns:
+
+1. Take a production `pg_dump` backup.
+2. Deploy this code while the database still has the legacy `body_html` columns.
+3. Run the raw-column data backfill:
+
+   ```sh
+   cd apps/web
+   LEGACY_IMAGE_BASE_URL=https://mbqb.cl \
+   LEGACY_IMAGE_ALLOWED_HOSTS=mbqb.cl,cdn.shopify.com,cdn.shopifycdn.net \
+   pnpm backfill:lexical-body:prod
+   ```
+
+4. Verify the script reports zero failures.
+5. Finish the feature, then generate the drop-column migration with Payload:
+
+   ```sh
+   cd apps/web
+   pnpm payload migrate:create remove-body-html
+   ```
+
+6. Review and commit the generated migration.
 
 **After deploying the squash to production** (schema already correct; Lexical shipped):
 

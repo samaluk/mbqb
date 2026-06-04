@@ -26,7 +26,7 @@ export default async function CanchaDetailPage({ params }: PageProps) {
   const cmsQuery = await getCmsQueryOptions()
   const canchas = await payload.find({
     collection: 'canchas',
-    depth: 0,
+    depth: 1,
     limit: 1,
     locale: 'es',
     ...cmsQuery,
@@ -64,7 +64,7 @@ export default async function CanchaDetailPage({ params }: PageProps) {
       >
         Abrir en Google Maps
       </a>
-      <RichContent body={cancha.body} fallbackHtml={cancha.bodyHtml} />
+      <RichContent body={cancha.body} />
     </PageDetail>
   )
 }

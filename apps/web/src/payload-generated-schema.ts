@@ -303,7 +303,6 @@ export const canchas_locales = pgTable(
   {
     title: varchar('title'),
     summary: varchar('summary'),
-    bodyHtml: varchar('body_html'),
     body: jsonb('body'),
     id: serial('id').primaryKey(),
     _locale: enum__locales('_locale').notNull(),
@@ -382,7 +381,6 @@ export const _canchas_v_locales = pgTable(
   {
     version_title: varchar('version_title'),
     version_summary: varchar('version_summary'),
-    version_bodyHtml: varchar('version_body_html'),
     version_body: jsonb('version_body'),
     id: serial('id').primaryKey(),
     _locale: enum__locales('_locale').notNull(),
@@ -435,7 +433,6 @@ export const la_biblia_articles_locales = pgTable(
   'la_biblia_articles_locales',
   {
     title: varchar('title'),
-    bodyHtml: varchar('body_html'),
     body: jsonb('body'),
     id: serial('id').primaryKey(),
     _locale: enum__locales('_locale').notNull(),
@@ -518,7 +515,6 @@ export const _la_biblia_articles_v_locales = pgTable(
   '_la_biblia_articles_v_locales',
   {
     version_title: varchar('version_title'),
-    version_bodyHtml: varchar('version_body_html'),
     version_body: jsonb('version_body'),
     id: serial('id').primaryKey(),
     _locale: enum__locales('_locale').notNull(),
@@ -571,7 +567,6 @@ export const products_locales = pgTable(
   'products_locales',
   {
     title: varchar('title'),
-    bodyHtml: varchar('body_html'),
     body: jsonb('body'),
     id: serial('id').primaryKey(),
     _locale: enum__locales('_locale').notNull(),
@@ -646,7 +641,6 @@ export const _products_v_locales = pgTable(
   '_products_v_locales',
   {
     version_title: varchar('version_title'),
-    version_bodyHtml: varchar('version_body_html'),
     version_body: jsonb('version_body'),
     id: serial('id').primaryKey(),
     _locale: enum__locales('_locale').notNull(),

@@ -27,7 +27,7 @@ export default async function ProductosPage() {
   const cmsQuery = await getCmsQueryOptions()
   const products = await payload.find({
     collection: 'products',
-    depth: 0,
+    depth: 1,
     limit: 20,
     locale: 'es',
     sort: 'title',
@@ -63,7 +63,7 @@ export default async function ProductosPage() {
               <CardTitle>{product.title}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
-              <RichSnippet body={product.body} fallbackHtml={product.bodyHtml} />
+              <RichSnippet body={product.body} />
               <Button asChild className="w-fit font-extrabold" variant="link">
                 <Link href={`/productos/${product.slug}`}>Ver producto</Link>
               </Button>

@@ -25,7 +25,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const cmsQuery = await getCmsQueryOptions()
   const products = await payload.find({
     collection: 'products',
-    depth: 0,
+    depth: 1,
     limit: 1,
     locale: 'es',
     ...cmsQuery,
@@ -60,7 +60,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           src={product.imageUrl}
         />
       ) : null}
-      <RichContent body={product.body} fallbackHtml={product.bodyHtml} />
+      <RichContent body={product.body} />
     </PageDetail>
   )
 }

@@ -71,17 +71,11 @@ export const Canchas: CollectionConfig = {
       localized: true,
     },
     {
-      name: 'bodyHtml',
-      type: 'textarea',
-      label: 'Body HTML',
-      localized: true,
-      required: true,
-    },
-    {
       name: 'body',
       type: 'richText',
       label: 'Body',
       localized: true,
+      required: true,
     },
     {
       name: 'accessType',

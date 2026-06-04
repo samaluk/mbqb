@@ -6,10 +6,9 @@ import { cn } from '@/lib/utils'
 
 type RichContentProps = Omit<ComponentProps<'div'>, 'children'> & {
   body?: SerializedEditorState | null
-  fallbackHtml: string
 }
 
-function RichContent({ body, className, fallbackHtml, ...props }: RichContentProps) {
+function RichContent({ body, className, ...props }: RichContentProps) {
   return (
     <div
       className={cn(
@@ -27,7 +26,7 @@ function RichContent({ body, className, fallbackHtml, ...props }: RichContentPro
         'max-[760px]:[&_ul]:text-[15px] max-[760px]:[&_ul]:leading-[1.42]',
         className,
       )}
-      dangerouslySetInnerHTML={{ __html: renderLexicalBodyToHTML(body, fallbackHtml) }}
+      dangerouslySetInnerHTML={{ __html: renderLexicalBodyToHTML(body) }}
       {...props}
     />
   )

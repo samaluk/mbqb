@@ -6,10 +6,9 @@ import { cn } from '@/lib/utils'
 
 type RichSnippetProps = Omit<ComponentProps<'div'>, 'children'> & {
   body?: SerializedEditorState | null
-  fallbackHtml: string
 }
 
-function RichSnippet({ body, className, fallbackHtml, ...props }: RichSnippetProps) {
+function RichSnippet({ body, className, ...props }: RichSnippetProps) {
   return (
     <div
       className={cn(
@@ -19,7 +18,7 @@ function RichSnippet({ body, className, fallbackHtml, ...props }: RichSnippetPro
         '[&_span]:m-0 [&_span]:!font-[inherit] [&_span]:!text-[inherit]',
         className,
       )}
-      dangerouslySetInnerHTML={{ __html: renderLexicalBodyToHTML(body, fallbackHtml) }}
+      dangerouslySetInnerHTML={{ __html: renderLexicalBodyToHTML(body) }}
       {...props}
     />
   )

@@ -30,7 +30,7 @@ export default async function LaBibliaPage() {
   const cmsQuery = await getCmsQueryOptions()
   const articles = await payload.find({
     collection: 'la-biblia-articles',
-    depth: 0,
+    depth: 1,
     limit: 20,
     locale: 'es',
     sort: 'title',
@@ -56,7 +56,7 @@ export default async function LaBibliaPage() {
               <CardTitle>{article.title}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
-              <RichSnippet body={article.body} fallbackHtml={article.bodyHtml} />
+              <RichSnippet body={article.body} />
               <Button asChild className="w-fit font-extrabold" variant="link">
                 <Link href={`/la-biblia/${article.slug}`}>Leer articulo</Link>
               </Button>

@@ -28,7 +28,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
   const cmsQuery = await getCmsQueryOptions()
   const articles = await payload.find({
     collection: 'la-biblia-articles',
-    depth: 0,
+    depth: 1,
     limit: 1,
     locale: 'es',
     ...cmsQuery,
@@ -52,7 +52,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
       <MetaPills
         items={[categoryLabels[article.category], article.difficulty]}
       />
-      <RichContent body={article.body} fallbackHtml={article.bodyHtml} />
+      <RichContent body={article.body} />
     </PageDetail>
   )
 }

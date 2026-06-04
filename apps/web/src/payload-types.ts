@@ -205,8 +205,7 @@ export interface Cancha {
   title: string;
   slug: string;
   summary?: string | null;
-  bodyHtml: string;
-  body?: {
+  body: {
     root: {
       type: string;
       children: {
@@ -220,7 +219,7 @@ export interface Cancha {
       version: number;
     };
     [k: string]: unknown;
-  } | null;
+  };
   accessType: 'pay-and-play' | 'private' | 'restricted' | 'unknown';
   region?: string | null;
   city?: string | null;
@@ -245,8 +244,7 @@ export interface LaBibliaArticle {
   id: number;
   title: string;
   slug: string;
-  bodyHtml: string;
-  body?: {
+  body: {
     root: {
       type: string;
       children: {
@@ -260,7 +258,7 @@ export interface LaBibliaArticle {
       version: number;
     };
     [k: string]: unknown;
-  } | null;
+  };
   category:
     | 'primeros-pasos'
     | 'reglas-y-etiqueta'
@@ -285,8 +283,7 @@ export interface Product {
   id: number;
   title: string;
   slug: string;
-  bodyHtml: string;
-  body?: {
+  body: {
     root: {
       type: string;
       children: {
@@ -300,7 +297,7 @@ export interface Product {
       version: number;
     };
     [k: string]: unknown;
-  } | null;
+  };
   priceCLP: number;
   stockStatus: 'available' | 'unavailable';
   imageUrl?: string | null;
@@ -462,7 +459,6 @@ export interface CanchasSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   summary?: T;
-  bodyHtml?: T;
   body?: T;
   accessType?: T;
   region?: T;
@@ -483,7 +479,6 @@ export interface CanchasSelect<T extends boolean = true> {
 export interface LaBibliaArticlesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
-  bodyHtml?: T;
   body?: T;
   category?: T;
   difficulty?: T;
@@ -501,7 +496,6 @@ export interface LaBibliaArticlesSelect<T extends boolean = true> {
 export interface ProductsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
-  bodyHtml?: T;
   body?: T;
   priceCLP?: T;
   stockStatus?: T;
