@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PAYLOAD_SECRET: ci-payload-secret-for-github-actions
+  PREVIEW_SECRET: ci-preview-secret-for-github-actions
+  NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+
+jobs:
+  quality:
+    name: Lint, format, typecheck, fallow, unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.3.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm run check:lint
+
+      - name: Format
+        run: pnpm format:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Fallow baseline
+        run: pnpm fallow:baseline:check
+
+      - name: Fallow audit
+        run: pnpm fallow:audit
+
+      - name: Unit tests
+        run: pnpm test:unit
+
+  build-and-integration:
+    name: Build, integration, and E2E tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: imresamu/postgis:17-3.5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mbqb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d mbqb"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      POSTGRES_URL: postgres://postgres:postgres@localhost:5432/mbqb
+      TEST_POSTGRES_URL: postgres://postgres:postgres@localhost:5432/mbqb_test
+      NODE_ENV: production
+      CI: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.3.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create integration test database
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+          PGPASSWORD=postgres psql -h localhost -U postgres -d mbqb -c "CREATE DATABASE mbqb_test;"
+
+      - name: Build
+        run: pnpm build
+
+      - name: Integration tests
+        run: pnpm test:int
+
+      - name: Install Playwright browsers
+        working-directory: apps/web
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: E2E tests
+        working-directory: apps/web
+        run: pnpm test:e2e
