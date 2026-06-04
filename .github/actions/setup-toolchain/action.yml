@@ -5,7 +5,7 @@ runs:
   using: composite
   steps:
     # Node must be installed before pnpm 11.x (requires Node >=22.13).
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       with:
         node-version-file: package.json
 
