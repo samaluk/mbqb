@@ -1,7 +1,7 @@
-import { loadLocalEnv } from './scripts/loadScriptEnv'
+import { loadTestEnv } from './scripts/loadScriptEnv'
 
 process.env.VITEST = 'true'
-loadLocalEnv()
+loadTestEnv()
 
 if (process.env.INTEGRATION_TEST === 'true') {
   const testPostgresUrl = process.env.TEST_POSTGRES_URL?.trim()

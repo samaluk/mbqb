@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 
-import { loadPlaywrightEnv } from './scripts/loadScriptEnv'
+import { loadTestEnv } from './scripts/loadScriptEnv'
 
-loadPlaywrightEnv()
+loadTestEnv()
 
 const isCI = !!process.env.CI
 const baseURL = process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000'

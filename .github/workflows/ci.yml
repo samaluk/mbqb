@@ -67,7 +67,6 @@ jobs:
     env:
       POSTGRES_URL: postgres://postgres:postgres@localhost:5432/mbqb
       TEST_POSTGRES_URL: postgres://postgres:postgres@localhost:5432/mbqb_test
-      NODE_ENV: production
       CI: true
 
     steps:
@@ -86,6 +85,8 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          NODE_ENV: production
 
       - name: Integration tests
         run: pnpm test:int

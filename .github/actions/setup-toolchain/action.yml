@@ -4,9 +4,14 @@ description: Install Node and pnpm versions from the root package.json
 runs:
   using: composite
   steps:
-    - uses: pnpm/action-setup@v4
-
+    # Node must be installed before pnpm 11.x (requires Node >=22.13).
     - uses: actions/setup-node@v4
       with:
         node-version-file: package.json
-        cache: pnpm
+
+    # Composite actions do not pass setup-node's PATH to nested JS actions; standalone
+    # installs @pnpm/exe without using the runner's default Node 20.
+    - uses: pnpm/action-setup@v4
+      with:
+        standalone: true
+        cache: true

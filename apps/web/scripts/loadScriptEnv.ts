@@ -17,14 +17,14 @@ const requireEnvFile = (relativePath: string, pullHint: string) => {
 /** Local dev / tests: Vercel Development env → `pnpm env:pull` → `.env.local`. */
 export const loadLocalEnv = () => requireEnvFile('.env.local', 'cd apps/web && pnpm env:pull')
 
-/** Playwright: `.env.local` locally; in CI use workflow-injected env (e.g. `POSTGRES_URL`). */
-export const loadPlaywrightEnv = () => {
+/** Vitest / Playwright: `.env.local` locally; in CI use workflow-injected env. */
+export const loadTestEnv = () => {
   const localFile = path.join(appDir, '.env.local')
   if (existsSync(localFile)) {
     dotenv.config({ path: localFile })
     return
   }
-  if (process.env.POSTGRES_URL?.trim()) {
+  if (process.env.CI || process.env.POSTGRES_URL?.trim() || process.env.PAYLOAD_SECRET?.trim()) {
     return
   }
   throw new Error(`Missing ${localFile}. Run: cd apps/web && pnpm env:pull`)
