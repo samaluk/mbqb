@@ -1,3 +1,5 @@
+export { clampNumber } from '@/lib/canchasBrowsing'
+
 export function getCanchasHref(
   searchParams: Record<string, string | string[] | undefined>,
   updates: Record<string, null | string>,
@@ -25,14 +27,4 @@ export function getCanchasHref(
   const query = params.toString()
 
   return query ? `/canchas?${query}` : '/canchas'
-}
-
-export function clampNumber(value: string, min: number, max: number, fallback: number) {
-  if (!value.trim()) return fallback
-
-  const number = Number(value)
-
-  if (!Number.isInteger(number)) return fallback
-
-  return Math.min(Math.max(number, min), max)
 }

@@ -6,10 +6,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from "@/lib/canchas"
+import type { CanchasSort } from "@/lib/canchasBrowsing"
 import { formatDistanceKm } from "@/lib/canchasGeo"
 import type { StoredUserGeo } from "@/lib/canchasUserGeo"
 
-import { CanchasDataTable, type CanchasSort } from "./CanchasDataTable"
+import { CanchasDataTable } from "./CanchasDataTable"
 import { CanchasMapLoader } from "./CanchasMapLoader"
 import { CanchasPagination } from "./CanchasPagination"
 

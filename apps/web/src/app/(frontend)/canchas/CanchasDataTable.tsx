@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
+import type { CanchasSort } from '@/lib/canchasBrowsing'
 import { formatDistanceKm } from '@/lib/canchasGeo'
 
 import { getCanchasHref } from './canchasSearchParams'
@@ -27,11 +28,6 @@ type CanchasDataTableProps = {
   sort: CanchasSort
   totalDocs: number
   totalPages: number
-}
-
-export type CanchasSort = {
-  direction: 'asc' | 'desc'
-  field: 'accessType' | 'city' | 'region' | 'title'
 }
 
 const columnLabels = {
@@ -245,4 +241,3 @@ function SortLink({
     </Button>
   )
 }
-
