@@ -525,5 +525,5 @@ function getUniqueValues(docs: CanchaMapItem[], key: keyof CanchaMapItem): strin
         .map((doc) => doc[key])
         .filter((value): value is string => typeof value === 'string' && value.length > 0),
     ),
-  ).sort((a, b) => a.localeCompare(b, 'es'))
+  ).toSorted((a, b) => a.localeCompare(b, 'es'))
 }

@@ -12,6 +12,12 @@ import { createStoredUserGeo } from '@/lib/canchasUserGeo'
 
 import { useCanchasGeo } from './CanchasGeoContext'
 
+function notifyLocationRequired() {
+  toast('Comparte tu ubicación para ajustar la distancia máxima.', {
+    id: 'canchas-location-required',
+  })
+}
+
 export function CanchasLocationFilter() {
   const { isGeoPending, setUserGeo, userGeo } = useCanchasGeo()
   const [isLocating, setIsLocating] = React.useState(false)
@@ -74,12 +80,6 @@ export function CanchasLocationFilter() {
   const clearLocation = () => {
     setLocationError(null)
     setUserGeo(null)
-  }
-
-  const notifyLocationRequired = () => {
-    toast('Comparte tu ubicación para ajustar la distancia máxima.', {
-      id: 'canchas-location-required',
-    })
   }
 
   const persistMaxDistance = React.useCallback(

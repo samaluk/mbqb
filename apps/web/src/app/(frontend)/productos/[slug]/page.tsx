@@ -53,7 +53,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
         ]}
       />
       {product.imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img
           alt=""
           className="aspect-[5/3] h-auto w-[min(100%,640px)] rounded-lg object-cover max-[760px]:aspect-[16/9]"

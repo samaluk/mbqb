@@ -13,8 +13,9 @@ export type CanchaWithDistance = CanchaMapItem & {
   distanceKm: number
 }
 
+const toRadians = (degrees: number) => (degrees * Math.PI) / 180
+
 export function getDistanceKm(from: GeoPoint, to: GeoPoint): number {
-  const toRadians = (degrees: number) => (degrees * Math.PI) / 180
   const deltaLatitude = toRadians(to.latitude - from.latitude)
   const deltaLongitude = toRadians(to.longitude - from.longitude)
   const fromLatitude = toRadians(from.latitude)
@@ -62,7 +63,7 @@ export function filterCanchasWithinRadius(canchas: CanchaWithDistance[], maxKm: 
 }
 
 export function sortCanchasByDistance(canchas: CanchaWithDistance[]) {
-  return [...canchas].sort((left, right) => left.distanceKm - right.distanceKm)
+  return canchas.toSorted((left, right) => left.distanceKm - right.distanceKm)
 }
 
 export function paginateCanchas<T>(canchas: T[], page: number, pageSize: number) {

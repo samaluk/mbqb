@@ -11,7 +11,10 @@
   "plugins": ["typescript", "react", "jsx-a11y", "unicorn"],
   "rules": {
     "react/react-in-jsx-scope": "off",
-    "no-underscore-dangle": ["error", { "allow": ["_id", "_tag"] }],
+    "no-underscore-dangle": [
+      "error",
+      { "allow": ["_id", "_tag", "_status", "__filename", "__dirname"] }
+    ],
     "typescript/ban-ts-comment": "warn",
     "typescript/no-empty-object-type": "warn",
     "typescript/no-explicit-any": "warn",

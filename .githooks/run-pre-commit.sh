@@ -5,7 +5,10 @@ root="$(git rev-parse --show-toplevel)"
 cd "$root"
 
 echo "pre-commit: lint"
-pnpm --filter @mbqb/web lint
+pnpm run check:lint
+
+echo "pre-commit: format"
+pnpm format:check
 
 echo "pre-commit: typecheck"
 pnpm typecheck

@@ -53,19 +53,19 @@ function dumpSchema() {
   return pgDump.stdout
 }
 
-function sanitizeDump(raw) {
-  const skipLine = (line) => {
-    const trimmed = line.trim()
-    if (!trimmed) return true
-    if (trimmed.startsWith('\\')) return true
-    if (trimmed.startsWith('--')) return true
-    if (trimmed.startsWith('SET ')) return true
-    if (trimmed.startsWith('SELECT pg_catalog')) return true
-    if (trimmed.startsWith('COMMENT ON ')) return true
-    if (/^CREATE SCHEMA public\b/i.test(trimmed)) return true
-    return false
-  }
+function skipLine(line) {
+  const trimmed = line.trim()
+  if (!trimmed) return true
+  if (trimmed.startsWith('\\')) return true
+  if (trimmed.startsWith('--')) return true
+  if (trimmed.startsWith('SET ')) return true
+  if (trimmed.startsWith('SELECT pg_catalog')) return true
+  if (trimmed.startsWith('COMMENT ON ')) return true
+  if (/^CREATE SCHEMA public\b/i.test(trimmed)) return true
+  return false
+}
 
+function sanitizeDump(raw) {
   const body = raw
     .split('\n')
     .filter((line) => !skipLine(line))

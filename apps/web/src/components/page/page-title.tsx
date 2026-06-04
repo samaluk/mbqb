@@ -6,7 +6,7 @@ type PageTitleProps = ComponentProps<'h1'> & {
   size?: 'default' | 'hero'
 }
 
-function PageTitle({ className, size = 'default', ...props }: PageTitleProps) {
+function PageTitle({ className, size = 'default', children, ...props }: PageTitleProps) {
   return (
     <h1
       className={cn(
@@ -18,7 +18,9 @@ function PageTitle({ className, size = 'default', ...props }: PageTitleProps) {
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </h1>
   )
 }
 

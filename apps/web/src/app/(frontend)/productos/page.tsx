@@ -46,7 +46,6 @@ export default async function ProductosPage() {
         {products.docs.map((product) => (
           <Card className="min-w-0" key={product.id} size="compact">
             {product.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
               <img
                 alt=""
                 className="aspect-[5/3] w-full object-cover max-[760px]:aspect-[16/9]"
