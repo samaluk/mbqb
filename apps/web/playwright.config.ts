@@ -1,28 +1,23 @@
 import { defineConfig, devices } from '@playwright/test'
 
-import { loadLocalEnv } from './scripts/loadScriptEnv'
+import { loadPlaywrightEnv } from './scripts/loadScriptEnv'
 
-loadLocalEnv()
+loadPlaywrightEnv()
+
+const isCI = !!process.env.CI
+const baseURL = process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000'
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
   testDir: './tests/e2e',
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
-  forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  forbidOnly: isCI,
+  retries: isCI ? 2 : 0,
+  workers: isCI ? 1 : undefined,
+  reporter: isCI ? [['github'], ['list']] : 'html',
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://localhost:3000',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    baseURL,
     trace: 'on-first-retry',
   },
   projects: [
@@ -32,8 +27,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
-    reuseExistingServer: true,
-    url: 'http://localhost:3000',
+    command: isCI ? 'pnpm start' : 'pnpm dev',
+    url: baseURL,
+    reuseExistingServer: !isCI,
+    timeout: isCI ? 120_000 : 60_000,
   },
 })
