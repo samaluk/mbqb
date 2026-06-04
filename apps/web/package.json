@@ -74,7 +74,7 @@
     "tailwindcss": "^4.3.0",
     "tsx": "4.22.4",
     "vite-tsconfig-paths": "6.1.1",
-    "vitest": "4.0.18"
+    "vitest": "4.1.8"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
