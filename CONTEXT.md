@@ -24,6 +24,10 @@ _Avoid_: Identity verifier, payment checker, public member directory
 A playable golf course or on-course golf experience that MBQB presents to help people understand where they can play.
 _Avoid_: Simulator, academy, practice range
 
+**Cancha Browsing**:
+The public experience for finding Canchas by text, access type, location, distance, and list/map/table view so golfers can decide where to play.
+_Avoid_: Course database admin, generic search page
+
 **Pay and Play**:
 An access type for a Cancha where users can generally play without belonging to that club, subject to the course's booking conditions.
 _Avoid_: Public course, unrestricted access
