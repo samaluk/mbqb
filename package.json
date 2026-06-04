@@ -13,6 +13,7 @@
     "format": "oxfmt --write apps/web",
     "format:check": "oxfmt --check apps/web",
     "check:lint": "oxlint apps/web --ignore-path .oxlintignore && oxlint apps/web --config .oxlintrc.tailwind.json --ignore-path .oxlintignore",
+    "oxlint": "pnpm check:lint",
     "lint:core": "oxlint apps/web --ignore-path .oxlintignore",
     "lint:fix": "oxlint --fix apps/web --ignore-path .oxlintignore && oxlint --fix apps/web --config .oxlintrc.tailwind.json --ignore-path .oxlintignore",
     "lint:fix:core": "oxlint --fix apps/web --ignore-path .oxlintignore",
