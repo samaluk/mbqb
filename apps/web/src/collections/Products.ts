@@ -1,52 +1,18 @@
 import type { CollectionConfig } from 'payload'
 
-import { publishedOrStaff } from '@/access/publishedOrStaff'
-import { isEditorOrAdmin } from '@/access/roles'
-import { buildPreviewUrl, draftVersions } from '@/lib/preview'
+import { getPublicContentPublishing } from '@/lib/publicContentPublishing'
+
+const publishing = getPublicContentPublishing('products')
 
 export const Products: CollectionConfig = {
   slug: 'products',
   admin: {
+    ...publishing.admin,
     defaultColumns: ['title', 'priceCLP', 'stockStatus', 'updatedAt'],
-    livePreview: {
-      url: ({ data, locale }) => {
-        const slug = typeof data?.slug === 'string' ? data.slug : ''
-
-        if (!slug) {
-          return null
-        }
-
-        return buildPreviewUrl({
-          collection: 'products',
-          locale,
-          path: `/productos/${slug}`,
-          slug,
-        })
-      },
-    },
-    preview: (data, { locale }) => {
-      const slug = typeof data?.slug === 'string' ? data.slug : ''
-
-      if (!slug) {
-        return null
-      }
-
-      return buildPreviewUrl({
-        collection: 'products',
-        locale,
-        path: `/productos/${slug}`,
-        slug,
-      })
-    },
     useAsTitle: 'title',
   },
-  access: {
-    create: isEditorOrAdmin,
-    delete: isEditorOrAdmin,
-    read: publishedOrStaff,
-    update: isEditorOrAdmin,
-  },
-  versions: draftVersions,
+  access: publishing.access,
+  versions: publishing.versions,
   fields: [
     {
       name: 'title',

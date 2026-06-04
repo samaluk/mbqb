@@ -1,23 +1,15 @@
-export const publicContentRevalidateSeconds = 15 * 60
+import {
+  getPublicContentDetailPath,
+  getPublicContentListingPath,
+  type PublicContentCollection,
+} from '@/lib/publicContentPublishing'
 
-type PublicCollection = 'canchas' | 'la-biblia-articles' | 'products'
+export const publicContentRevalidateSeconds = 15 * 60
 
 type RevalidatePath = (path: string) => void
 
 type MaybeSlugDoc = {
   slug?: unknown
-}
-
-const collectionListings: Record<PublicCollection, string> = {
-  canchas: '/canchas',
-  'la-biblia-articles': '/la-biblia',
-  products: '/productos',
-}
-
-const collectionDetailPrefixes: Record<PublicCollection, string> = {
-  canchas: '/canchas',
-  'la-biblia-articles': '/la-biblia',
-  products: '/productos',
 }
 
 const globalPublicPaths = [
@@ -35,16 +27,15 @@ export function getPublicCollectionRevalidationPaths({
   doc,
   previousDoc,
 }: {
-  collection: PublicCollection
+  collection: PublicContentCollection
   doc?: MaybeSlugDoc | null
   previousDoc?: MaybeSlugDoc | null
 }) {
-  const paths = new Set<string>([collectionListings[collection]])
-  const prefix = collectionDetailPrefixes[collection]
+  const paths = new Set<string>([getPublicContentListingPath(collection)])
 
   for (const slug of [getSlug(doc), getSlug(previousDoc)]) {
     if (slug) {
-      paths.add(`${prefix}/${slug}`)
+      paths.add(getPublicContentDetailPath(collection, slug))
     }
   }
 
@@ -52,7 +43,7 @@ export function getPublicCollectionRevalidationPaths({
 }
 
 export async function revalidatePublicCollectionDoc(args: {
-  collection: PublicCollection
+  collection: PublicContentCollection
   doc?: MaybeSlugDoc | null
   previousDoc?: MaybeSlugDoc | null
   revalidate?: RevalidatePath

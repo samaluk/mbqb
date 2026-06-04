@@ -43,3 +43,7 @@ _Avoid_: News, blog, opinion feed
 **Product**:
 An MBQB merchandise item promoted through the site for inquiry or purchase through an external contact flow.
 _Avoid_: Cart item, checkout item
+
+**Public Content Publishing**:
+The shared CMS publishing behavior for public Cancha, La Biblia, and Product content: draft previews, staff-only editing, published public reads, and public route revalidation.
+_Avoid_: Generic CMS plumbing, private membership validation
