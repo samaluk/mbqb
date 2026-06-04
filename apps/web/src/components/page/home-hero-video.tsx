@@ -8,11 +8,7 @@ type HomeHeroVideoProps = ComponentProps<'video'> & {
 
 function HomeHeroVideo({ className, src, ...props }: HomeHeroVideoProps) {
   return (
-    <div
-      aria-hidden
-      className="absolute inset-0 -z-[2] size-full overflow-hidden bg-ink"
-      data-slot="hero-video"
-    >
+    <div aria-hidden className="home-hero-video-bg" data-slot="hero-video">
       <video
         autoPlay
         className={cn('block size-full object-cover', className)}

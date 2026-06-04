@@ -107,11 +107,7 @@ export function CanchasDataTable({
               canchas.map((cancha) => (
                 <TableRow key={cancha.id}>
                   <TableCell data-column="title">
-                    <Button
-                      asChild
-                      className="h-auto justify-start px-0 py-0 text-left"
-                      variant="link"
-                    >
+                    <Button asChild className="h-auto justify-start p-0 text-left" variant="link">
                       <Link href={`/canchas/${cancha.slug}`}>{cancha.title}</Link>
                     </Button>
                   </TableCell>
@@ -128,7 +124,7 @@ export function CanchasDataTable({
                   <TableCell data-column="region">{cancha.region || 'Sin region'}</TableCell>
                   <TableCell data-column="city">{cancha.city || 'Sin ciudad'}</TableCell>
                   <TableCell data-column="summary">
-                    <span className="block max-w-[420px] truncate text-muted-foreground">
+                    <span className="block max-w-105 truncate text-muted-foreground">
                       {cancha.summary || 'Sin resumen'}
                     </span>
                   </TableCell>

@@ -48,7 +48,7 @@ export default async function ProductosPage() {
             {product.imageUrl ? (
               <img
                 alt=""
-                className="aspect-[5/3] w-full object-cover max-[760px]:aspect-[16/9]"
+                className="aspect-5/3 w-full object-cover max-[760px]:aspect-video"
                 src={product.imageUrl}
               />
             ) : null}

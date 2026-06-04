@@ -44,7 +44,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
 
   return (
     <PageDetail>
-      <Link className="w-fit text-[15px] font-extrabold text-green no-underline" href="/la-biblia">
+      <Link className="back-link" href="/la-biblia">
         Volver a La Biblia
       </Link>
       <PageKicker>La Biblia</PageKicker>

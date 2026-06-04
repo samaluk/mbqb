@@ -37,7 +37,7 @@ export function CanchasFilteredResults({ results }: CanchasFilteredResultsProps)
 
   return (
     <div className="mt-6 flex flex-col gap-3">
-      <div className="grid grid-cols-[minmax(320px,0.85fr)_minmax(0,1.15fr)] items-start gap-4 max-[760px]:grid-cols-1 max-[760px]:gap-3">
+      <div className="grid grid-cols-canchas-cards items-start gap-4 max-[760px]:grid-cols-1 max-[760px]:gap-3">
         <CanchasMapLoader
           canchas={mapCanchaDocs}
           userLocation={
@@ -45,7 +45,7 @@ export function CanchasFilteredResults({ results }: CanchasFilteredResultsProps)
           }
         />
         <div
-          className="grid max-h-[680px] gap-2 overflow-auto pr-1 max-[760px]:max-h-none max-[760px]:overflow-visible max-[760px]:pr-0"
+          className="grid max-h-170 gap-2 overflow-auto pe-1 max-[760px]:max-h-none max-[760px]:overflow-visible max-[760px]:pe-0"
           aria-label="Listado de canchas"
         >
           {canchaDocs.length ? (
@@ -53,7 +53,7 @@ export function CanchasFilteredResults({ results }: CanchasFilteredResultsProps)
               <Card className="min-w-0" key={cancha.id} size="compact">
                 <CardHeader>
                   <div className="flex items-start gap-2.5">
-                    <span className="grid size-7 shrink-0 place-items-center rounded-full bg-green text-[13px] font-black text-white-soft max-[760px]:size-6 max-[760px]:text-xs">
+                    <span className="grid size-7 shrink-0 place-items-center rounded-full bg-green text-label font-black text-white-soft max-[760px]:size-6 max-[760px]:text-xs">
                       {(pagination.page - 1) * pagination.pageSize + index + 1}
                     </span>
                     <div className="flex flex-wrap gap-2">
@@ -69,7 +69,7 @@ export function CanchasFilteredResults({ results }: CanchasFilteredResultsProps)
                 </CardHeader>
                 <CardContent className="flex flex-col gap-2">
                   {cancha.summary ? (
-                    <p className="max-w-none text-base text-muted max-[760px]:text-sm max-[760px]:leading-[1.4]">
+                    <p className="max-w-none text-base text-muted max-[760px]:text-sm max-[760px]:leading-snippet-sm">
                       {cancha.summary}
                     </p>
                   ) : null}

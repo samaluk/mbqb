@@ -49,13 +49,13 @@ export default async function CanchaDetailPage({ params }: PageProps) {
 
   return (
     <PageDetail>
-      <Link className="w-fit text-[15px] font-extrabold text-green no-underline" href="/canchas">
+      <Link className="back-link" href="/canchas">
         Volver a canchas
       </Link>
       <PageKicker>Cancha</PageKicker>
       <PageTitle>{cancha.title}</PageTitle>
       <MetaPills items={metaItems} />
-      {cancha.summary ? <PageLede className="max-w-[780px]">{cancha.summary}</PageLede> : null}
+      {cancha.summary ? <PageLede className="max-w-195">{cancha.summary}</PageLede> : null}
       <a
         className="inline-flex min-h-10 w-fit items-center justify-center rounded-md border border-green bg-transparent px-4 font-bold text-green no-underline"
         href={getGoogleMapsUrl(canchaItem)}

@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { canchaAccessLabels } from '@/lib/canchas'
+import { canchaAccessLabels, isCanchaAccessType } from '@/lib/canchas'
 import type { CanchasControlsModel } from '@/lib/canchasBrowsing'
 
 import { useCanchasGeo } from './CanchasGeoContext'
@@ -130,7 +130,7 @@ export function CanchasViewControls({ controls }: CanchasViewControlsProps) {
         ) : null}
       </div>
       <CanchasLocationFilter />
-      <div className="grid grid-cols-[minmax(220px,1.4fr)_repeat(3,minmax(160px,1fr))] gap-2 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1">
+      <div className="grid grid-cols-canchas-filters gap-2 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1">
         <div className="flex flex-col gap-1.5">
           <Label className="text-xs font-normal text-muted-foreground" htmlFor="canchas-search">
             Buscar cancha
@@ -138,11 +138,11 @@ export function CanchasViewControls({ controls }: CanchasViewControlsProps) {
           <div className="relative">
             <SearchIcon
               aria-hidden="true"
-              className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+              className="pointer-events-none absolute inset-s-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
               data-icon="inline-start"
             />
             <Input
-              className="pl-8"
+              className="ps-8"
               defaultValue={query}
               id="canchas-search"
               key={query}
@@ -156,7 +156,7 @@ export function CanchasViewControls({ controls }: CanchasViewControlsProps) {
           label="Tipo de acceso"
           onValueChange={(value) => updateFilter('accessType', value)}
           options={filterOptions.accessTypes.map((accessType) => ({
-            label: canchaAccessLabels[accessType as keyof typeof canchaAccessLabels] ?? accessType,
+            label: isCanchaAccessType(accessType) ? canchaAccessLabels[accessType] : accessType,
             value: accessType,
           }))}
           value={searchParams.get('accessType') ?? allValue}

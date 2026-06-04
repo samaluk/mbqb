@@ -41,7 +41,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   return (
     <PageDetail>
-      <Link className="w-fit text-[15px] font-extrabold text-green no-underline" href="/productos">
+      <Link className="back-link" href="/productos">
         Volver a productos
       </Link>
       <PageKicker>Producto</PageKicker>
@@ -55,7 +55,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       {product.imageUrl ? (
         <img
           alt=""
-          className="aspect-[5/3] h-auto w-[min(100%,640px)] rounded-lg object-cover max-[760px]:aspect-[16/9]"
+          className="aspect-5/3 h-auto w-product-image rounded-lg object-cover max-[760px]:aspect-video"
           src={product.imageUrl}
         />
       ) : null}

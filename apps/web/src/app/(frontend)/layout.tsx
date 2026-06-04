@@ -29,7 +29,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
     <html lang="es-CL">
       <body>
         <RefreshRouteOnSave />
-        <header className="mx-auto flex max-w-[1120px] items-center justify-between gap-5 px-6 py-4 max-[760px]:sticky max-[760px]:top-0 max-[760px]:z-[15] max-[760px]:gap-3 max-[760px]:border-b max-[760px]:border-line/70 max-[760px]:bg-paper/95 max-[760px]:px-3 max-[760px]:py-2 max-[760px]:backdrop-blur-[10px]">
+        <header className="site-header">
           <Link className="font-extrabold no-underline max-[760px]:text-lg" href="/">
             MBQB
           </Link>

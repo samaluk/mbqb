@@ -15,17 +15,14 @@ import {
 } from '@/lib/canchas'
 import { formatDistanceKm, type GeoPoint } from '@/lib/canchasGeo'
 
-const clubMarkerBase =
-  'grid place-items-center rounded-full border-2 border-white-soft text-[13px] font-black text-white-soft shadow-[0_8px_24px_rgb(16_20_17/22%)] [&_span]:block [&_span]:leading-none'
-
 const clubMarkerClassByAccess: Record<CanchaMapItem['accessType'], string> = {
-  private: `${clubMarkerBase} bg-red`,
-  'pay-and-play': `${clubMarkerBase} bg-green`,
-  restricted: `${clubMarkerBase} bg-[#286784]`,
-  unknown: `${clubMarkerBase} bg-muted`,
+  private: 'map-marker-private',
+  'pay-and-play': 'map-marker-pay-and-play',
+  restricted: 'map-marker-restricted',
+  unknown: 'map-marker-unknown',
 }
 
-const userLocationMarkerClass = `${clubMarkerBase} bg-[#1d4ed8] text-lg`
+const userLocationMarkerClass = 'map-marker-user'
 
 const createClubIcon = (index: number, accessType: CanchaMapItem['accessType']) =>
   L.divIcon({
@@ -97,7 +94,7 @@ export default function CanchasMap({
   return (
     <MapContainer
       center={[-33.45, -70.66]}
-      className="sticky top-6 z-0 min-h-[680px] overflow-hidden rounded-lg border border-line bg-white-soft max-[760px]:relative max-[760px]:top-auto max-[760px]:min-h-[220px] [&_.leaflet-container]:font-[inherit] [&_.leaflet-control-attribution]:text-[11px]"
+      className="canchas-map"
       scrollWheelZoom={false}
       zoom={8}
       zoomControl
@@ -111,8 +108,8 @@ export default function CanchasMap({
         <Marker icon={userLocationIcon} position={[userLocation.latitude, userLocation.longitude]}>
           <Popup>
             <div className="grid min-w-32 gap-1 text-ink">
-              <strong className="leading-[1.15]">Tu ubicación</strong>
-              <span className="text-[13px] text-muted">Centro del filtro por distancia</span>
+              <strong className="leading-snug">Tu ubicación</strong>
+              <span className="text-label text-muted">Centro del filtro por distancia</span>
             </div>
           </Popup>
         </Marker>
@@ -125,17 +122,15 @@ export default function CanchasMap({
         >
           <Popup>
             <div className="grid min-w-40 gap-1 text-ink">
-              <strong className="leading-[1.15]">{cancha.title}</strong>
-              <span className="text-[13px] text-muted">
-                {canchaAccessLabels[cancha.accessType]}
-              </span>
+              <strong className="leading-snug">{cancha.title}</strong>
+              <span className="text-label text-muted">{canchaAccessLabels[cancha.accessType]}</span>
               {cancha.city || cancha.region ? (
-                <span className="text-[13px] text-muted">
+                <span className="text-label text-muted">
                   {[cancha.city, cancha.region].filter(Boolean).join(', ')}
                 </span>
               ) : null}
               {'distanceKm' in cancha && typeof cancha.distanceKm === 'number' ? (
-                <span className="text-[13px] font-semibold text-green">
+                <span className="text-label font-semibold text-green">
                   {formatDistanceKm(cancha.distanceKm)}
                 </span>
               ) : null}
