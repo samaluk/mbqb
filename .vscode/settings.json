@@ -1,4 +1,10 @@
 {
+  "eslint.workingDirectories": [
+    {
+      "directory": "apps/web",
+      "changeProcessCWD": true
+    }
+  ],
   "npm.packageManager": "pnpm",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[typescript]": {
