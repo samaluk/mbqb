@@ -2,7 +2,7 @@
 # From https://github.com/vercel/next.js/blob/canary/examples/with-docker/Dockerfile
 
 # Node version must match engines.node in the repo root package.json
-FROM node:22.17.0-alpine AS base
+FROM node:22.22.3-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
