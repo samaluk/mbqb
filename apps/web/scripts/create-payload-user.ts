@@ -9,6 +9,16 @@ type StaffRole = 'admin' | 'editor' | 'validation-manager'
 
 const validRoles = new Set<StaffRole>(['admin', 'editor', 'validation-manager'])
 
+function parseStaffRole(value: string | undefined): StaffRole {
+  const role = value?.trim() || 'admin'
+
+  if (role === 'admin' || role === 'editor' || role === 'validation-manager') {
+    return role
+  }
+
+  throw new Error(`CMS_USER_ROLE must be one of: ${[...validRoles].join(', ')}`)
+}
+
 const getRequiredEnv = (name: string) => {
   const value = process.env[name]?.trim()
 
@@ -22,12 +32,8 @@ const getRequiredEnv = (name: string) => {
 const main = async () => {
   const email = getRequiredEnv('CMS_USER_EMAIL').toLowerCase()
   const password = getRequiredEnv('CMS_USER_PASSWORD')
-  const role = (process.env.CMS_USER_ROLE?.trim() || 'admin') as StaffRole
+  const role = parseStaffRole(process.env.CMS_USER_ROLE)
   const updateExisting = process.env.CMS_USER_UPDATE_EXISTING === 'true'
-
-  if (!validRoles.has(role)) {
-    throw new Error(`CMS_USER_ROLE must be one of: ${[...validRoles].join(', ')}`)
-  }
 
   const { default: config } = await import('@payload-config')
   const payload = await getPayload({ config })

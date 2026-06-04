@@ -14,6 +14,24 @@ const json = (body: Record<string, string>, status: number) =>
     status,
   })
 
+async function readRutFromRequest(request: Request): Promise<string> {
+  let raw: unknown
+
+  try {
+    raw = await request.json()
+  } catch {
+    return ''
+  }
+
+  if (typeof raw !== 'object' || raw === null || !('rut' in raw)) {
+    return ''
+  }
+
+  const { rut } = raw
+
+  return typeof rut === 'string' ? rut : ''
+}
+
 export const handleBogeyficadorCheck = async (
   request: Request,
   { checkMembership, clientKey, rateLimiter }: BogeyficadorCheckDependencies,
@@ -28,8 +46,7 @@ export const handleBogeyficadorCheck = async (
     )
   }
 
-  const body = (await request.json().catch(() => null)) as { rut?: unknown } | null
-  const rut = typeof body?.rut === 'string' ? body.rut : ''
+  const rut = await readRutFromRequest(request)
   const result = await checkMembership(rut)
 
   if (result.status === 'invalid_rut') {

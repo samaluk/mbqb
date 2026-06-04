@@ -1,11 +1,7 @@
 import type { Payload, Where } from 'payload'
 
 import type { CanchaMapItem } from '@/lib/canchas'
-import {
-  annotateCanchasWithDistance,
-  paginateCanchas,
-  type CanchaWithDistance,
-} from '@/lib/canchasGeo'
+import { annotateCanchasWithDistance, paginateCanchas } from '@/lib/canchasGeo'
 import { getCanchasNearWhere } from '@/lib/canchasLocation'
 import type { StoredUserGeo } from '@/lib/canchasUserGeo'
 
@@ -127,7 +123,17 @@ type LoadCanchasBrowsingArgs = {
 const defaultPageSize = 10
 const maxPageSize = 50
 const geoFetchLimit = 1000
-const sortableFields = new Set(['accessType', 'city', 'region', 'title'])
+function isSortField(field: string): field is CanchasSort['field'] {
+  switch (field) {
+    case 'accessType':
+    case 'city':
+    case 'region':
+    case 'title':
+      return true
+    default:
+      return false
+  }
+}
 
 export function createPayloadCanchasAdapter({
   cmsQuery,
@@ -403,10 +409,10 @@ function parseSort(value: string): CanchasSort {
   const direction = value.startsWith('-') ? 'desc' : 'asc'
   const field = value.replace(/^-/, '')
 
-  if (sortableFields.has(field)) {
+  if (isSortField(field)) {
     return {
       direction,
-      field: field as CanchasSort['field'],
+      field,
     }
   }
 
@@ -515,7 +521,7 @@ function buildSortLink(
 function annotatePool(docs: CanchaMapItem[], userGeo: StoredUserGeo | null) {
   if (!userGeo) return docs
 
-  return annotateCanchasWithDistance(docs, userGeo) as CanchaWithDistance[]
+  return annotateCanchasWithDistance(docs, userGeo)
 }
 
 function getUniqueValues(docs: CanchaMapItem[], key: keyof CanchaMapItem): string[] {

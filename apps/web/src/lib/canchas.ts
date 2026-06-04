@@ -3,6 +3,12 @@ export const canchaAccessLabels = {
   'pay-and-play': 'Pay and play',
   restricted: 'Restringida',
   unknown: 'Por confirmar',
+} as const
+
+export type CanchaAccessType = keyof typeof canchaAccessLabels
+
+export function isCanchaAccessType(value: string): value is CanchaAccessType {
+  return value in canchaAccessLabels
 }
 
 import type { Cancha } from '@/payload-types'

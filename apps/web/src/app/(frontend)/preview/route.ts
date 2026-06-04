@@ -2,7 +2,6 @@ import { env } from '@/env'
 import config from '@payload-config'
 import { draftMode } from 'next/headers'
 import { redirect } from 'next/navigation'
-import type { PayloadRequest } from 'payload'
 import { getPayload } from 'payload'
 
 export async function GET(req: Request) {
@@ -29,7 +28,6 @@ export async function GET(req: Request) {
   try {
     const user = await payload.auth({
       headers: req.headers,
-      req: req as unknown as PayloadRequest,
     })
 
     const draft = await draftMode()
@@ -45,5 +43,5 @@ export async function GET(req: Request) {
     return new Response('You are not allowed to preview this page', { status: 403 })
   }
 
-  redirect(path)
+  return redirect(path)
 }

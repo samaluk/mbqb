@@ -9,10 +9,14 @@ export type StoredUserGeo = GeoPoint & {
   maxKm: number
 }
 
-export function parseStoredUserGeo(value: unknown): StoredUserGeo | null {
-  if (!value || typeof value !== 'object') return null
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
 
-  const record = value as Record<string, unknown>
+export function parseStoredUserGeo(value: unknown): StoredUserGeo | null {
+  if (!isRecord(value)) return null
+
+  const record = value
   const latitude = Number(record.latitude)
   const longitude = Number(record.longitude)
   const maxKm = Number(record.maxKm)

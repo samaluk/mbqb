@@ -16,6 +16,31 @@ type CheckResponse = {
   status: CheckStatus
 }
 
+function isCheckStatus(status: unknown): status is CheckStatus {
+  return (
+    status === 'active' ||
+    status === 'invalid_rut' ||
+    status === 'not_found' ||
+    status === 'rate_limited'
+  )
+}
+
+function parseCheckResponse(data: unknown): CheckResponse {
+  if (typeof data !== 'object' || data === null) {
+    return { message: 'Respuesta invalida.', status: 'not_found' }
+  }
+
+  const message =
+    'message' in data && typeof data.message === 'string' ? data.message : 'Respuesta invalida.'
+  const status = 'status' in data ? data.status : null
+
+  if (isCheckStatus(status)) {
+    return { message, status }
+  }
+
+  return { message, status: 'not_found' }
+}
+
 const formatRutInput = (value: string) => {
   const cleaned = value.replace(/[.\-\s]/g, '').toUpperCase()
   const body = cleaned.slice(0, -1).replace(/\D/g, '')
@@ -45,14 +70,18 @@ export function BogeyficadorForm() {
       method: 'POST',
     })
 
-    const data = (await response.json()) as CheckResponse
-    setResult(data)
+    const data: unknown = await response.json()
+    setResult(parseCheckResponse(data))
     setIsSubmitting(false)
   }
 
   return (
-    <form onSubmit={onSubmit}>
-      <Card className="shadow-[0_12px_40px_rgb(16_20_17_/_8%)]" size="compact">
+    <form
+      onSubmit={(event) => {
+        void onSubmit(event)
+      }}
+    >
+      <Card className="shadow-card" size="compact">
         <CardContent>
           <FieldGroup>
             <Field>
@@ -87,7 +116,7 @@ export function BogeyficadorForm() {
           </Button>
           {result ? (
             <Badge
-              className="h-auto justify-start whitespace-normal px-3 py-2.5 text-sm font-bold"
+              className="h-auto justify-start px-3 py-2.5 text-sm font-bold whitespace-normal"
               variant={result.status === 'active' ? 'secondary' : 'destructive'}
             >
               {result.message}
