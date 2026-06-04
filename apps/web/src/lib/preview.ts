@@ -1,3 +1,5 @@
+import { env } from '@/env'
+
 type PreviewTarget = {
   collection: string
   path: string
@@ -24,7 +26,7 @@ export function buildPreviewUrl({ collection, path, slug, locale }: PreviewTarge
   const params = new URLSearchParams({
     collection,
     path: buildPreviewPath(path, normalizeLocale(locale)),
-    previewSecret: process.env.PREVIEW_SECRET || '',
+    previewSecret: env.PREVIEW_SECRET,
     slug,
   })
 

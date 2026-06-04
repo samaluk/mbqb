@@ -1,3 +1,4 @@
+import { env } from '@/env'
 import config from '@payload-config'
 import { draftMode } from 'next/headers'
 import { redirect } from 'next/navigation'
@@ -13,7 +14,7 @@ export async function GET(req: Request) {
   const slug = searchParams.get('slug')
   const previewSecret = searchParams.get('previewSecret')
 
-  if (previewSecret !== process.env.PREVIEW_SECRET) {
+  if (previewSecret !== env.PREVIEW_SECRET) {
     return new Response('You are not allowed to preview this page', { status: 403 })
   }
 

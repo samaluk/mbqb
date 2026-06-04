@@ -6,6 +6,8 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
+import { env } from '@/env'
+
 import { ActiveMemberships } from './collections/ActiveMemberships'
 import { Canchas } from './collections/Canchas'
 import { LaBibliaArticles } from './collections/LaBibliaArticles'
@@ -52,27 +54,27 @@ export default buildConfig({
     ],
   },
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || '',
-  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
+  secret: env.PAYLOAD_SECRET,
+  serverURL: env.NEXT_PUBLIC_SERVER_URL,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: postgresAdapter({
     migrationDir: path.resolve(dirname, 'migrations'),
     pool: {
-      connectionString: process.env.DATABASE_URL || '',
+      connectionString: env.DATABASE_URL,
     },
-    push: process.env.NODE_ENV !== 'production' && process.env.CI !== 'true',
+    push: env.NODE_ENV !== 'production' && env.CI !== 'true',
   }),
   sharp,
   plugins: [
     vercelBlobStorage({
       clientUploads: true,
-      enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
+      enabled: Boolean(env.BLOB_READ_WRITE_TOKEN),
       collections: {
         media: true,
       },
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      token: env.BLOB_READ_WRITE_TOKEN,
     }),
   ],
 })

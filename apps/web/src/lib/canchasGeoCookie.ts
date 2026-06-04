@@ -2,6 +2,8 @@ import 'server-only'
 
 import { cookies } from 'next/headers'
 
+import { env } from '@/env'
+
 import { parseStoredUserGeo, type StoredUserGeo } from '@/lib/canchasUserGeo'
 
 export const canchasUserGeoCookieName = 'mbqb.canchas.userGeo'
@@ -13,7 +15,7 @@ const cookieOptions = {
   httpOnly: true,
   path: cookiePath,
   sameSite: 'lax' as const,
-  secure: process.env.NODE_ENV === 'production',
+  secure: env.NODE_ENV === 'production',
 }
 
 export async function readCanchasUserGeoCookie(): Promise<StoredUserGeo | null> {

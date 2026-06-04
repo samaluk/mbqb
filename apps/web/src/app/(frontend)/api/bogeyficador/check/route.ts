@@ -2,6 +2,7 @@ import configPromise from '@payload-config'
 import { headers } from 'next/headers'
 import { getPayload } from 'payload'
 
+import { env } from '@/env'
 import {
   checkActiveMembership,
   findActiveMembershipByLookupHash,
@@ -29,7 +30,7 @@ export const POST = async (request: Request) => {
     checkMembership: (rut) =>
       checkActiveMembership(rut, {
         findByLookupHash: (lookupHash) => findActiveMembershipByLookupHash(payload, lookupHash),
-        hashSecret: process.env.PAYLOAD_SECRET ?? 'development-secret',
+        hashSecret: env.PAYLOAD_SECRET,
       }),
     clientKey: await getClientKey(),
     rateLimiter: bogeyficadorRateLimiter,

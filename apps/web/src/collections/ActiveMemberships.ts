@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin, isValidationManagerOrAdmin } from '@/access/roles'
+import { env } from '@/env'
 import { createMembershipLookupHash } from '@/lib/membershipLookupHash'
 import { normalizeRut } from '@/lib/rut'
 
@@ -34,10 +35,7 @@ export const ActiveMemberships: CollectionConfig = {
         return {
           ...data,
           normalizedRut,
-          rutLookupHash: createMembershipLookupHash(
-            normalizedRut,
-            process.env.PAYLOAD_SECRET ?? 'development-secret',
-          ),
+          rutLookupHash: createMembershipLookupHash(normalizedRut, env.PAYLOAD_SECRET),
         }
       },
     ],
