@@ -131,14 +131,24 @@ Before applying the generated migration that drops legacy `body_html` columns:
    ```
 
 4. Verify the script reports zero failures.
-5. Finish the feature, then generate the drop-column migration with Payload:
+5. Sync Lexical `body` into published version snapshots (required for the public site when drafts are enabled):
+
+   ```sh
+   cd apps/web
+   pnpm sync:published-lexical-body:prod -- --dry-run
+   pnpm sync:published-lexical-body:prod
+   ```
+
+   The HTML backfill updates `*_locales.body` only. Payload serves anonymous reads from `_collection_v_locales.version_body` on the published snapshot, so the storefront can stay empty while admin looks correct until this step runs.
+
+6. Finish the feature, then generate the drop-column migration with Payload:
 
    ```sh
    cd apps/web
    pnpm payload migrate:create remove-body-html
    ```
 
-6. Review and commit the generated migration.
+7. Review and commit the generated migration.
 
 **After deploying the squash to production** (schema already correct; Lexical shipped):
 
