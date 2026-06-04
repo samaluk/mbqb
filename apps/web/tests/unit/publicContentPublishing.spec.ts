@@ -16,10 +16,7 @@ describe('Public Content Publishing', () => {
       canchasPublishing.admin.preview?.({ slug: 'club-test' }, { locale: 'es' } as never),
     )
     const laBibliaPreview = parsePreviewUrl(
-      laBibliaPublishing.admin.preview?.(
-        { slug: 'reglas-basicas' },
-        { locale: 'en' } as never,
-      ),
+      laBibliaPublishing.admin.preview?.({ slug: 'reglas-basicas' }, { locale: 'en' } as never),
     )
     const productPreview = parsePreviewUrl(
       productsPublishing.admin.livePreview?.url({

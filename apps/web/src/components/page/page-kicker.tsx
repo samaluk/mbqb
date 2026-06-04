@@ -11,8 +11,7 @@ function PageKicker({ className, tone = 'default', ...props }: PageKickerProps) 
     <div
       className={cn(
         'text-[13px] font-[850] leading-none uppercase text-green max-[760px]:text-[11px]',
-        tone === 'hero' &&
-          'group-has-[data-slot=hero-video]/hero:text-lime',
+        tone === 'hero' && 'group-has-[data-slot=hero-video]/hero:text-lime',
         className,
       )}
       {...props}

@@ -31,7 +31,10 @@ export function toGeoCoordinates(point: CanchaLocationPoint): GeoCoordinates {
   return { latitude, longitude }
 }
 
-export function toCanchaLocationPoint({ latitude, longitude }: GeoCoordinates): CanchaLocationPoint {
+export function toCanchaLocationPoint({
+  latitude,
+  longitude,
+}: GeoCoordinates): CanchaLocationPoint {
   return [longitude, latitude]
 }
 

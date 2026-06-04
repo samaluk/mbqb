@@ -64,7 +64,8 @@ export default async function HomePage() {
         <PageKicker tone="hero">Neo Golf Club</PageKicker>
         <PageTitle size="hero">Mas Bogeys Que Birdies</PageTitle>
         <PageLede>
-          Comunidad chilena para jugar mas golf, encontrar canchas accesibles y aprender sin vueltas.
+          Comunidad chilena para jugar mas golf, encontrar canchas accesibles y aprender sin
+          vueltas.
         </PageLede>
         <div className="mt-5 flex flex-wrap gap-2">
           <Button asChild className="min-h-10 px-4 font-bold">

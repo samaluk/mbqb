@@ -49,9 +49,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
       </Link>
       <PageKicker>La Biblia</PageKicker>
       <PageTitle>{article.title}</PageTitle>
-      <MetaPills
-        items={[categoryLabels[article.category], article.difficulty]}
-      />
+      <MetaPills items={[categoryLabels[article.category], article.difficulty]} />
       <RichContent body={article.body} />
     </PageDetail>
   )

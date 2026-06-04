@@ -13,8 +13,7 @@ export const isAdmin = ({ req }: AccessArgs) => hasRole(req.user, ['admin'])
 
 export const isAdminField: FieldAccess = ({ req }) => hasRole(req.user, ['admin'])
 
-export const isEditorOrAdmin = ({ req }: AccessArgs) =>
-  hasRole(req.user, ['admin', 'editor'])
+export const isEditorOrAdmin = ({ req }: AccessArgs) => hasRole(req.user, ['admin', 'editor'])
 
 export const isValidationManagerOrAdmin = ({ req }: AccessArgs) =>
   hasRole(req.user, ['admin', 'validation-manager'])

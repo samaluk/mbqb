@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import * as React from "react"
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import * as React from 'react'
 
-import type { StoredUserGeo } from "@/lib/canchasUserGeo"
+import type { StoredUserGeo } from '@/lib/canchasUserGeo'
 
-import { clearCanchasUserGeo, setCanchasUserGeo } from "./actions"
+import { clearCanchasUserGeo, setCanchasUserGeo } from './actions'
 
 type CanchasGeoContextValue = {
   hasGeoFilter: boolean
@@ -37,7 +37,7 @@ export function CanchasGeoProvider({
 
   const resetPageAndRefresh = React.useCallback(() => {
     const params = new URLSearchParams(searchParams.toString())
-    params.delete("page")
+    params.delete('page')
     const nextQuery = params.toString()
     router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname)
     router.refresh()
@@ -77,7 +77,7 @@ export function useCanchasGeo() {
   const context = React.use(CanchasGeoContext)
 
   if (!context) {
-    throw new Error("useCanchasGeo must be used within CanchasGeoProvider")
+    throw new Error('useCanchasGeo must be used within CanchasGeoProvider')
   }
 
   return context

@@ -8,8 +8,8 @@ export default function SobreNosotrosPage() {
       <EditorialBody>
         <p>
           MBQB nacio desde la experiencia de aprender golf sin venir de una familia de golf ni de un
-          club tradicional. Entender donde jugar, que palos comprar, como federarse y como moverse en
-          una cancha no era evidente.
+          club tradicional. Entender donde jugar, que palos comprar, como federarse y como moverse
+          en una cancha no era evidente.
         </p>
         <p>
           Primero fue un canal de YouTube para documentar ese proceso como aficionado. Despues se

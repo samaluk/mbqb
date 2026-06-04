@@ -2,10 +2,7 @@ import { getPayload, type Payload } from 'payload'
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import config from '@/payload.config'
-import {
-  checkActiveMembership,
-  findActiveMembershipByLookupHash,
-} from '@/lib/bogeyficador'
+import { checkActiveMembership, findActiveMembershipByLookupHash } from '@/lib/bogeyficador'
 import { getActiveMembershipPrivacyFields } from '@/lib/activeMembershipPrivacy'
 
 let payload: Payload

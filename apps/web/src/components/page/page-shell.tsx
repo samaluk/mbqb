@@ -6,11 +6,7 @@ type PageShellProps = ComponentProps<'section'> & {
   variant?: 'default' | 'hero'
 }
 
-function PageShell({
-  className,
-  variant = 'default',
-  ...props
-}: PageShellProps) {
+function PageShell({ className, variant = 'default', ...props }: PageShellProps) {
   return (
     <section
       className={cn(
@@ -42,9 +38,7 @@ function PageDetail({
 }
 
 function HomeHeroContent({ className, ...props }: ComponentProps<'div'>) {
-  return (
-    <div className={cn('max-w-[760px] max-[760px]:self-end', className)} {...props} />
-  )
+  return <div className={cn('max-w-[760px] max-[760px]:self-end', className)} {...props} />
 }
 
 export { PageShell, PageDetail, HomeHeroContent }

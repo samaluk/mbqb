@@ -25,6 +25,5 @@ export const env = createEnv({
     NEXT_PUBLIC_SERVER_URL: process.env.NEXT_PUBLIC_SERVER_URL,
   },
   emptyStringAsUndefined: true,
-  skipValidation:
-    process.env.SKIP_ENV_VALIDATION === 'true' || process.env.VITEST === 'true',
+  skipValidation: process.env.SKIP_ENV_VALIDATION === 'true' || process.env.VITEST === 'true',
 })

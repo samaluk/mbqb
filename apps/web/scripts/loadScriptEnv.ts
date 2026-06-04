@@ -15,8 +15,7 @@ const requireEnvFile = (relativePath: string, pullHint: string) => {
 }
 
 /** Local dev / tests: Vercel Development env → `pnpm env:pull` → `.env.local`. */
-export const loadLocalEnv = () =>
-  requireEnvFile('.env.local', 'cd apps/web && pnpm env:pull')
+export const loadLocalEnv = () => requireEnvFile('.env.local', 'cd apps/web && pnpm env:pull')
 
 /** Production DB scripts: `pnpm env:pull:production` → `.env.production.local`. */
 export const loadProductionEnv = () => {

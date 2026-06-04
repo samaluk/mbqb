@@ -126,7 +126,9 @@ export default function CanchasMap({
           <Popup>
             <div className="grid min-w-40 gap-1 text-ink">
               <strong className="leading-[1.15]">{cancha.title}</strong>
-              <span className="text-[13px] text-muted">{canchaAccessLabels[cancha.accessType]}</span>
+              <span className="text-[13px] text-muted">
+                {canchaAccessLabels[cancha.accessType]}
+              </span>
               {cancha.city || cancha.region ? (
                 <span className="text-[13px] text-muted">
                   {[cancha.city, cancha.region].filter(Boolean).join(', ')}

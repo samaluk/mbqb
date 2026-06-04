@@ -30,9 +30,7 @@ describe('canchasLocation', () => {
   })
 
   it('builds Payload near queries in [longitude, latitude] order', () => {
-    expect(
-      getCanchasNearWhere({ latitude: -33.4489, longitude: -70.6693 }, 25),
-    ).toEqual({
+    expect(getCanchasNearWhere({ latitude: -33.4489, longitude: -70.6693 }, 25)).toEqual({
       location: {
         near: [-70.6693, -33.4489, 25_000],
       },

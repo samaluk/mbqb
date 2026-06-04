@@ -45,7 +45,8 @@ export const ActiveMemberships: CollectionConfig = {
       label: 'RUT',
       required: true,
       admin: {
-        description: 'Staff entry field. Payload stores a normalized RUT and lookup hash for checks.',
+        description:
+          'Staff entry field. Payload stores a normalized RUT and lookup hash for checks.',
       },
     },
     {

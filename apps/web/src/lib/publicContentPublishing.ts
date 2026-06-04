@@ -1,4 +1,8 @@
-import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, CollectionConfig } from 'payload'
+import type {
+  CollectionAfterChangeHook,
+  CollectionAfterDeleteHook,
+  CollectionConfig,
+} from 'payload'
 
 import { publishedOrStaff } from '@/access/publishedOrStaff'
 import { isEditorOrAdmin } from '@/access/roles'

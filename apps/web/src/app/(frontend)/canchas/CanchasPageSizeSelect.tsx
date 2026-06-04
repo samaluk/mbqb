@@ -18,7 +18,9 @@ export function CanchasPageSizeSelect({ pagination }: CanchasPageSizeSelectProps
   return (
     <Select
       onValueChange={(value) => {
-        const option = pagination.pageSizeOptions.find((pageSizeOption) => `${pageSizeOption.value}` === value)
+        const option = pagination.pageSizeOptions.find(
+          (pageSizeOption) => `${pageSizeOption.value}` === value,
+        )
         if (option) window.location.href = option.href
       }}
       value={`${pagination.pageSize}`}

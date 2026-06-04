@@ -3,10 +3,7 @@ import { headers } from 'next/headers'
 import { getPayload } from 'payload'
 
 import { env } from '@/env'
-import {
-  checkActiveMembership,
-  findActiveMembershipByLookupHash,
-} from '@/lib/bogeyficador'
+import { checkActiveMembership, findActiveMembershipByLookupHash } from '@/lib/bogeyficador'
 import { handleBogeyficadorCheck } from '@/lib/bogeyficadorRoute'
 import { createFixedWindowRateLimiter } from '@/lib/rateLimit'
 

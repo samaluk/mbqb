@@ -2,10 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 
-import {
-  clearCanchasUserGeoCookie,
-  setCanchasUserGeoCookie,
-} from '@/lib/canchasGeoCookie'
+import { clearCanchasUserGeoCookie, setCanchasUserGeoCookie } from '@/lib/canchasGeoCookie'
 import { parseStoredUserGeo, type StoredUserGeo } from '@/lib/canchasUserGeo'
 
 export async function setCanchasUserGeo(geo: StoredUserGeo) {

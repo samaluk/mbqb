@@ -11,11 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
-import type {
-  CanchasPaginationModel,
-  CanchasSort,
-  CanchasSortLink,
-} from '@/lib/canchasBrowsing'
+import type { CanchasPaginationModel, CanchasSort, CanchasSortLink } from '@/lib/canchasBrowsing'
 import { formatDistanceKm } from '@/lib/canchasGeo'
 
 import { CanchasColumnControls } from './CanchasColumnControls'
@@ -186,14 +182,7 @@ function ColumnLabel({
     return <span>{label}</span>
   }
 
-  return (
-    <SortLink
-      label={label}
-      sort={sort}
-      sortLink={sortLink}
-      sortField={sortField}
-    />
-  )
+  return <SortLink label={label} sort={sort} sortLink={sortLink} sortField={sortField} />
 }
 
 function SortLink({

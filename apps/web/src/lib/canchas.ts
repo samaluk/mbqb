@@ -14,7 +14,8 @@ export type CanchaMapItem = Pick<
   'accessType' | 'city' | 'id' | 'location' | 'region' | 'slug' | 'summary' | 'title'
 >
 
-export const getCanchaLocation = (cancha: CanchaMapItem) => getCanchaLocationFromPoint(cancha.location)
+export const getCanchaLocation = (cancha: CanchaMapItem) =>
+  getCanchaLocationFromPoint(cancha.location)
 
 export const getGoogleMapsUrl = (cancha: CanchaMapItem) => {
   const location = getCanchaLocation(cancha)

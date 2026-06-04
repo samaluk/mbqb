@@ -1,20 +1,16 @@
-"use client"
+'use client'
 
-import { LocateFixedIcon, LocateOffIcon } from "lucide-react"
-import * as React from "react"
-import { toast } from "sonner"
+import { LocateFixedIcon, LocateOffIcon } from 'lucide-react'
+import * as React from 'react'
+import { toast } from 'sonner'
 
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import {
-  defaultMaxDistanceKm,
-  maxMaxDistanceKm,
-  minMaxDistanceKm,
-} from "@/lib/canchasGeo"
-import { createStoredUserGeo } from "@/lib/canchasUserGeo"
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Slider } from '@/components/ui/slider'
+import { defaultMaxDistanceKm, maxMaxDistanceKm, minMaxDistanceKm } from '@/lib/canchasGeo'
+import { createStoredUserGeo } from '@/lib/canchasUserGeo'
 
-import { useCanchasGeo } from "./CanchasGeoContext"
+import { useCanchasGeo } from './CanchasGeoContext'
 
 export function CanchasLocationFilter() {
   const { isGeoPending, setUserGeo, userGeo } = useCanchasGeo()
@@ -40,7 +36,7 @@ export function CanchasLocationFilter() {
 
   const requestLocation = () => {
     if (!navigator.geolocation) {
-      setLocationError("Tu navegador no permite compartir ubicación.")
+      setLocationError('Tu navegador no permite compartir ubicación.')
       return
     }
 
@@ -57,7 +53,7 @@ export function CanchasLocationFilter() {
         )
 
         if (!geo) {
-          setLocationError("No pudimos guardar tu ubicación. Intenta de nuevo.")
+          setLocationError('No pudimos guardar tu ubicación. Intenta de nuevo.')
           return
         }
 
@@ -65,7 +61,7 @@ export function CanchasLocationFilter() {
       },
       () => {
         setIsLocating(false)
-        setLocationError("No pudimos obtener tu ubicación. Revisa los permisos del navegador.")
+        setLocationError('No pudimos obtener tu ubicación. Revisa los permisos del navegador.')
       },
       {
         enableHighAccuracy: true,
@@ -81,8 +77,8 @@ export function CanchasLocationFilter() {
   }
 
   const notifyLocationRequired = () => {
-    toast("Comparte tu ubicación para ajustar la distancia máxima.", {
-      id: "canchas-location-required",
+    toast('Comparte tu ubicación para ajustar la distancia máxima.', {
+      id: 'canchas-location-required',
     })
   }
 
@@ -148,8 +144,8 @@ export function CanchasLocationFilter() {
             Cerca de ti
           </Label>
           <p className="max-w-prose text-sm text-muted-foreground">
-            Tu ubicación se guarda en una cookie de sesión segura en este navegador. No se incluye al
-            compartir el enlace de la página.
+            Tu ubicación se guarda en una cookie de sesión segura en este navegador. No se incluye
+            al compartir el enlace de la página.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -161,10 +157,10 @@ export function CanchasLocationFilter() {
           >
             <LocateFixedIcon data-icon="inline-start" />
             {isLocating
-              ? "Obteniendo ubicación..."
+              ? 'Obteniendo ubicación...'
               : hasLocation
-                ? "Actualizar ubicación"
-                : "Usar mi ubicación"}
+                ? 'Actualizar ubicación'
+                : 'Usar mi ubicación'}
           </Button>
           {hasLocation ? (
             <Button disabled={isGeoPending} onClick={clearLocation} type="button" variant="ghost">
@@ -178,8 +174,8 @@ export function CanchasLocationFilter() {
       <div className="flex flex-col gap-3">
         {hasLocation ? (
           <p className="text-sm text-muted-foreground">
-            Mostrando canchas a hasta <strong className="text-foreground">{sliderMaxKm} km</strong> de
-            tu ubicación actual.
+            Mostrando canchas a hasta <strong className="text-foreground">{sliderMaxKm} km</strong>{' '}
+            de tu ubicación actual.
           </p>
         ) : (
           <p className="text-sm text-muted-foreground">
@@ -187,7 +183,10 @@ export function CanchasLocationFilter() {
           </p>
         )}
         <div className="flex flex-col gap-2">
-          <Label className="text-xs font-normal text-muted-foreground" htmlFor="canchas-max-distance">
+          <Label
+            className="text-xs font-normal text-muted-foreground"
+            htmlFor="canchas-max-distance"
+          >
             Distancia máxima: {sliderMaxKm} km
           </Label>
           <div className="relative">
