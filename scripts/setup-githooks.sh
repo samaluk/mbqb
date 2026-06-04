@@ -19,4 +19,4 @@ fi
 
 echo "Configured pre-commit hooks:"
 git hook list pre-commit 2>/dev/null || true
-echo "Done. pre-commit runs: lint, typecheck (tsc --noEmit), test."
+echo "Done. pre-commit runs: lint, typecheck (tsc --noEmit), fallow audit, test."

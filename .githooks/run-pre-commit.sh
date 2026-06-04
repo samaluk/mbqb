@@ -10,6 +10,9 @@ pnpm --filter @mbqb/web lint
 echo "pre-commit: typecheck"
 pnpm --filter @mbqb/web exec tsc --noEmit
 
+echo "pre-commit: fallow audit"
+pnpm fallow:audit
+
 echo "pre-commit: test"
 pnpm --filter @mbqb/web test
 
