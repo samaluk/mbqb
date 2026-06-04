@@ -2,8 +2,7 @@ import type { Payload } from 'payload'
 
 import type { ActiveMembership } from '@/payload-types'
 
-import { createMembershipLookupHash } from './membershipLookupHash'
-import { normalizeRut } from './rut'
+import { getActiveMembershipLookup } from '@/lib/activeMembershipPrivacy'
 
 type MembershipRecord = Pick<
   ActiveMembership,
@@ -25,15 +24,13 @@ export const checkActiveMembership = async (
   rutInput: string,
   lookup: MembershipLookup,
 ): Promise<BogeyficadorResult> => {
-  const normalizedRut = normalizeRut(rutInput)
+  const activeMembershipLookup = getActiveMembershipLookup(rutInput, lookup.hashSecret)
 
-  if (!normalizedRut) {
+  if (!activeMembershipLookup.ok) {
     return { status: 'invalid_rut' }
   }
 
-  const membership = await lookup.findByLookupHash(
-    createMembershipLookupHash(normalizedRut, lookup.hashSecret),
-  )
+  const membership = await lookup.findByLookupHash(activeMembershipLookup.lookupHash)
 
   if (!membership?.isActive) {
     return { status: 'not_found' }

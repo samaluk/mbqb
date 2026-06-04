@@ -2,8 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { isAdmin, isValidationManagerOrAdmin } from '@/access/roles'
 import { env } from '@/env'
-import { createMembershipLookupHash } from '@/lib/membershipLookupHash'
-import { normalizeRut } from '@/lib/rut'
+import { getActiveMembershipPrivacyFields } from '@/lib/activeMembershipPrivacy'
 
 export const ActiveMemberships: CollectionConfig = {
   slug: 'active-memberships',
@@ -26,16 +25,15 @@ export const ActiveMemberships: CollectionConfig = {
       ({ data }) => {
         if (!data?.rut) return data
 
-        const normalizedRut = normalizeRut(data.rut)
+        const privacyFields = getActiveMembershipPrivacyFields(data.rut, env.PAYLOAD_SECRET)
 
-        if (!normalizedRut) {
+        if (!privacyFields) {
           return data
         }
 
         return {
           ...data,
-          normalizedRut,
-          rutLookupHash: createMembershipLookupHash(normalizedRut, env.PAYLOAD_SECRET),
+          ...privacyFields,
         }
       },
     ],
