@@ -63,7 +63,7 @@ export default async function ProductosPage() {
               <CardTitle>{product.title}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
-              <RichSnippet html={product.bodyHtml} />
+              <RichSnippet body={product.body} fallbackHtml={product.bodyHtml} />
               <Button asChild className="w-fit font-extrabold" variant="link">
                 <Link href={`/productos/${product.slug}`}>Ver producto</Link>
               </Button>

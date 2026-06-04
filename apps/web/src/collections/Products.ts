@@ -69,6 +69,12 @@ export const Products: CollectionConfig = {
       required: true,
     },
     {
+      name: 'body',
+      type: 'richText',
+      label: 'Body',
+      localized: true,
+    },
+    {
       name: 'priceCLP',
       type: 'number',
       label: 'Price CLP',

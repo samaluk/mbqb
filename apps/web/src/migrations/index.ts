@@ -6,6 +6,7 @@ import * as migration_20260603_140000_canchas_booking_fields from './20260603_14
 import * as migration_20260603_150000_canchas_location_point from './20260603_150000_canchas_location_point'
 import * as migration_20260604_010000_cms_drafts_schema from './20260604_010000_cms_drafts_schema'
 import * as migration_20260604_020000_publish_existing_cms_content from './20260604_020000_publish_existing_cms_content'
+import * as migration_20260604_030000_add_lexical_body_fields from './20260604_030000_add_lexical_body_fields'
 
 export const migrations = [
   {
@@ -47,5 +48,10 @@ export const migrations = [
     down: migration_20260604_020000_publish_existing_cms_content.down,
     name: '20260604_020000_publish_existing_cms_content',
     up: migration_20260604_020000_publish_existing_cms_content.up,
+  },
+  {
+    down: migration_20260604_030000_add_lexical_body_fields.down,
+    name: '20260604_030000_add_lexical_body_fields',
+    up: migration_20260604_030000_add_lexical_body_fields.up,
   },
 ]

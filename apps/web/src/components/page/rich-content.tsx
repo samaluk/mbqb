@@ -1,13 +1,15 @@
 import type { ComponentProps } from 'react'
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 
-import { sanitizeHtml } from '@/lib/sanitizeHtml'
+import { renderLexicalBodyToHTML } from '@/lib/lexicalBody'
 import { cn } from '@/lib/utils'
 
 type RichContentProps = Omit<ComponentProps<'div'>, 'children'> & {
-  html: string
+  body?: SerializedEditorState | null
+  fallbackHtml: string
 }
 
-function RichContent({ className, html, ...props }: RichContentProps) {
+function RichContent({ body, className, fallbackHtml, ...props }: RichContentProps) {
   return (
     <div
       className={cn(
@@ -25,7 +27,7 @@ function RichContent({ className, html, ...props }: RichContentProps) {
         'max-[760px]:[&_ul]:text-[15px] max-[760px]:[&_ul]:leading-[1.42]',
         className,
       )}
-      dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
+      dangerouslySetInnerHTML={{ __html: renderLexicalBodyToHTML(body, fallbackHtml) }}
       {...props}
     />
   )

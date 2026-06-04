@@ -73,6 +73,12 @@ export const LaBibliaArticles: CollectionConfig = {
       required: true,
     },
     {
+      name: 'body',
+      type: 'richText',
+      label: 'Body',
+      localized: true,
+    },
+    {
       name: 'category',
       type: 'select',
       defaultValue: 'equipo',

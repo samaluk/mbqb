@@ -1,6 +1,10 @@
 import { getPayload, type CollectionSlug, type Payload } from 'payload'
 
 import type { Cancha } from '@/payload-types'
+import {
+  canConvertHTMLToLexicalBody,
+  convertHTMLToLexicalBody,
+} from '@/lib/convertHTMLToLexicalBody'
 
 import { loadScriptEnv } from './loadScriptEnv.js'
 
@@ -270,7 +274,12 @@ const importProducts = async (payload: Payload) => {
   let count = 0
 
   for (const product of products) {
+    const body = canConvertHTMLToLexicalBody(product.body_html)
+      ? ((await convertHTMLToLexicalBody(product.body_html)) as unknown as Record<string, unknown>)
+      : undefined
+
     await upsert(payload, 'products', product.handle, {
+      ...(body ? { body } : {}),
       bodyHtml: product.body_html,
       imageUrl: product.images[0]?.src,
       priceCLP: Number(product.variants[0]?.price ?? 0),
@@ -314,6 +323,9 @@ const importCancha = async (
   lastmod?: string,
 ) => {
   const city = inferCity(page.body_html)
+  const body = canConvertHTMLToLexicalBody(page.body_html)
+    ? ((await convertHTMLToLexicalBody(page.body_html)) as unknown as Record<string, unknown>)
+    : undefined
   const existing = await payload.find({
     collection: 'canchas',
     limit: 1,
@@ -334,6 +346,7 @@ const importCancha = async (
     preserveCanchaManualFields(
       {
         accessType: privateCanchaHandles.has(handle) ? 'private' : 'pay-and-play',
+        ...(body ? { body } : {}),
         bodyHtml: page.body_html,
         city,
         region: inferRegion(city),
@@ -355,7 +368,12 @@ const importArticle = async (
   sourceUrl: string,
   lastmod?: string,
 ) => {
+  const body = canConvertHTMLToLexicalBody(page.body_html)
+    ? ((await convertHTMLToLexicalBody(page.body_html)) as unknown as Record<string, unknown>)
+    : undefined
+
   await upsert(payload, 'la-biblia-articles', handle, {
+    ...(body ? { body } : {}),
     bodyHtml: page.body_html,
     category: 'equipo',
     difficulty: 'principiante',

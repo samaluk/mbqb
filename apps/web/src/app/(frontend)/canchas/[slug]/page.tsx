@@ -64,7 +64,7 @@ export default async function CanchaDetailPage({ params }: PageProps) {
       >
         Abrir en Google Maps
       </a>
-      <RichContent html={cancha.bodyHtml} />
+      <RichContent body={cancha.body} fallbackHtml={cancha.bodyHtml} />
     </PageDetail>
   )
 }

@@ -52,7 +52,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
       <MetaPills
         items={[categoryLabels[article.category], article.difficulty]}
       />
-      <RichContent html={article.bodyHtml} />
+      <RichContent body={article.body} fallbackHtml={article.bodyHtml} />
     </PageDetail>
   )
 }

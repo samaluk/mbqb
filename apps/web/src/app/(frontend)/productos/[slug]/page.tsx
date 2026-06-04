@@ -60,7 +60,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           src={product.imageUrl}
         />
       ) : null}
-      <RichContent html={product.bodyHtml} />
+      <RichContent body={product.body} fallbackHtml={product.bodyHtml} />
     </PageDetail>
   )
 }

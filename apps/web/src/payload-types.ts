@@ -206,6 +206,21 @@ export interface Cancha {
   slug: string;
   summary?: string | null;
   bodyHtml: string;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   accessType: 'pay-and-play' | 'private' | 'restricted' | 'unknown';
   region?: string | null;
   city?: string | null;
@@ -231,6 +246,21 @@ export interface LaBibliaArticle {
   title: string;
   slug: string;
   bodyHtml: string;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   category:
     | 'primeros-pasos'
     | 'reglas-y-etiqueta'
@@ -256,6 +286,21 @@ export interface Product {
   title: string;
   slug: string;
   bodyHtml: string;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   priceCLP: number;
   stockStatus: 'available' | 'unavailable';
   imageUrl?: string | null;
@@ -418,6 +463,7 @@ export interface CanchasSelect<T extends boolean = true> {
   slug?: T;
   summary?: T;
   bodyHtml?: T;
+  body?: T;
   accessType?: T;
   region?: T;
   city?: T;
@@ -438,6 +484,7 @@ export interface LaBibliaArticlesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   bodyHtml?: T;
+  body?: T;
   category?: T;
   difficulty?: T;
   reviewedAt?: T;
@@ -455,6 +502,7 @@ export interface ProductsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   bodyHtml?: T;
+  body?: T;
   priceCLP?: T;
   stockStatus?: T;
   imageUrl?: T;

@@ -78,6 +78,12 @@ export const Canchas: CollectionConfig = {
       required: true,
     },
     {
+      name: 'body',
+      type: 'richText',
+      label: 'Body',
+      localized: true,
+    },
+    {
       name: 'accessType',
       type: 'select',
       defaultValue: 'unknown',

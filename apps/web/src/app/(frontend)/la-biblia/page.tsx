@@ -56,7 +56,7 @@ export default async function LaBibliaPage() {
               <CardTitle>{article.title}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
-              <RichSnippet html={article.bodyHtml} />
+              <RichSnippet body={article.body} fallbackHtml={article.bodyHtml} />
               <Button asChild className="w-fit font-extrabold" variant="link">
                 <Link href={`/la-biblia/${article.slug}`}>Leer articulo</Link>
               </Button>

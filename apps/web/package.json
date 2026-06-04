@@ -13,6 +13,8 @@
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "import:mbqb": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/import-mbqb-shopify.ts",
     "import:mbqb:prod": "cross-env NODE_ENV=production DOTENV_CONFIG_PATH=../../.vercel/.env.production.local NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/import-mbqb-shopify.ts",
+    "backfill:lexical-body": "cross-env NODE_OPTIONS=\"--no-deprecation -r dotenv/config --import=tsx/esm\" tsx scripts/backfill-lexical-body.ts",
+    "backfill:lexical-body:prod": "cross-env NODE_ENV=production DOTENV_CONFIG_PATH=.env.production.local NODE_OPTIONS=\"--no-deprecation -r dotenv/config --import=tsx/esm\" tsx scripts/backfill-lexical-body.ts",
     "create:prod-user": "cross-env NODE_ENV=production NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/create-payload-user.ts",
     "seed:dev-from-prod": "bash scripts/seed-dev-from-production.sh",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
