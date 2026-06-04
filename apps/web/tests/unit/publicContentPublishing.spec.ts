@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { getPublicContentPublishing } from '@/lib/publicContentPublishing'
-import { getPublicCollectionRevalidationPaths } from '@/lib/revalidatePublicContent'
+import {
+  getPublicContentPublishing,
+  getPublicContentRevalidationPaths,
+  revalidateDeletedPublicContentDoc,
+  revalidatePublicContentDoc,
+} from '@/lib/publicContentPublishing'
 
 describe('Public Content Publishing', () => {
   it('builds collection preview URLs from the shared route facts', () => {
@@ -50,7 +54,7 @@ describe('Public Content Publishing', () => {
 
   it('builds listing and detail revalidation paths from the same route facts', () => {
     expect(
-      getPublicCollectionRevalidationPaths({
+      getPublicContentRevalidationPaths({
         collection: 'la-biblia-articles',
         doc: { slug: 'nuevo-slug' },
         previousDoc: { slug: 'slug-viejo' },
@@ -58,11 +62,74 @@ describe('Public Content Publishing', () => {
     ).toEqual(['/la-biblia', '/la-biblia/nuevo-slug', '/la-biblia/slug-viejo'])
 
     expect(
-      getPublicCollectionRevalidationPaths({
+      getPublicContentRevalidationPaths({
         collection: 'products',
         doc: { slug: 'gorra' },
       }),
     ).toEqual(['/productos', '/productos/gorra'])
+  })
+
+  it('wires public route revalidation hooks into collection publishing', () => {
+    const publishing = getPublicContentPublishing('canchas')
+    const afterChange = publishing.hooks.afterChange?.[0]
+    const afterDelete = publishing.hooks.afterDelete?.[0]
+
+    expect(afterChange).toBeDefined()
+    expect(afterDelete).toBeDefined()
+  })
+
+  it('revalidates public collection routes for published changes', async () => {
+    const revalidatedPaths: string[] = []
+    const revalidate = (path: string) => revalidatedPaths.push(path)
+
+    await revalidatePublicContentDoc({
+      collection: 'canchas',
+      doc: {
+        _status: 'published',
+        slug: 'nuevo-slug',
+      },
+      previousDoc: {
+        _status: 'published',
+        slug: 'slug-viejo',
+      },
+      revalidate,
+    })
+
+    await revalidateDeletedPublicContentDoc({
+      collection: 'canchas',
+      doc: {
+        _status: 'published',
+        slug: 'nuevo-slug',
+      },
+      revalidate,
+    })
+
+    expect(revalidatedPaths).toEqual([
+      '/canchas',
+      '/canchas/nuevo-slug',
+      '/canchas/slug-viejo',
+      '/canchas',
+      '/canchas/nuevo-slug',
+    ])
+  })
+
+  it('skips public route revalidation for draft-only changes', async () => {
+    const revalidatedPaths: string[] = []
+
+    await revalidatePublicContentDoc({
+      collection: 'la-biblia-articles',
+      doc: {
+        _status: 'draft',
+        slug: 'draft-slug',
+      },
+      previousDoc: {
+        _status: 'draft',
+        slug: 'old-draft-slug',
+      },
+      revalidate: (path: string) => revalidatedPaths.push(path),
+    })
+
+    expect(revalidatedPaths).toEqual([])
   })
 })
 

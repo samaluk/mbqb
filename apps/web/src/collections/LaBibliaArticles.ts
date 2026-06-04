@@ -16,6 +16,7 @@ export const LaBibliaArticles: CollectionConfig = {
     useAsTitle: 'title',
   },
   access: publishing.access,
+  hooks: publishing.hooks,
   versions: publishing.versions,
   fields: [
     {

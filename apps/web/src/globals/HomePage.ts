@@ -3,7 +3,7 @@ import type { GlobalConfig } from 'payload'
 import { publishedOrStaff } from '@/access/publishedOrStaff'
 import { isEditorOrAdmin } from '@/access/roles'
 import { buildPreviewUrl, draftVersions } from '@/lib/preview'
-import { revalidateGlobalPublicContent } from '@/lib/revalidatePublicContent'
+import { revalidateGlobalPublicContent } from '@/lib/publicContentPublishing'
 
 export const HomePage: GlobalConfig = {
   slug: 'home-page',
