@@ -8,6 +8,12 @@ From the repository root:
 
 ```sh
 pnpm install
+cd apps/web
+vercel login
+vercel link
+pnpm env:pull
+docker compose up -d postgres
+cd ../..
 pnpm dev
 ```
 
@@ -15,11 +21,30 @@ The app runs at `http://localhost:3000`. Payload admin runs at `/admin`.
 
 ## Environment
 
-Copy `.env.example` to `.env` inside `apps/web` and set:
+[Vercel](https://vercel.com) is the source of truth for all environment variables. The canonical list and validation rules live in [`src/env.ts`](src/env.ts) (`@t3-oss/env-nextjs` + Zod). Local files are only a cache from `vercel env pull`:
 
-- `DATABASE_URL`: Postgres connection string.
-- `PAYLOAD_SECRET`: Payload secret.
-- `BLOB_READ_WRITE_TOKEN`: Vercel Blob token for production media storage.
+| File | When |
+|------|------|
+| `.env.local` | Local dev and tests — `pnpm env:pull` (Vercel **Development**) |
+| `.env.production.local` | Production DB scripts — `pnpm env:pull:production` |
+
+```sh
+cd apps/web
+pnpm env:pull              # → .env.local
+pnpm env:pull:production   # → .env.production.local
+vercel env ls              # inspect remote values
+```
+
+Configure the Vercel **Development** environment with a local Docker `DATABASE_URL` (`postgres://postgres:postgres@127.0.0.1:5433/mbqb`), `NEXT_PUBLIC_SERVER_URL=http://localhost:3000`, `PAYLOAD_SECRET`, `PREVIEW_SECRET`, and `BLOB_READ_WRITE_TOKEN` (optional). Do not point Development `DATABASE_URL` at production.
+
+If you run `pnpm seed:dev-from-prod`, set Development `PAYLOAD_SECRET` to the **same value as Production** in the Vercel dashboard so membership lookup hashes match the copied data.
+
+### Adding a new variable
+
+1. Add it in the Vercel project (`vercel env add …`).
+2. Add it to the `server` or `client` schema and `runtimeEnv` in [`src/env.ts`](src/env.ts).
+3. Run `pnpm env:pull` (or `env:pull:production` if production-only).
+4. Use `env.YOUR_VAR` in application code under `src/` — do not read `process.env` directly.
 
 ## Local Database
 
@@ -27,22 +52,16 @@ Use Docker when you do not have local Postgres:
 
 ```sh
 cd apps/web
-docker compose up postgres
-```
-
-### Seed local data from production
-
-Local Postgres should match production (Postgres 17 + PostGIS). Use the Compose service (port **5433** so it does not clash with a Homebrew Postgres on 5432):
-
-```sh
-cd apps/web
 docker compose up -d postgres
 ```
 
-After pulling production env vars to `apps/web/.env.production.local`:
+Postgres 17 + PostGIS on port **5433** (avoids clashing with a local Postgres on 5432). Set `DATABASE_URL` in Vercel Development, then `pnpm env:pull`.
+
+### Seed local data from production
 
 ```sh
-vercel env pull .env.production.local --environment=production
+cd apps/web
+pnpm env:pull:production
 pnpm seed:dev-from-prod
 ```
 
@@ -52,10 +71,11 @@ This replaces your local `mbqb` database with a copy of production (schema and c
 
 ```sh
 cd apps/web
+pnpm env:pull:production
 CMS_USER_EMAIL=you@example.com CMS_USER_PASSWORD="$(openssl rand -base64 32)" pnpm create:prod-user
 ```
 
-Use `CMS_USER_UPDATE_EXISTING=true` to reset an existing user password. For production, ensure `DOTENV_CONFIG_PATH` points at pulled Vercel env (or rely on `apps/web/.env.production.local`) and set `NODE_ENV=production`.
+Use `CMS_USER_UPDATE_EXISTING=true` to reset an existing user password. `create:prod-user` loads `.env.production.local` when `NODE_ENV=production`.
 
 ## Current Foundation
 
@@ -67,10 +87,7 @@ Current CMS foundation includes `users`, `media`, `active-memberships`, and `sit
 
 Editors can preview draft CMS content in the admin panel (Live Preview) and via the Preview button. The frontend uses Next.js draft mode plus `router.refresh()` on autosave.
 
-Set in `apps/web/.env`:
-
-- `NEXT_PUBLIC_SERVER_URL` — public app URL (e.g. `http://localhost:3000`)
-- `PREVIEW_SECRET` — random string; must match production Vercel env
+`PREVIEW_SECRET` and `NEXT_PUBLIC_SERVER_URL` must be set (via Vercel / `env:pull`). They are validated in `src/env.ts`.
 
 ### Migrations
 
@@ -100,6 +117,13 @@ pnpm migrate:down
 pnpm migrate:fresh
 ```
 
+For production migration against a pulled env file:
+
+```sh
+pnpm env:pull:production
+pnpm migrate
+```
+
 ### Squashed baseline
 
 Schema history starts from `20260604_000000_baseline` (includes drafts/version tables and Lexical `body` jsonb columns). One-off data backfills live in scripts, not migrations.
@@ -125,6 +149,7 @@ Before applying the generated migration that drops legacy `body_html` columns:
 
    ```sh
    cd apps/web
+   pnpm env:pull:production
    LEGACY_IMAGE_BASE_URL=https://mbqb.cl \
    LEGACY_IMAGE_ALLOWED_HOSTS=mbqb.cl,cdn.shopify.com,cdn.shopifycdn.net \
    pnpm backfill:lexical-body:prod
