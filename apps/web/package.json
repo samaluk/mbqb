@@ -72,7 +72,7 @@
     "@vitejs/plugin-react": "4.5.2",
     "jsdom": "28.1.0",
     "tailwindcss": "^4.3.0",
-    "tsx": "4.21.0",
+    "tsx": "4.22.4",
     "vite-tsconfig-paths": "6.1.1",
     "vitest": "4.0.18"
   },
