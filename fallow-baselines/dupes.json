@@ -1,0 +1,5 @@
+{
+  "clone_groups": [
+    "apps/web/tests/unit/canchasBrowsing.spec.ts:142-166|apps/web/tests/unit/canchasBrowsing.spec.ts:22-43|apps/web/tests/unit/canchasBrowsing.spec.ts:90-112"
+  ]
+}

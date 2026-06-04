@@ -5,11 +5,17 @@
   "scripts": {
     "build": "pnpm --filter @mbqb/web build",
     "dev": "pnpm --filter @mbqb/web dev",
+    "fallow": "fallow",
+    "fallow:audit": "fallow audit",
+    "fallow:baseline": "fallow dead-code --save-baseline fallow-baselines/dead-code.json && fallow health --save-baseline fallow-baselines/health.json && fallow dupes --save-baseline fallow-baselines/dupes.json",
     "generate:types": "pnpm --filter @mbqb/web generate:types",
     "lint": "pnpm --filter @mbqb/web lint",
     "test": "pnpm --filter @mbqb/web test",
     "test:int": "pnpm --filter @mbqb/web test:int",
     "test:unit": "pnpm --filter @mbqb/web test:unit",
     "typecheck": "pnpm --filter @mbqb/web exec tsc --noEmit"
+  },
+  "devDependencies": {
+    "fallow": "^2.88.3"
   }
 }

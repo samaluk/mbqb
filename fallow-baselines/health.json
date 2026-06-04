@@ -1,0 +1,93 @@
+{
+  "finding_counts": {
+    "apps/web/scripts/build-baseline-migration.mjs": {
+      "crap_high": {
+        "count": 1
+      },
+      "crap_moderate": {
+        "count": 1
+      }
+    },
+    "apps/web/scripts/create-payload-user.ts": {
+      "crap_moderate": {
+        "count": 1
+      }
+    },
+    "apps/web/scripts/loadScriptEnv.ts": {
+      "crap_moderate": {
+        "count": 1
+      }
+    },
+    "apps/web/src/app/(frontend)/bogeyficador/BogeyficadorForm.tsx": {
+      "crap_moderate": {
+        "count": 1
+      }
+    },
+    "apps/web/src/app/(frontend)/canchas/CanchasDataTable.tsx": {
+      "crap_high": {
+        "count": 1
+      }
+    },
+    "apps/web/src/app/(frontend)/canchas/CanchasFilteredResults.tsx": {
+      "crap_moderate": {
+        "count": 2
+      }
+    },
+    "apps/web/src/app/(frontend)/canchas/CanchasLocationFilter.tsx": {
+      "crap_critical": {
+        "count": 1
+      }
+    },
+    "apps/web/src/app/(frontend)/canchas/CanchasMap.tsx": {
+      "crap_moderate": {
+        "count": 1
+      }
+    },
+    "apps/web/src/app/(frontend)/canchas/CanchasViewControls.tsx": {
+      "crap_critical": {
+        "count": 1
+      }
+    },
+    "apps/web/src/app/(frontend)/canchas/[slug]/page.tsx": {
+      "crap_moderate": {
+        "count": 1
+      }
+    },
+    "apps/web/src/app/(frontend)/page.tsx": {
+      "crap_moderate": {
+        "count": 1
+      }
+    },
+    "apps/web/src/app/(frontend)/preview/route.ts": {
+      "crap_high": {
+        "count": 1
+      }
+    },
+    "apps/web/src/components/ui/field.tsx": {
+      "crap_high": {
+        "count": 1
+      }
+    },
+    "apps/web/src/components/ui/toggle-group.tsx": {
+      "crap_moderate": {
+        "count": 1
+      }
+    },
+    "apps/web/src/lib/canchasBrowsing.ts": {
+      "complexity_moderate": {
+        "count": 1
+      },
+      "crap_moderate": {
+        "count": 1
+      }
+    }
+  },
+  "runtime_coverage_findings": [],
+  "target_keys": [
+    "apps/web/src/components/ui/sheet.tsx:dead code",
+    "apps/web/src/access/roles.ts:high impact",
+    "apps/web/src/components/ui/field.tsx:dead code",
+    "apps/web/src/components/ui/empty.tsx:dead code",
+    "apps/web/src/components/ui/dropdown-menu.tsx:dead code"
+  ]
+}
