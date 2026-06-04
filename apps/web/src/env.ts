@@ -1,6 +1,11 @@
 import { createEnv } from '@t3-oss/env-nextjs'
 import { z } from 'zod'
 
+import { applyProductionDatabaseUrl } from '../scripts/databaseUrl.js'
+
+// Neon/Vercel often expose POSTGRES_URL* or DATABASE_URL_UNPOOLED, not DATABASE_URL.
+applyProductionDatabaseUrl()
+
 export const env = createEnv({
   server: {
     BLOB_READ_WRITE_TOKEN: z.string().optional(),
