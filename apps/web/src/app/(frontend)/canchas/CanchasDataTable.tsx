@@ -11,23 +11,23 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
-import type { CanchasSort } from '@/lib/canchasBrowsing'
+import type {
+  CanchasPaginationModel,
+  CanchasSort,
+  CanchasSortLink,
+} from '@/lib/canchasBrowsing'
 import { formatDistanceKm } from '@/lib/canchasGeo'
 
-import { getCanchasHref } from './canchasSearchParams'
 import { CanchasColumnControls } from './CanchasColumnControls'
 import { CanchasPagination } from './CanchasPagination'
 
 type CanchasDataTableProps = {
   canchas: CanchaMapItem[]
   geoSortActive?: boolean
-  page: number
-  pageSize: number
-  searchParams: Record<string, string | string[] | undefined>
+  pagination: CanchasPaginationModel
   showDistance?: boolean
   sort: CanchasSort
-  totalDocs: number
-  totalPages: number
+  sortLinks: Record<CanchasSort['field'], CanchasSortLink>
 }
 
 const columnLabels = {
@@ -45,13 +45,10 @@ const hideableColumns = ['accessType', 'region', 'city', 'summary'] as const
 export function CanchasDataTable({
   canchas,
   geoSortActive = false,
-  page,
-  pageSize,
-  searchParams,
+  pagination,
   showDistance = false,
   sort,
-  totalDocs,
-  totalPages,
+  sortLinks,
 }: CanchasDataTableProps) {
   return (
     <div className="mt-4 flex flex-col gap-3">
@@ -68,8 +65,8 @@ export function CanchasDataTable({
                 <ColumnLabel
                   geoSortActive={geoSortActive}
                   label={columnLabels.title}
-                  searchParams={searchParams}
                   sort={sort}
+                  sortLink={sortLinks.title}
                   sortField="title"
                 />
               </TableHead>
@@ -80,8 +77,8 @@ export function CanchasDataTable({
                 <ColumnLabel
                   geoSortActive={geoSortActive}
                   label={columnLabels.accessType}
-                  searchParams={searchParams}
                   sort={sort}
+                  sortLink={sortLinks.accessType}
                   sortField="accessType"
                 />
               </TableHead>
@@ -89,8 +86,8 @@ export function CanchasDataTable({
                 <ColumnLabel
                   geoSortActive={geoSortActive}
                   label={columnLabels.region}
-                  searchParams={searchParams}
                   sort={sort}
+                  sortLink={sortLinks.region}
                   sortField="region"
                 />
               </TableHead>
@@ -98,8 +95,8 @@ export function CanchasDataTable({
                 <ColumnLabel
                   geoSortActive={geoSortActive}
                   label={columnLabels.city}
-                  searchParams={searchParams}
                   sort={sort}
+                  sortLink={sortLinks.city}
                   sortField="city"
                 />
               </TableHead>
@@ -167,14 +164,7 @@ export function CanchasDataTable({
           </TableBody>
         </Table>
       </div>
-      <CanchasPagination
-        page={page}
-        pageSize={pageSize}
-        searchParams={searchParams}
-        totalDocs={totalDocs}
-        totalPages={totalPages}
-        view="table"
-      />
+      <CanchasPagination pagination={pagination} />
     </div>
   )
 }
@@ -182,14 +172,14 @@ export function CanchasDataTable({
 function ColumnLabel({
   geoSortActive,
   label,
-  searchParams,
   sort,
+  sortLink,
   sortField,
 }: {
   geoSortActive: boolean
   label: string
-  searchParams: Record<string, string | string[] | undefined>
   sort: CanchasSort
+  sortLink: CanchasSortLink
   sortField: CanchasSort['field']
 }) {
   if (geoSortActive) {
@@ -199,8 +189,8 @@ function ColumnLabel({
   return (
     <SortLink
       label={label}
-      searchParams={searchParams}
       sort={sort}
+      sortLink={sortLink}
       sortField={sortField}
     />
   )
@@ -208,30 +198,20 @@ function ColumnLabel({
 
 function SortLink({
   label,
-  searchParams,
   sort,
+  sortLink,
   sortField,
 }: {
   label: string
-  searchParams: Record<string, string | string[] | undefined>
   sort: CanchasSort
+  sortLink: CanchasSortLink
   sortField: CanchasSort['field']
 }) {
   const active = sort.field === sortField
-  const nextDirection = active && sort.direction === 'asc' ? 'desc' : 'asc'
 
   return (
     <Button asChild className="px-0" size="sm" type="button" variant="ghost">
-      <Link
-        href={getCanchasHref(
-          searchParams,
-          {
-            page: null,
-            sort: `${nextDirection === 'desc' ? '-' : ''}${sortField}`,
-          },
-          { view: 'table' },
-        )}
-      >
+      <Link href={sortLink.href}>
         {label}
         <ChevronDownIcon
           className={active && sort.direction === 'asc' ? 'rotate-180' : undefined}

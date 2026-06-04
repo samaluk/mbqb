@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import type { CanchaMapItem } from '@/lib/canchas'
-import { loadCanchasBrowsing, parseCanchasFilters, type CanchasFinder } from '@/lib/canchasBrowsing'
+import {
+  getCanchasHref,
+  loadCanchasBrowsing,
+  parseCanchasFilters,
+  type CanchasFinder,
+} from '@/lib/canchasBrowsing'
 
 const cancha = (overrides: Partial<CanchaMapItem> = {}): CanchaMapItem => ({
   accessType: 'pay-and-play',
@@ -79,12 +84,28 @@ describe('loadCanchasBrowsing', () => {
       regions: ['Los Rios', 'Metropolitana'],
     })
     expect(model.pagination).toMatchObject({
+      label: '1-1 de 2 canchas',
       page: 1,
+      pageLabel: 'Pagina 1 de 2',
       pageSize: 1,
       totalDocs: 2,
       totalPages: 2,
     })
     expect(model.pagination.canchas).toHaveLength(1)
+    expect(model.pagination.links.next).toEqual({
+      disabled: false,
+      href: '/canchas?pageSize=1&q=Cancha&page=2',
+    })
+    expect(model.pagination.pageSizeOptions).toContainEqual({
+      href: '/canchas?pageSize=20&q=Cancha',
+      value: 20,
+    })
+    expect(model.navigation.sortLinks.city).toMatchObject({
+      active: false,
+      disabled: false,
+      direction: 'asc',
+      href: '/canchas?pageSize=1&q=Cancha&view=table&sort=city',
+    })
     expect(calls).toHaveLength(2)
     expect(calls[1]).toMatchObject({
       limit: 1000,
@@ -132,6 +153,11 @@ describe('loadCanchasBrowsing', () => {
 
     expect(model.view).toBe('table')
     expect(model.showDistance).toBe(true)
+    expect(model.navigation.sortLinks.region).toMatchObject({
+      active: true,
+      disabled: true,
+      href: '/canchas?sort=region&view=table',
+    })
     expect(model.pagination.canchas).toHaveLength(1)
     expect(model.pagination.canchas[0]).toHaveProperty('distanceKm')
     expect(calls[1]).toMatchObject({
@@ -144,5 +170,28 @@ describe('loadCanchasBrowsing', () => {
         },
       },
     })
+  })
+})
+
+describe('getCanchasHref', () => {
+  it('preserves first query values while applying updates', () => {
+    expect(
+      getCanchasHref(
+        {
+          page: '3',
+          q: ['club', 'ignored'],
+          view: 'table',
+        },
+        {
+          page: null,
+          sort: '-city',
+        },
+        { view: 'table' },
+      ),
+    ).toBe('/canchas?q=club&view=table&sort=-city')
+  })
+
+  it('removes the table view param for cards links', () => {
+    expect(getCanchasHref({ view: 'table' }, {}, { view: 'cards' })).toBe('/canchas')
   })
 })

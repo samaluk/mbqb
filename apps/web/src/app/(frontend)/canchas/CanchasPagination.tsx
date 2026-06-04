@@ -8,71 +8,39 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
+import type { CanchasPaginationLink, CanchasPaginationModel } from '@/lib/canchasBrowsing'
 
-import { getCanchasHref } from './canchasSearchParams'
 import { CanchasPageSizeSelect } from './CanchasPageSizeSelect'
 
 type CanchasPaginationProps = {
-  page: number
-  pageSize: number
-  searchParams: Record<string, string | string[] | undefined>
-  totalDocs: number
-  totalPages: number
-  view: 'cards' | 'table'
+  pagination: CanchasPaginationModel
 }
 
-export function CanchasPagination({
-  page,
-  pageSize,
-  searchParams,
-  totalDocs,
-  totalPages,
-  view,
-}: CanchasPaginationProps) {
-  const firstRow = totalDocs === 0 ? 0 : (page - 1) * pageSize + 1
-  const lastRow = Math.min(page * pageSize, totalDocs)
-  const hrefOptions = view === 'table' ? { view: 'table' as const } : undefined
-
+export function CanchasPagination({ pagination }: CanchasPaginationProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="text-sm text-muted-foreground">
-        {firstRow}-{lastRow} de {totalDocs} canchas
-      </div>
+      <div className="text-sm text-muted-foreground">{pagination.label}</div>
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">Filas</span>
-          <CanchasPageSizeSelect pageSize={pageSize} searchParams={searchParams} view={view} />
+          <CanchasPageSizeSelect pagination={pagination} />
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-sm font-medium">
-            Pagina {page} de {Math.max(totalPages, 1)}
-          </div>
+          <div className="text-sm font-medium">{pagination.pageLabel}</div>
           <div className="flex items-center gap-1">
-            <PaginationButton
-              disabled={page <= 1}
-              href={getCanchasHref(searchParams, { page: '1' }, hrefOptions)}
-            >
+            <PaginationButton link={pagination.links.first}>
               <ChevronsLeftIcon />
               <span className="sr-only">Primera pagina</span>
             </PaginationButton>
-            <PaginationButton
-              disabled={page <= 1}
-              href={getCanchasHref(searchParams, { page: `${page - 1}` }, hrefOptions)}
-            >
+            <PaginationButton link={pagination.links.previous}>
               <ChevronLeftIcon />
               <span className="sr-only">Pagina anterior</span>
             </PaginationButton>
-            <PaginationButton
-              disabled={page >= totalPages}
-              href={getCanchasHref(searchParams, { page: `${page + 1}` }, hrefOptions)}
-            >
+            <PaginationButton link={pagination.links.next}>
               <ChevronRightIcon />
               <span className="sr-only">Pagina siguiente</span>
             </PaginationButton>
-            <PaginationButton
-              disabled={page >= totalPages}
-              href={getCanchasHref(searchParams, { page: `${totalPages}` }, hrefOptions)}
-            >
+            <PaginationButton link={pagination.links.last}>
               <ChevronsRightIcon />
               <span className="sr-only">Ultima pagina</span>
             </PaginationButton>
@@ -85,14 +53,12 @@ export function CanchasPagination({
 
 function PaginationButton({
   children,
-  disabled,
-  href,
+  link,
 }: {
   children: ReactNode
-  disabled: boolean
-  href: string
+  link: CanchasPaginationLink
 }) {
-  if (disabled) {
+  if (link.disabled) {
     return (
       <Button disabled size="icon-sm" type="button" variant="outline">
         {children}
@@ -102,7 +68,7 @@ function PaginationButton({
 
   return (
     <Button asChild size="icon-sm" variant="outline">
-      <Link href={href}>{children}</Link>
+      <Link href={link.href}>{children}</Link>
     </Button>
   )
 }

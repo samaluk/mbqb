@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { clampNumber } from '../../src/app/(frontend)/canchas/canchasSearchParams'
+import { clampNumber } from '@/lib/canchasBrowsing'
 
 describe('clampNumber', () => {
   it('uses the fallback when pageSize is missing', () => {

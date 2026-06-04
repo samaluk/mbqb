@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from "@/lib/canchas"
-import type { CanchasSort } from "@/lib/canchasBrowsing"
+import type { CanchasNavigationModel, CanchasPaginationModel, CanchasSort } from "@/lib/canchasBrowsing"
 import { formatDistanceKm } from "@/lib/canchasGeo"
 import type { StoredUserGeo } from "@/lib/canchasUserGeo"
 
@@ -16,14 +16,8 @@ import { CanchasPagination } from "./CanchasPagination"
 
 type CanchasFilteredResultsProps = {
   mapCanchas?: CanchaMapItem[]
-  pagination: {
-    canchas: CanchaMapItem[]
-    page: number
-    pageSize: number
-    totalDocs: number
-    totalPages: number
-  }
-  searchParams: Record<string, string | string[] | undefined>
+  navigation: CanchasNavigationModel
+  pagination: CanchasPaginationModel
   showDistance: boolean
   sort: CanchasSort
   userGeo: StoredUserGeo | null
@@ -32,8 +26,8 @@ type CanchasFilteredResultsProps = {
 
 export function CanchasFilteredResults({
   mapCanchas,
+  navigation,
   pagination,
-  searchParams,
   showDistance,
   sort,
   userGeo,
@@ -47,13 +41,10 @@ export function CanchasFilteredResults({
       <CanchasDataTable
         canchas={canchaDocs}
         geoSortActive={showDistance}
-        page={pagination.page}
-        pageSize={pagination.pageSize}
-        searchParams={searchParams}
+        pagination={pagination}
         showDistance={showDistance}
         sort={sort}
-        totalDocs={pagination.totalDocs}
-        totalPages={pagination.totalPages}
+        sortLinks={navigation.sortLinks}
       />
     )
   }
@@ -119,12 +110,7 @@ export function CanchasFilteredResults({
         </div>
       </div>
       <CanchasPagination
-        page={pagination.page}
-        pageSize={pagination.pageSize}
-        searchParams={searchParams}
-        totalDocs={pagination.totalDocs}
-        totalPages={pagination.totalPages}
-        view="cards"
+        pagination={pagination}
       />
     </div>
   )

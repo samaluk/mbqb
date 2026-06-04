@@ -29,10 +29,41 @@ export type CanchasFilters = {
 
 export type CanchasPaginationModel = {
   canchas: CanchaMapItem[]
+  firstRow: number
+  label: string
   page: number
+  pageLabel: string
   pageSize: number
+  pageSizeOptions: CanchasPageSizeOption[]
+  links: {
+    first: CanchasPaginationLink
+    last: CanchasPaginationLink
+    next: CanchasPaginationLink
+    previous: CanchasPaginationLink
+  }
   totalDocs: number
   totalPages: number
+}
+
+export type CanchasPaginationLink = {
+  disabled: boolean
+  href: string
+}
+
+export type CanchasPageSizeOption = {
+  href: string
+  value: number
+}
+
+export type CanchasSortLink = {
+  active: boolean
+  direction: CanchasSort['direction']
+  disabled: boolean
+  href: string
+}
+
+export type CanchasNavigationModel = {
+  sortLinks: Record<CanchasSort['field'], CanchasSortLink>
 }
 
 export type CanchasBrowsingModel = {
@@ -42,6 +73,7 @@ export type CanchasBrowsingModel = {
     regions: string[]
   }
   mapCanchas?: CanchaMapItem[]
+  navigation: CanchasNavigationModel
   pagination: CanchasPaginationModel
   showDistance: boolean
   sort: CanchasSort
@@ -122,6 +154,36 @@ export async function loadCanchasBrowsing({
     ? paginateCanchas(poolDocs, filters.page, filters.pageSize)
     : null
   const tableDocs = tableResult ? annotatePool(tableResult.docs, userGeo) : []
+  const pagination =
+    view === 'table' && tableResult
+      ? buildPaginationModel({
+          docs: tableDocs,
+          page: tableResult.page ?? filters.page,
+          pageSize: filters.pageSize,
+          searchParams,
+          totalDocs: tableResult.totalDocs,
+          totalPages: tableResult.totalPages,
+          view,
+        })
+      : cardsPagination
+        ? buildPaginationModel({
+            docs: cardsPagination.docs,
+            page: cardsPagination.page,
+            pageSize: filters.pageSize,
+            searchParams,
+            totalDocs: cardsPagination.totalDocs,
+            totalPages: cardsPagination.totalPages,
+            view,
+          })
+        : buildPaginationModel({
+            docs: [],
+            page: 1,
+            pageSize: filters.pageSize,
+            searchParams,
+            totalDocs: 0,
+            totalPages: 1,
+            view,
+          })
 
   return {
     filterOptions: {
@@ -130,30 +192,10 @@ export async function loadCanchasBrowsing({
       regions: getUniqueValues(filterOptionsResult.docs, 'region'),
     },
     mapCanchas: userGeo && view === 'cards' ? poolDocs : undefined,
-    pagination:
-      view === 'table' && tableResult
-        ? {
-            canchas: tableDocs,
-            page: tableResult.page ?? filters.page,
-            pageSize: filters.pageSize,
-            totalDocs: tableResult.totalDocs,
-            totalPages: tableResult.totalPages,
-          }
-        : cardsPagination
-          ? {
-              canchas: cardsPagination.docs,
-              page: cardsPagination.page,
-              pageSize: filters.pageSize,
-              totalDocs: cardsPagination.totalDocs,
-              totalPages: cardsPagination.totalPages,
-            }
-          : {
-              canchas: [],
-              page: 1,
-              pageSize: filters.pageSize,
-              totalDocs: 0,
-              totalPages: 1,
-            },
+    navigation: {
+      sortLinks: buildSortLinks(searchParams, filters.sort, userGeo !== null),
+    },
+    pagination,
     showDistance: userGeo !== null,
     sort: filters.sort,
     userGeo,
@@ -186,6 +228,39 @@ export function clampNumber(value: string, min: number, max: number, fallback: n
   if (!Number.isInteger(number)) return fallback
 
   return Math.min(Math.max(number, min), max)
+}
+
+export function getCanchasHref(
+  searchParams: Record<string, string | string[] | undefined>,
+  updates: Record<string, null | string>,
+  options?: { view?: CanchasView },
+) {
+  const params = new URLSearchParams()
+
+  for (const [key, value] of Object.entries(searchParams)) {
+    const paramValue = Array.isArray(value) ? value[0] : value
+    if (paramValue) params.set(key, paramValue)
+  }
+
+  if (options?.view === 'table') {
+    params.set('view', 'table')
+  }
+
+  if (options?.view === 'cards') {
+    params.delete('view')
+  }
+
+  for (const [key, value] of Object.entries(updates)) {
+    if (value) {
+      params.set(key, value)
+    } else {
+      params.delete(key)
+    }
+  }
+
+  const query = params.toString()
+
+  return query ? `/canchas?${query}` : '/canchas'
 }
 
 function getCanchasWhere(filters: CanchasFilters, userGeo?: StoredUserGeo | null) {
@@ -267,6 +342,98 @@ function parseSort(value: string): CanchasSort {
 
 function getPayloadSort(sort: CanchasSort) {
   return `${sort.direction === 'desc' ? '-' : ''}${sort.field}`
+}
+
+function buildPaginationModel({
+  docs,
+  page,
+  pageSize,
+  searchParams,
+  totalDocs,
+  totalPages,
+  view,
+}: {
+  docs: CanchaMapItem[]
+  page: number
+  pageSize: number
+  searchParams: Record<string, string | string[] | undefined>
+  totalDocs: number
+  totalPages: number
+  view: CanchasView
+}): CanchasPaginationModel {
+  const firstRow = totalDocs === 0 ? 0 : (page - 1) * pageSize + 1
+  const lastRow = Math.min(page * pageSize, totalDocs)
+  const hrefOptions = { view }
+
+  return {
+    canchas: docs,
+    firstRow,
+    label: `${firstRow}-${lastRow} de ${totalDocs} canchas`,
+    links: {
+      first: {
+        disabled: page <= 1,
+        href: getCanchasHref(searchParams, { page: '1' }, hrefOptions),
+      },
+      last: {
+        disabled: page >= totalPages,
+        href: getCanchasHref(searchParams, { page: `${totalPages}` }, hrefOptions),
+      },
+      next: {
+        disabled: page >= totalPages,
+        href: getCanchasHref(searchParams, { page: `${page + 1}` }, hrefOptions),
+      },
+      previous: {
+        disabled: page <= 1,
+        href: getCanchasHref(searchParams, { page: `${page - 1}` }, hrefOptions),
+      },
+    },
+    page,
+    pageLabel: `Pagina ${page} de ${Math.max(totalPages, 1)}`,
+    pageSize,
+    pageSizeOptions: [10, 20, 50].map((value) => ({
+      href: getCanchasHref(searchParams, { page: null, pageSize: `${value}` }, hrefOptions),
+      value,
+    })),
+    totalDocs,
+    totalPages,
+  }
+}
+
+function buildSortLinks(
+  searchParams: Record<string, string | string[] | undefined>,
+  sort: CanchasSort,
+  disabled: boolean,
+): Record<CanchasSort['field'], CanchasSortLink> {
+  return {
+    accessType: buildSortLink(searchParams, sort, 'accessType', disabled),
+    city: buildSortLink(searchParams, sort, 'city', disabled),
+    region: buildSortLink(searchParams, sort, 'region', disabled),
+    title: buildSortLink(searchParams, sort, 'title', disabled),
+  }
+}
+
+function buildSortLink(
+  searchParams: Record<string, string | string[] | undefined>,
+  sort: CanchasSort,
+  field: CanchasSort['field'],
+  disabled: boolean,
+): CanchasSortLink {
+  const active = sort.field === field
+  const direction = active && sort.direction === 'asc' ? 'desc' : 'asc'
+
+  return {
+    active,
+    direction,
+    disabled,
+    href: getCanchasHref(
+      searchParams,
+      {
+        page: null,
+        sort: `${direction === 'desc' ? '-' : ''}${field}`,
+      },
+      { view: 'table' },
+    ),
+  }
 }
 
 function annotatePool(docs: CanchaMapItem[], userGeo: StoredUserGeo | null) {

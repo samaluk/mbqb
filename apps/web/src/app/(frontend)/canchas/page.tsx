@@ -58,8 +58,8 @@ export default async function CanchasPage({ searchParams }: PageProps) {
           />
           <CanchasFilteredResults
             mapCanchas={browsing.mapCanchas}
+            navigation={browsing.navigation}
             pagination={browsing.pagination}
-            searchParams={params}
             showDistance={browsing.showDistance}
             sort={browsing.sort}
             userGeo={browsing.userGeo}

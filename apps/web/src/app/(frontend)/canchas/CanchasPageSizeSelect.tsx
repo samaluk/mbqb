@@ -1,7 +1,5 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
-
 import {
   Select,
   SelectContent,
@@ -10,47 +8,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { CanchasPaginationModel } from '@/lib/canchasBrowsing'
 
 type CanchasPageSizeSelectProps = {
-  pageSize: number
-  searchParams: Record<string, string | string[] | undefined>
-  view: 'cards' | 'table'
+  pagination: CanchasPaginationModel
 }
 
-export function CanchasPageSizeSelect({ pageSize, searchParams, view }: CanchasPageSizeSelectProps) {
-  const pathname = usePathname()
-  const router = useRouter()
-
+export function CanchasPageSizeSelect({ pagination }: CanchasPageSizeSelectProps) {
   return (
     <Select
       onValueChange={(value) => {
-        const params = new URLSearchParams()
-
-        for (const [key, paramValue] of Object.entries(searchParams)) {
-          const value = Array.isArray(paramValue) ? paramValue[0] : paramValue
-          if (value) params.set(key, value)
-        }
-
-        if (view === 'table') {
-          params.set('view', 'table')
-        } else {
-          params.delete('view')
-        }
-        params.set('pageSize', value)
-        params.delete('page')
-
-        router.push(`${pathname}?${params.toString()}`)
+        const option = pagination.pageSizeOptions.find((pageSizeOption) => `${pageSizeOption.value}` === value)
+        if (option) window.location.href = option.href
       }}
-      value={`${pageSize}`}
+      value={`${pagination.pageSize}`}
     >
       <SelectTrigger aria-label="Filas por pagina" className="w-20" size="sm">
         <SelectValue />
       </SelectTrigger>
       <SelectContent side="top">
         <SelectGroup>
-          {[10, 20, 50].map((size) => (
-            <SelectItem key={size} value={`${size}`}>
-              {size}
+          {pagination.pageSizeOptions.map((option) => (
+            <SelectItem key={option.value} value={`${option.value}`}>
+              {option.value}
             </SelectItem>
           ))}
         </SelectGroup>
