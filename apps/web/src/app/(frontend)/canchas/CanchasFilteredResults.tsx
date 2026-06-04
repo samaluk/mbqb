@@ -1,42 +1,28 @@
-"use client"
+'use client'
 
-import Link from "next/link"
+import Link from 'next/link'
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from "@/lib/canchas"
-import type { CanchasNavigationModel, CanchasPaginationModel, CanchasSort } from "@/lib/canchasBrowsing"
-import { formatDistanceKm } from "@/lib/canchasGeo"
-import type { StoredUserGeo } from "@/lib/canchasUserGeo"
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { canchaAccessLabels, getGoogleMapsUrl } from '@/lib/canchas'
+import type { CanchasResultsModel } from '@/lib/canchasBrowsing'
+import { formatDistanceKm } from '@/lib/canchasGeo'
 
-import { CanchasDataTable } from "./CanchasDataTable"
-import { CanchasMapLoader } from "./CanchasMapLoader"
-import { CanchasPagination } from "./CanchasPagination"
+import { CanchasDataTable } from './CanchasDataTable'
+import { CanchasMapLoader } from './CanchasMapLoader'
+import { CanchasPagination } from './CanchasPagination'
 
 type CanchasFilteredResultsProps = {
-  mapCanchas?: CanchaMapItem[]
-  navigation: CanchasNavigationModel
-  pagination: CanchasPaginationModel
-  showDistance: boolean
-  sort: CanchasSort
-  userGeo: StoredUserGeo | null
-  view: "cards" | "table"
+  results: CanchasResultsModel
 }
 
-export function CanchasFilteredResults({
-  mapCanchas,
-  navigation,
-  pagination,
-  showDistance,
-  sort,
-  userGeo,
-  view,
-}: CanchasFilteredResultsProps) {
+export function CanchasFilteredResults({ results }: CanchasFilteredResultsProps) {
+  const { mapCanchas, navigation, pagination, showDistance, sort, userGeo, view } = results
   const canchaDocs = pagination.canchas
   const mapCanchaDocs = mapCanchas ?? canchaDocs
 
-  if (view === "table") {
+  if (view === 'table') {
     return (
       <CanchasDataTable
         canchas={canchaDocs}
@@ -54,7 +40,9 @@ export function CanchasFilteredResults({
       <div className="grid grid-cols-[minmax(320px,0.85fr)_minmax(0,1.15fr)] items-start gap-4 max-[760px]:grid-cols-1 max-[760px]:gap-3">
         <CanchasMapLoader
           canchas={mapCanchaDocs}
-          userLocation={userGeo ? { latitude: userGeo.latitude, longitude: userGeo.longitude } : null}
+          userLocation={
+            userGeo ? { latitude: userGeo.latitude, longitude: userGeo.longitude } : null
+          }
         />
         <div
           className="grid max-h-[680px] gap-2 overflow-auto pr-1 max-[760px]:max-h-none max-[760px]:overflow-visible max-[760px]:pr-0"
@@ -72,7 +60,7 @@ export function CanchasFilteredResults({
                       <Badge variant="outline">{canchaAccessLabels[cancha.accessType]}</Badge>
                       {cancha.region ? <Badge variant="outline">{cancha.region}</Badge> : null}
                       {cancha.city ? <Badge variant="outline">{cancha.city}</Badge> : null}
-                      {"distanceKm" in cancha && typeof cancha.distanceKm === "number" ? (
+                      {'distanceKm' in cancha && typeof cancha.distanceKm === 'number' ? (
                         <Badge variant="secondary">{formatDistanceKm(cancha.distanceKm)}</Badge>
                       ) : null}
                     </div>
@@ -102,16 +90,14 @@ export function CanchasFilteredResults({
             <Card className="min-w-0" size="compact">
               <CardContent className="py-6 text-sm text-muted-foreground">
                 {showDistance
-                  ? "No hay canchas con coordenadas dentro del radio elegido. Prueba aumentar la distancia máxima."
-                  : "No hay canchas para los filtros seleccionados."}
+                  ? 'No hay canchas con coordenadas dentro del radio elegido. Prueba aumentar la distancia máxima.'
+                  : 'No hay canchas para los filtros seleccionados.'}
               </CardContent>
             </Card>
           )}
         </div>
       </div>
-      <CanchasPagination
-        pagination={pagination}
-      />
+      <CanchasPagination pagination={pagination} />
     </div>
   )
 }

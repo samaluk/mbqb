@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 import { getPayload } from 'payload'
 
 import { readCanchasUserGeoCookie } from '@/lib/canchasGeoCookie'
-import { loadCanchasBrowsing } from '@/lib/canchasBrowsing'
+import { createPayloadCanchasAdapter, loadCanchasBrowsing } from '@/lib/canchasBrowsing'
 import { getCmsQueryOptions } from '@/lib/cmsQuery'
 
 import { PageKicker, PageLede, PageShell, PageTitle } from '@/components/page'
@@ -22,20 +22,7 @@ export default async function CanchasPage({ searchParams }: PageProps) {
   const payload = await getPayload({ config })
   const cmsQuery = await getCmsQueryOptions()
   const browsing = await loadCanchasBrowsing({
-    findCanchas: async (args) => {
-      const result = await payload.find({
-        collection: 'canchas',
-        ...args,
-        ...cmsQuery,
-      })
-
-      return {
-        docs: result.docs,
-        page: result.page ?? undefined,
-        totalDocs: result.totalDocs,
-        totalPages: result.totalPages,
-      }
-    },
+    canchas: createPayloadCanchasAdapter({ cmsQuery, payload }),
     searchParams: params,
     userGeo,
   })
@@ -50,21 +37,8 @@ export default async function CanchasPage({ searchParams }: PageProps) {
       </PageLede>
       <Suspense fallback={null}>
         <CanchasGeoProvider initialUserGeo={userGeo}>
-          <CanchasViewControls
-            accessTypes={browsing.filterOptions.accessTypes}
-            cities={browsing.filterOptions.cities}
-            regions={browsing.filterOptions.regions}
-            view={browsing.view}
-          />
-          <CanchasFilteredResults
-            mapCanchas={browsing.mapCanchas}
-            navigation={browsing.navigation}
-            pagination={browsing.pagination}
-            showDistance={browsing.showDistance}
-            sort={browsing.sort}
-            userGeo={browsing.userGeo}
-            view={browsing.view}
-          />
+          <CanchasViewControls controls={browsing.controls} />
+          <CanchasFilteredResults results={browsing.results} />
         </CanchasGeoProvider>
       </Suspense>
     </PageShell>

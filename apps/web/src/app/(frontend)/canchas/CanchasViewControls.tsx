@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import { SearchIcon } from "lucide-react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import * as React from "react"
+import { SearchIcon } from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import * as React from 'react'
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -14,34 +14,28 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { canchaAccessLabels } from "@/lib/canchas"
+} from '@/components/ui/select'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { canchaAccessLabels } from '@/lib/canchas'
+import type { CanchasControlsModel } from '@/lib/canchasBrowsing'
 
-import { useCanchasGeo } from "./CanchasGeoContext"
-import { CanchasLocationFilter } from "./CanchasLocationFilter"
+import { useCanchasGeo } from './CanchasGeoContext'
+import { CanchasLocationFilter } from './CanchasLocationFilter'
 
 type CanchasViewControlsProps = {
-  accessTypes: string[]
-  cities: string[]
-  regions: string[]
-  view: "cards" | "table"
+  controls: CanchasControlsModel
 }
 
-const allValue = "__all__"
-const allOptionLabel = "Cualquiera"
+const allValue = '__all__'
+const allOptionLabel = 'Cualquiera'
 
-export function CanchasViewControls({
-  accessTypes,
-  cities,
-  regions,
-  view,
-}: CanchasViewControlsProps) {
+export function CanchasViewControls({ controls }: CanchasViewControlsProps) {
+  const { filterOptions, view } = controls
   const { hasGeoFilter, setUserGeo } = useCanchasGeo()
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const query = searchParams.get("q") ?? ""
+  const query = searchParams.get('q') ?? ''
   const searchTimeout = React.useRef<number>(null)
 
   const updateParams = React.useCallback(
@@ -62,9 +56,12 @@ export function CanchasViewControls({
     [pathname, router, searchParams],
   )
 
-  React.useEffect(() => () => {
-    if (searchTimeout.current) window.clearTimeout(searchTimeout.current)
-  }, [])
+  React.useEffect(
+    () => () => {
+      if (searchTimeout.current) window.clearTimeout(searchTimeout.current)
+    },
+    [],
+  )
 
   const updateSearch = (value: string) => {
     if (searchTimeout.current) window.clearTimeout(searchTimeout.current)
@@ -79,7 +76,7 @@ export function CanchasViewControls({
     }, 300)
   }
 
-  const updateFilter = (key: "accessType" | "city" | "region", value: string) => {
+  const updateFilter = (key: 'accessType' | 'city' | 'region', value: string) => {
     updateParams({
       [key]: value === allValue ? null : value,
       page: null,
@@ -88,9 +85,9 @@ export function CanchasViewControls({
 
   const hasFilters =
     Boolean(query) ||
-    Boolean(searchParams.get("accessType")) ||
-    Boolean(searchParams.get("region")) ||
-    Boolean(searchParams.get("city")) ||
+    Boolean(searchParams.get('accessType')) ||
+    Boolean(searchParams.get('region')) ||
+    Boolean(searchParams.get('city')) ||
     hasGeoFilter
 
   return (
@@ -103,7 +100,7 @@ export function CanchasViewControls({
 
             updateParams({
               page: null,
-              view: value === "table" ? "table" : null,
+              view: value === 'table' ? 'table' : null,
             })
           }}
           type="single"
@@ -157,26 +154,26 @@ export function CanchasViewControls({
         <FilterSelect
           id="canchas-filter-access-type"
           label="Tipo de acceso"
-          onValueChange={(value) => updateFilter("accessType", value)}
-          options={accessTypes.map((accessType) => ({
+          onValueChange={(value) => updateFilter('accessType', value)}
+          options={filterOptions.accessTypes.map((accessType) => ({
             label: canchaAccessLabels[accessType as keyof typeof canchaAccessLabels] ?? accessType,
             value: accessType,
           }))}
-          value={searchParams.get("accessType") ?? allValue}
+          value={searchParams.get('accessType') ?? allValue}
         />
         <FilterSelect
           id="canchas-filter-region"
           label="Región"
-          onValueChange={(value) => updateFilter("region", value)}
-          options={regions.map((region) => ({ label: region, value: region }))}
-          value={searchParams.get("region") ?? allValue}
+          onValueChange={(value) => updateFilter('region', value)}
+          options={filterOptions.regions.map((region) => ({ label: region, value: region }))}
+          value={searchParams.get('region') ?? allValue}
         />
         <FilterSelect
           id="canchas-filter-city"
           label="Ciudad"
-          onValueChange={(value) => updateFilter("city", value)}
-          options={cities.map((city) => ({ label: city, value: city }))}
-          value={searchParams.get("city") ?? allValue}
+          onValueChange={(value) => updateFilter('city', value)}
+          options={filterOptions.cities.map((city) => ({ label: city, value: city }))}
+          value={searchParams.get('city') ?? allValue}
         />
       </div>
     </div>

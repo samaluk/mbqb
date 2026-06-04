@@ -1,4 +1,4 @@
-import type { Where } from 'payload'
+import type { Payload, Where } from 'payload'
 
 import type { CanchaMapItem } from '@/lib/canchas'
 import {
@@ -66,12 +66,16 @@ export type CanchasNavigationModel = {
   sortLinks: Record<CanchasSort['field'], CanchasSortLink>
 }
 
-export type CanchasBrowsingModel = {
+export type CanchasControlsModel = {
   filterOptions: {
     accessTypes: string[]
     cities: string[]
     regions: string[]
   }
+  view: CanchasView
+}
+
+export type CanchasResultsModel = {
   mapCanchas?: CanchaMapItem[]
   navigation: CanchasNavigationModel
   pagination: CanchasPaginationModel
@@ -79,6 +83,11 @@ export type CanchasBrowsingModel = {
   sort: CanchasSort
   userGeo: StoredUserGeo | null
   view: CanchasView
+}
+
+export type CanchasBrowsingModel = {
+  controls: CanchasControlsModel
+  results: CanchasResultsModel
 }
 
 type FindCanchasArgs = {
@@ -100,8 +109,17 @@ type FindCanchasResult = {
 
 export type CanchasFinder = (args: FindCanchasArgs) => Promise<FindCanchasResult>
 
+export type CanchasAdapter = {
+  find: CanchasFinder
+}
+
+type CanchasCmsQueryOptions = {
+  draft: boolean
+  overrideAccess: boolean
+}
+
 type LoadCanchasBrowsingArgs = {
-  findCanchas: CanchasFinder
+  canchas: CanchasAdapter
   searchParams: Record<string, string | string[] | undefined>
   userGeo: StoredUserGeo | null
 }
@@ -111,24 +129,50 @@ const maxPageSize = 50
 const geoFetchLimit = 1000
 const sortableFields = new Set(['accessType', 'city', 'region', 'title'])
 
+export function createPayloadCanchasAdapter({
+  cmsQuery,
+  payload,
+}: {
+  cmsQuery: CanchasCmsQueryOptions
+  payload: Pick<Payload, 'find'>
+}): CanchasAdapter {
+  return {
+    find: async (args) => {
+      const result = await payload.find({
+        collection: 'canchas',
+        ...args,
+        ...cmsQuery,
+      })
+
+      return {
+        docs: result.docs as CanchaMapItem[],
+        page: result.page ?? undefined,
+        totalDocs: result.totalDocs,
+        totalPages: result.totalPages,
+      }
+    },
+  }
+}
+
 export async function loadCanchasBrowsing({
-  findCanchas,
+  canchas,
   searchParams,
   userGeo,
 }: LoadCanchasBrowsingArgs): Promise<CanchasBrowsingModel> {
   const filters = parseCanchasFilters(searchParams)
   const view = filters.view === 'table' ? 'table' : 'cards'
+  const hrefSearchParams = normalizeCanchasSearchParams(searchParams, filters)
   const where = getCanchasWhere(filters, userGeo)
 
   const [filterOptionsResult, tableResult, poolResult] = await Promise.all([
-    findCanchas({
+    canchas.find({
       depth: 0,
       limit: 1000,
       locale: 'es',
       sort: 'title',
     }),
     view === 'table'
-      ? findCanchas({
+      ? canchas.find({
           depth: 0,
           limit: filters.pageSize,
           locale: 'es',
@@ -138,7 +182,7 @@ export async function loadCanchasBrowsing({
         })
       : Promise.resolve(null),
     view === 'cards'
-      ? findCanchas({
+      ? canchas.find({
           depth: 0,
           limit: geoFetchLimit,
           locale: 'es',
@@ -160,7 +204,7 @@ export async function loadCanchasBrowsing({
           docs: tableDocs,
           page: tableResult.page ?? filters.page,
           pageSize: filters.pageSize,
-          searchParams,
+          searchParams: hrefSearchParams,
           totalDocs: tableResult.totalDocs,
           totalPages: tableResult.totalPages,
           view,
@@ -170,7 +214,7 @@ export async function loadCanchasBrowsing({
             docs: cardsPagination.docs,
             page: cardsPagination.page,
             pageSize: filters.pageSize,
-            searchParams,
+            searchParams: hrefSearchParams,
             totalDocs: cardsPagination.totalDocs,
             totalPages: cardsPagination.totalPages,
             view,
@@ -179,21 +223,24 @@ export async function loadCanchasBrowsing({
             docs: [],
             page: 1,
             pageSize: filters.pageSize,
-            searchParams,
+            searchParams: hrefSearchParams,
             totalDocs: 0,
             totalPages: 1,
             view,
           })
-
-  return {
-    filterOptions: {
-      accessTypes: getUniqueValues(filterOptionsResult.docs, 'accessType'),
-      cities: getUniqueValues(filterOptionsResult.docs, 'city'),
-      regions: getUniqueValues(filterOptionsResult.docs, 'region'),
-    },
+  const filterOptions = {
+    accessTypes: getUniqueValues(filterOptionsResult.docs, 'accessType'),
+    cities: getUniqueValues(filterOptionsResult.docs, 'city'),
+    regions: getUniqueValues(filterOptionsResult.docs, 'region'),
+  }
+  const controls: CanchasControlsModel = {
+    filterOptions,
+    view,
+  }
+  const results: CanchasResultsModel = {
     mapCanchas: userGeo && view === 'cards' ? poolDocs : undefined,
     navigation: {
-      sortLinks: buildSortLinks(searchParams, filters.sort, userGeo !== null),
+      sortLinks: buildSortLinks(hrefSearchParams, filters.sort, userGeo !== null),
     },
     pagination,
     showDistance: userGeo !== null,
@@ -201,9 +248,14 @@ export async function loadCanchasBrowsing({
     userGeo,
     view,
   }
+
+  return {
+    controls,
+    results,
+  }
 }
 
-export function parseCanchasFilters(
+function parseCanchasFilters(
   params: Record<string, string | string[] | undefined>,
 ): CanchasFilters {
   const sort = parseSort(getParam(params.sort))
@@ -220,7 +272,7 @@ export function parseCanchasFilters(
   }
 }
 
-export function clampNumber(value: string, min: number, max: number, fallback: number) {
+function clampNumber(value: string, min: number, max: number, fallback: number) {
   if (!value.trim()) return fallback
 
   const number = Number(value)
@@ -230,7 +282,7 @@ export function clampNumber(value: string, min: number, max: number, fallback: n
   return Math.min(Math.max(number, min), max)
 }
 
-export function getCanchasHref(
+function getCanchasHref(
   searchParams: Record<string, string | string[] | undefined>,
   updates: Record<string, null | string>,
   options?: { view?: CanchasView },
@@ -261,6 +313,30 @@ export function getCanchasHref(
   const query = params.toString()
 
   return query ? `/canchas?${query}` : '/canchas'
+}
+
+function normalizeCanchasSearchParams(
+  searchParams: Record<string, string | string[] | undefined>,
+  filters: CanchasFilters,
+) {
+  const normalized: Record<string, string> = {}
+
+  for (const key of ['accessType', 'city', 'q', 'region', 'view'] as const) {
+    const value = filters[key]
+    if (value) normalized[key] = value
+  }
+
+  if (hasParam(searchParams.page)) normalized.page = `${filters.page}`
+  if (hasParam(searchParams.pageSize)) normalized.pageSize = `${filters.pageSize}`
+  if (hasParam(searchParams.sort)) {
+    normalized.sort = `${filters.sort.direction === 'desc' ? '-' : ''}${filters.sort.field}`
+  }
+
+  return normalized
+}
+
+function hasParam(value: string | string[] | undefined) {
+  return getParam(value).trim().length > 0
 }
 
 function getCanchasWhere(filters: CanchasFilters, userGeo?: StoredUserGeo | null) {
