@@ -86,7 +86,35 @@ Set in `apps/web/.env`:
 - `NEXT_PUBLIC_SERVER_URL` — public app URL (e.g. `http://localhost:3000`)
 - `PREVIEW_SECRET` — random string; must match production Vercel env
 
-### Migrations (squashed baseline)
+### Migrations
+
+Local development follows Payload's recommended Postgres workflow: the local database is a sandbox, and Payload/Drizzle `push` syncs schema changes while `pnpm dev` runs. Do not run migrations against the same pushed local database as part of ordinary feature work; Payload treats `push` and migrations as separate workflows.
+
+For normal schema changes:
+
+1. Edit the Payload config locally and develop against the pushed local schema.
+2. Finish the feature before generating a migration.
+3. Create a migration from `apps/web`:
+
+   ```sh
+   pnpm payload migrate:create meaningful-name
+   ```
+
+4. Review the generated SQL before committing it.
+5. Let CI/production run `pnpm migrate` before `next build`.
+
+If a migration depends on environment-specific config, generate and review it with those conditions in mind. This matters for production-only plugins or flags, including Vercel Blob storage controlled by `BLOB_READ_WRITE_TOKEN`.
+
+Useful migration commands from `apps/web`:
+
+```sh
+pnpm migrate:status
+pnpm migrate:create meaningful-name
+pnpm migrate:down
+pnpm migrate:fresh
+```
+
+### Squashed baseline
 
 Schema history is a single migration: `20260604_000000_baseline` (includes drafts/version tables and Lexical `body` jsonb columns). One-off data backfills (publish drafts, Lexical body content) live in scripts, not migrations.
 
@@ -94,7 +122,7 @@ Schema history is a single migration: `20260604_000000_baseline` (includes draft
 
 ```sh
 cd apps/web
-yes | DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5433/mbqb npx payload migrate:fresh
+DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5433/mbqb pnpm migrate:fresh
 ```
 
 **Local — match production:** `pnpm seed:dev-from-prod` (restores prod dump, then `payload migrate`).

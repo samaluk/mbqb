@@ -58,10 +58,11 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: postgresAdapter({
+    migrationDir: path.resolve(dirname, 'migrations'),
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
-    push: false,
+    push: process.env.NODE_ENV !== 'production' && process.env.CI !== 'true',
   }),
   sharp,
   plugins: [
