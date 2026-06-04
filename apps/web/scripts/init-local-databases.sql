@@ -1,0 +1,1 @@
+CREATE DATABASE mbqb_test;

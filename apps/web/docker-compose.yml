@@ -23,6 +23,7 @@ services:
       POSTGRES_USER: postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./scripts/init-local-databases.sql:/docker-entrypoint-initdb.d/10-init-local-databases.sql:ro
 
 volumes:
   pgdata:
