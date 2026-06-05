@@ -5,13 +5,13 @@ runs:
   using: composite
   steps:
     # Node must be installed before pnpm 11.x (requires Node >=22.13).
-    - uses: actions/setup-node@v6
+    - uses: actions/setup-node@v6.4.0
       with:
         node-version-file: package.json
 
     # Composite actions do not pass setup-node's PATH to nested JS actions; standalone
     # installs @pnpm/exe without using the runner's default Node 20.
-    - uses: pnpm/action-setup@v6
+    - uses: pnpm/action-setup@v6.0.8
       with:
         standalone: true
         cache: true
