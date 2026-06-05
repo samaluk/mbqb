@@ -3,6 +3,10 @@ packages:
 
 minimumReleaseAge: 0
 
+peerDependencyRules:
+  allowedVersions:
+    esbuild: 0.25.12
+
 allowBuilds:
   esbuild: true
   msw: false
