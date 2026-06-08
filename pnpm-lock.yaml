@@ -63,8 +63,8 @@ importers:
         specifier: 16.14.1
         version: 16.14.1
       isomorphic-dompurify:
-        specifier: 3.15.0
-        version: 3.15.0(@noble/hashes@1.8.0)
+        specifier: 3.16.0
+        version: 3.16.0(@noble/hashes@1.8.0)
       leaflet:
         specifier: 1.9.4
         version: 1.9.4
@@ -4145,8 +4145,8 @@ packages:
     resolution: {integrity: sha512-6B3tLtFqtQS4ekarvLVMZ+X+VlvQekbe4taUkf/rhVO3d/h0M2rfARm/pXLcPEsjjMsFgrFgSrhQIxcSVrBz8w==}
     engines: {node: '>=18'}
 
-  isomorphic-dompurify@3.15.0:
-    resolution: {integrity: sha512-9ZtkbQ8+SgNf6LuDAdu9bq23dVXMIGNM8ZYnyl2MufyZiSD5dqAUJcyjtYZz7B80HuPpEn/f0NCS6zKvavHtfA==}
+  isomorphic-dompurify@3.16.0:
+    resolution: {integrity: sha512-KzTJsMuVPqPwBOD0F6jKXoV/+v8CSx0rxVp+/67KV6Xbw++0zD/avT3bZsgwR0M5QRMiOE+QqQtoZLEJYy1C4Q==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24.0.0}
 
   isomorphic.js@0.2.5:
@@ -9433,7 +9433,7 @@ snapshots:
 
   isexe@3.1.5: {}
 
-  isomorphic-dompurify@3.15.0(@noble/hashes@1.8.0):
+  isomorphic-dompurify@3.16.0(@noble/hashes@1.8.0):
     dependencies:
       dompurify: 3.4.8
       jsdom: 29.1.1(@noble/hashes@1.8.0)
