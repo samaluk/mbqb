@@ -17,7 +17,8 @@ env:
 jobs:
   quality:
     name: Lint, format, typecheck, fallow, unit tests
-    runs-on: ubuntu-latest
+    # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
+    runs-on: ${{ vars.USE_SELF_HOSTED_RUNNERS == 'true' && (vars.SELF_HOSTED_RUNNER_LABELS != '' && fromJSON(vars.SELF_HOSTED_RUNNER_LABELS) || fromJSON('["self-hosted"]')) || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v6.0.3
         with:
@@ -48,7 +49,8 @@ jobs:
 
   build-and-integration:
     name: Build, integration, and E2E tests
-    runs-on: ubuntu-latest
+    # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
+    runs-on: ${{ vars.USE_SELF_HOSTED_RUNNERS == 'true' && (vars.SELF_HOSTED_RUNNER_LABELS != '' && fromJSON(vars.SELF_HOSTED_RUNNER_LABELS) || fromJSON('["self-hosted"]')) || 'ubuntu-latest' }}
     services:
       postgres:
         image: imresamu/postgis:17-3.5
