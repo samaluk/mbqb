@@ -51,24 +51,10 @@ jobs:
     name: Build, integration, and E2E tests
     # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
     runs-on: ${{ vars.USE_SELF_HOSTED_RUNNERS == 'true' && (vars.SELF_HOSTED_RUNNER_LABELS != '' && fromJSON(vars.SELF_HOSTED_RUNNER_LABELS) || fromJSON('["self-hosted"]')) || 'ubuntu-latest' }}
-    services:
-      postgres:
-        image: imresamu/postgis:17-3.5
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: mbqb
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d mbqb"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
 
     env:
-      POSTGRES_URL: postgres://postgres:postgres@localhost:5432/mbqb
-      TEST_POSTGRES_URL: postgres://postgres:postgres@localhost:5432/mbqb_test
+      POSTGRES_URL: postgres://postgres:postgres@localhost:5433/mbqb
+      TEST_POSTGRES_URL: postgres://postgres:postgres@localhost:5433/mbqb_test
       CI: true
 
     steps:
@@ -79,11 +65,25 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Create integration test database
+      - name: Start PostgreSQL
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq postgresql-client
-          PGPASSWORD=postgres psql -h localhost -U postgres -d mbqb -c "CREATE DATABASE mbqb_test;"
+          docker run -d \
+            --name postgres \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=mbqb \
+            -p 5433:5432 \
+            imresamu/postgis:17-3.5
+
+      - name: Wait for PostgreSQL
+        run: |
+          for i in $(seq 1 30); do
+            docker exec postgres pg_isready -U postgres -d mbqb && break
+            sleep 1
+          done
+
+      - name: Create integration test database
+        run: docker exec postgres psql -U postgres -d mbqb -c "CREATE DATABASE mbqb_test;"
 
       - name: Build
         run: pnpm build
