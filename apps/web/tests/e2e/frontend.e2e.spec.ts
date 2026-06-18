@@ -9,7 +9,7 @@ test.describe('Frontend', () => {
   })
 
   test('can go on homepage', async () => {
-    await page.goto('http://localhost:3000')
+    await page.goto('/')
 
     await expect(page).toHaveTitle(/MBQB/)
 
@@ -19,7 +19,7 @@ test.describe('Frontend', () => {
   })
 
   test('can check invalid Bogeyficador input', async () => {
-    await page.goto('http://localhost:3000/bogeyficador')
+    await page.goto('/bogeyficador')
 
     await page.getByLabel('RUT').fill('123456789')
     await page.getByRole('button', { name: 'Revisar membresia' }).click()
@@ -37,7 +37,7 @@ test.describe('Frontend', () => {
       '/convenios',
       '/privacidad',
     ]) {
-      const response = await page.goto(`http://localhost:3000${path}`)
+      const response = await page.goto(path)
 
       expect(response?.status()).toBe(200)
       await expect(page.locator('h1')).toBeVisible()

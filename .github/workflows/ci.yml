@@ -12,7 +12,6 @@ concurrency:
 env:
   PAYLOAD_SECRET: ci-payload-secret-for-github-actions
   PREVIEW_SECRET: ci-preview-secret-for-github-actions
-  NEXT_PUBLIC_SERVER_URL: http://localhost:3000
 
 jobs:
   quality:
@@ -61,6 +60,14 @@ jobs:
       - uses: actions/checkout@v6.0.3
 
       - uses: ./.github/actions/setup-toolchain
+
+      - name: Allocate app port
+        shell: bash
+        run: |
+          APP_PORT="$(python3 -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()')"
+          echo "APP_PORT=$APP_PORT" >> "$GITHUB_ENV"
+          echo "PORT=$APP_PORT" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SERVER_URL=http://127.0.0.1:$APP_PORT" >> "$GITHUB_ENV"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
