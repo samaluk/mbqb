@@ -29,7 +29,7 @@
     "typecheck": "pnpm --filter @mbqb/web typecheck"
   },
   "devDependencies": {
-    "fallow": "2.89.0",
+    "fallow": "2.96.0",
     "oxfmt": "0.55.0",
     "oxlint": "1.68.0",
     "oxlint-tailwindcss": "1.2.0",
