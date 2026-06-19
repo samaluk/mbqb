@@ -62,6 +62,13 @@
   "unused_optional_dependencies": [],
   "unused_enum_members": [],
   "unused_class_members": [],
+  "unused_store_members": [],
+  "unprovided_injects": [],
+  "unrendered_components": [],
+  "unused_component_props": [],
+  "unused_component_emits": [],
+  "unused_server_actions": [],
+  "unused_load_data_keys": [],
   "unresolved_imports": [],
   "unlisted_dependencies": [],
   "duplicate_exports": [],
@@ -76,5 +83,10 @@
   "empty_catalog_groups": [],
   "unresolved_catalog_references": [],
   "unused_dependency_overrides": [],
-  "misconfigured_dependency_overrides": []
+  "misconfigured_dependency_overrides": [],
+  "invalid_client_exports": [],
+  "mixed_client_server_barrels": [],
+  "misplaced_directives": [],
+  "route_collisions": [],
+  "dynamic_segment_name_conflicts": []
 }
