@@ -10,7 +10,7 @@ const appDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const loadDotenvFileSkipEmpty = (file: string) => {
   const parsed = dotenv.parse(readFileSync(file))
   for (const [key, value] of Object.entries(parsed)) {
-    if (value.trim() !== '') {
+    if (value.trim() !== '' && !process.env[key]?.trim()) {
       process.env[key] = value
     }
   }

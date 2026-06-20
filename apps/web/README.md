@@ -26,7 +26,7 @@ The app runs at `http://localhost:3000`. Payload admin runs at `/admin`.
 | File | When |
 |------|------|
 | `.env.local` | Local dev, build, migrate, and tests — `pnpm env:pull` (Vercel **Development**) |
-| `.env.production.local` | Production-only scripts — `pnpm env:pull:production` (seed from prod, prod admin user, `migrate:production`) |
+| `.env.production.local` | Production-only scripts — `pnpm env:pull:production` (seed from prod, prod admin user, `build:production`, `migrate:production`) |
 
 ```sh
 cd apps/web
@@ -104,7 +104,7 @@ For normal schema changes:
    ```
 
 4. Review the generated SQL before committing it.
-5. Let CI/production run `pnpm migrate` before `next build`.
+5. Let CI run `pnpm build`; production runs must use `pnpm build:production`.
 
 If a migration depends on environment-specific config, generate and review it with those conditions in mind. This matters for production-only plugins or flags, including Vercel Blob storage controlled by `BLOB_READ_WRITE_TOKEN`.
 
@@ -117,10 +117,11 @@ pnpm migrate:down
 pnpm migrate:fresh
 ```
 
-`pnpm build` and `pnpm migrate` use `.env.local` (local Docker Postgres), same as CI. For an explicit production migration:
+`pnpm build` and `pnpm migrate` use `.env.local` or CI-injected variables and never load production configuration. Production targeting is explicit:
 
 ```sh
 pnpm env:pull:production
+pnpm build:production
 pnpm migrate:production
 ```
 
