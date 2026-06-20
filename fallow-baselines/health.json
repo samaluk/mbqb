@@ -19,9 +19,6 @@
       }
     },
     "apps/web/src/app/(frontend)/bogeyficador/BogeyficadorForm.tsx": {
-      "complexity_critical": {
-        "count": 1
-      },
       "crap_high": {
         "count": 1
       },
@@ -30,55 +27,26 @@
       }
     },
     "apps/web/src/app/(frontend)/canchas/CanchasDataTable.tsx": {
-      "complexity_critical": {
-        "count": 1
-      },
-      "complexity_high": {
-        "count": 1
-      },
       "crap_high": {
         "count": 1
       }
     },
     "apps/web/src/app/(frontend)/canchas/CanchasFilteredResults.tsx": {
-      "complexity_critical": {
-        "count": 1
-      },
-      "complexity_moderate": {
-        "count": 1
-      },
-      "crap_critical": {
-        "count": 1
-      },
       "crap_moderate": {
-        "count": 1
+        "count": 2
       }
     },
     "apps/web/src/app/(frontend)/canchas/CanchasLocationFilter.tsx": {
-      "complexity_critical": {
-        "count": 1
-      },
       "crap_critical": {
         "count": 1
       }
     },
     "apps/web/src/app/(frontend)/canchas/CanchasMap.tsx": {
-      "complexity_high": {
-        "count": 1
-      },
-      "crap_high": {
-        "count": 1
-      }
-    },
-    "apps/web/src/app/(frontend)/canchas/CanchasPagination.tsx": {
-      "complexity_critical": {
+      "crap_moderate": {
         "count": 1
       }
     },
     "apps/web/src/app/(frontend)/canchas/CanchasViewControls.tsx": {
-      "complexity_critical": {
-        "count": 1
-      },
       "crap_critical": {
         "count": 1
       }
@@ -95,11 +63,6 @@
     },
     "apps/web/src/app/(frontend)/preview/route.ts": {
       "crap_high": {
-        "count": 1
-      }
-    },
-    "apps/web/src/app/(frontend)/productos/page.tsx": {
-      "complexity_moderate": {
         "count": 1
       }
     },
@@ -129,12 +92,6 @@
     "apps/web/src/components/ui/sheet.tsx:dead code",
     "apps/web/src/components/ui/field.tsx:dead code",
     "apps/web/src/components/ui/empty.tsx:dead code",
-    "apps/web/src/app/(frontend)/canchas/CanchasViewControls.tsx:complexity",
-    "apps/web/src/components/ui/dropdown-menu.tsx:dead code",
-    "apps/web/src/app/(frontend)/bogeyficador/BogeyficadorForm.tsx:complexity",
-    "apps/web/src/app/(frontend)/canchas/CanchasLocationFilter.tsx:complexity",
-    "apps/web/src/app/(frontend)/canchas/CanchasFilteredResults.tsx:complexity",
-    "apps/web/src/app/(frontend)/canchas/CanchasDataTable.tsx:complexity",
-    "apps/web/src/app/(frontend)/canchas/CanchasPagination.tsx:complexity"
+    "apps/web/src/components/ui/dropdown-menu.tsx:dead code"
   ]
 }
