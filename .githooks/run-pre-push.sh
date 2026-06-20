@@ -18,7 +18,7 @@ fi
 echo "pre-push: typecheck"
 pnpm typecheck
 
-echo "pre-push: build"
+echo "pre-push: local build"
 pnpm build
 
 echo "pre-push: ok"
