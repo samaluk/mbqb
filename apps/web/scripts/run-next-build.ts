@@ -10,8 +10,13 @@ const appDir = path.resolve(path.dirname(filename), '..')
 loadBuildEnv()
 await import('../src/env.js')
 
-execSync('payload migrate', {
+const nodeOptions = process.env.NODE_OPTIONS?.replaceAll('--import=tsx/esm', '').trim()
+
+execSync('next build', {
   cwd: appDir,
-  env: process.env,
+  env: {
+    ...process.env,
+    NODE_OPTIONS: nodeOptions || '--no-deprecation --max-old-space-size=8000',
+  },
   stdio: 'inherit',
 })

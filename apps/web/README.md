@@ -25,8 +25,8 @@ The app runs at `http://localhost:3000`. Payload admin runs at `/admin`.
 
 | File | When |
 |------|------|
-| `.env.local` | Local dev and tests — `pnpm env:pull` (Vercel **Development**) |
-| `.env.production.local` | Production DB scripts — `pnpm env:pull:production` |
+| `.env.local` | Local dev, build, migrate, and tests — `pnpm env:pull` (Vercel **Development**) |
+| `.env.production.local` | Production-only scripts — `pnpm env:pull:production` (seed from prod, prod admin user, `migrate:production`) |
 
 ```sh
 cd apps/web
@@ -117,11 +117,11 @@ pnpm migrate:down
 pnpm migrate:fresh
 ```
 
-For production migration against a pulled env file:
+`pnpm build` and `pnpm migrate` use `.env.local` (local Docker Postgres), same as CI. For an explicit production migration:
 
 ```sh
 pnpm env:pull:production
-pnpm migrate
+pnpm migrate:production
 ```
 
 ### Squashed baseline
