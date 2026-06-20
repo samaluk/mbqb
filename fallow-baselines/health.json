@@ -15,7 +15,7 @@
     },
     "apps/web/scripts/loadScriptEnv.ts": {
       "crap_moderate": {
-        "count": 2
+        "count": 3
       }
     },
     "apps/web/src/app/(frontend)/bogeyficador/BogeyficadorForm.tsx": {
@@ -87,8 +87,8 @@
   },
   "runtime_coverage_findings": [],
   "target_keys": [
-    "apps/web/scripts/loadScriptEnv.ts:high impact",
     "apps/web/src/access/roles.ts:high impact",
+    "apps/web/scripts/loadScriptEnv.ts:high impact",
     "apps/web/src/components/ui/sheet.tsx:dead code",
     "apps/web/src/components/ui/field.tsx:dead code",
     "apps/web/src/components/ui/empty.tsx:dead code",

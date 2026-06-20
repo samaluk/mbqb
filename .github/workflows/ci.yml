@@ -93,7 +93,7 @@ jobs:
       - name: Create integration test database
         run: docker exec postgres psql -U postgres -d mbqb -c "CREATE DATABASE mbqb_test;"
 
-      - name: Build
+      - name: Build (local/CI target)
         run: pnpm build
         env:
           NODE_ENV: production

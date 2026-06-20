@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -6,22 +6,86 @@ import dotenv from 'dotenv'
 
 const appDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
+/** Vercel sensitive production vars pull as `=""` — treat those as unset. */
+const loadDotenvFileSkipEmpty = (file: string) => {
+  const parsed = dotenv.parse(readFileSync(file))
+  for (const [key, value] of Object.entries(parsed)) {
+    if (value.trim() !== '' && !process.env[key]?.trim()) {
+      process.env[key] = value
+    }
+  }
+}
+
+const applyBuildDefaults = () => {
+  if (!process.env.PAYLOAD_SECRET?.trim()) {
+    process.env.PAYLOAD_SECRET = 'development-secret'
+  }
+  if (!process.env.PREVIEW_SECRET?.trim()) {
+    process.env.PREVIEW_SECRET = 'development-preview-secret'
+  }
+  if (!process.env.NEXT_PUBLIC_SERVER_URL?.trim()) {
+    process.env.NEXT_PUBLIC_SERVER_URL = 'http://localhost:3000'
+  }
+}
+
 const requireEnvFile = (relativePath: string, pullHint: string) => {
   const file = path.join(appDir, relativePath)
   if (!existsSync(file)) {
     throw new Error(`Missing ${file}. Run: ${pullHint}`)
   }
-  dotenv.config({ path: file })
+  loadDotenvFileSkipEmpty(file)
 }
 
-/** Local dev / tests: Vercel Development env → `pnpm env:pull` → `.env.local`. */
+/** Vercel sensitive vars pull as `KEY=""` — strip so they do not override `.env.local`. */
+export const sanitizePulledEnvFile = (file: string) => {
+  if (!existsSync(file)) return
+
+  const content = readFileSync(file, 'utf8')
+  const sanitized = content
+    .split('\n')
+    .filter((line) => {
+      const match = /^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/.exec(line)
+      if (!match) return true
+      const value = match[2]?.trim()
+      return value !== '""' && value !== "''" && value !== ''
+    })
+    .join('\n')
+
+  if (sanitized !== content) {
+    writeFileSync(file, sanitized)
+  }
+}
+
+/** Local dev: Vercel Development env → `pnpm env:pull` → `.env.local`. */
 export const loadLocalEnv = () => requireEnvFile('.env.local', 'cd apps/web && pnpm env:pull')
+
+/** Local build/migrate and CI: `.env.local` or injected env — never production pull. */
+export const loadBuildEnv = () => {
+  if (process.env.VERCEL) {
+    applyBuildDefaults()
+    return
+  }
+
+  const localFile = path.join(appDir, '.env.local')
+  if (existsSync(localFile)) {
+    loadDotenvFileSkipEmpty(localFile)
+    applyBuildDefaults()
+    return
+  }
+
+  if (process.env.CI || process.env.POSTGRES_URL?.trim()) {
+    applyBuildDefaults()
+    return
+  }
+
+  throw new Error(`Missing ${localFile}. Run: cd apps/web && pnpm env:pull`)
+}
 
 /** Vitest / Playwright: `.env.local` locally; in CI use workflow-injected env. */
 export const loadTestEnv = () => {
   const localFile = path.join(appDir, '.env.local')
   if (existsSync(localFile)) {
-    dotenv.config({ path: localFile })
+    loadDotenvFileSkipEmpty(localFile)
     return
   }
   if (process.env.CI || process.env.POSTGRES_URL?.trim() || process.env.PAYLOAD_SECRET?.trim()) {
@@ -30,15 +94,16 @@ export const loadTestEnv = () => {
   throw new Error(`Missing ${localFile}. Run: cd apps/web && pnpm env:pull`)
 }
 
-/** Production DB scripts: `pnpm env:pull:production` → `.env.production.local`. */
+/** Production DB scripts only: `pnpm env:pull:production` → `.env.production.local`. */
 export const loadProductionEnv = () => {
   const configured = process.env.DOTENV_CONFIG_PATH ?? '.env.production.local'
   const file = path.isAbsolute(configured) ? configured : path.join(appDir, configured)
 
   if (existsSync(file)) {
-    dotenv.config({ path: file })
+    sanitizePulledEnvFile(file)
+    loadDotenvFileSkipEmpty(file)
   } else if (process.env.VERCEL || process.env.POSTGRES_URL?.trim()) {
-    // Vercel (and similar CI) inject env at build time — no pulled file on disk.
+    // Vercel injects env at build/deploy time — no pulled file on disk.
   } else {
     throw new Error(`Missing ${file}. Run: cd apps/web && pnpm env:pull:production`)
   }

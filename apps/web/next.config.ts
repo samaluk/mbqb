@@ -9,6 +9,12 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
+  // TypeScript 7 uses the native tsc CLI; Next.js still expects the TS 6 programmatic API
+  // during builds. Run `pnpm typecheck` separately instead.
+  // https://github.com/vercel/next.js/discussions/81472#discussioncomment-16725569
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   async redirects() {
     return [
       {

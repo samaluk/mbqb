@@ -25,8 +25,8 @@ The app runs at `http://localhost:3000`. Payload admin runs at `/admin`.
 
 | File | When |
 |------|------|
-| `.env.local` | Local dev and tests — `pnpm env:pull` (Vercel **Development**) |
-| `.env.production.local` | Production DB scripts — `pnpm env:pull:production` |
+| `.env.local` | Local dev, build, migrate, and tests — `pnpm env:pull` (Vercel **Development**) |
+| `.env.production.local` | Production-only scripts — `pnpm env:pull:production` (seed from prod, prod admin user, `build:production`, `migrate:production`) |
 
 ```sh
 cd apps/web
@@ -104,7 +104,7 @@ For normal schema changes:
    ```
 
 4. Review the generated SQL before committing it.
-5. Let CI/production run `pnpm migrate` before `next build`.
+5. Let CI run `pnpm build`; production runs must use `pnpm build:production`.
 
 If a migration depends on environment-specific config, generate and review it with those conditions in mind. This matters for production-only plugins or flags, including Vercel Blob storage controlled by `BLOB_READ_WRITE_TOKEN`.
 
@@ -117,12 +117,18 @@ pnpm migrate:down
 pnpm migrate:fresh
 ```
 
-For production migration against a pulled env file:
+`pnpm build` and `pnpm migrate` use `.env.local` or CI-injected variables and never load production configuration. Production targeting is explicit:
 
 ```sh
 pnpm env:pull:production
-pnpm migrate
+pnpm build:production
+pnpm migrate:production
 ```
+
+The Next build runs its compile and generate phases separately, bypassing Next.js's
+TypeScript setup because TypeScript 7 is not compatible with the programmatic API used
+by this Next.js release. Run `pnpm typecheck` separately; a successful build alone does
+not prove type safety.
 
 ### Squashed baseline
 

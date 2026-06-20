@@ -17,6 +17,8 @@ else
   echo "Added include.path=$include_path"
 fi
 
-echo "Configured pre-commit hooks:"
+echo "Configured hooks:"
 git hook list pre-commit 2>/dev/null || true
-echo "Done. pre-commit runs: check:lint, format:check, typecheck (tsgo --noEmit), fallow baseline check, fallow audit, test."
+git hook list pre-push 2>/dev/null || true
+echo "Done. pre-commit runs: check:lint, format:check, typecheck (tsc --noEmit), fallow baseline check, fallow audit, test."
+echo "Done. pre-push runs: typecheck (TypeScript 7 tsc --noEmit), local build (migrate + build:next)."

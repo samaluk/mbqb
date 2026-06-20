@@ -7,6 +7,7 @@
   },
   "scripts": {
     "build": "pnpm --filter @mbqb/web build",
+    "build:production": "pnpm --filter @mbqb/web build:production",
     "dev": "pnpm --filter @mbqb/web dev",
     "fallow": "fallow",
     "fallow:audit": "fallow audit --base origin/master",
@@ -22,6 +23,8 @@
     "lint:fix:core": "oxlint --fix apps/web --ignore-path .oxlintignore",
     "lint:fix:tailwind": "oxlint --fix apps/web --config .oxlintrc.tailwind.json --ignore-path .oxlintignore",
     "lint:tailwind": "oxlint apps/web --config .oxlintrc.tailwind.json --ignore-path .oxlintignore",
+    "migrate": "pnpm --filter @mbqb/web migrate",
+    "migrate:production": "pnpm --filter @mbqb/web migrate:production",
     "test": "pnpm --filter @mbqb/web test",
     "test:e2e": "pnpm --filter @mbqb/web test:e2e",
     "test:int": "pnpm --filter @mbqb/web test:int",
