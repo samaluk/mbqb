@@ -125,6 +125,11 @@ pnpm build:production
 pnpm migrate:production
 ```
 
+The Next build runs its compile and generate phases separately, bypassing Next.js's
+TypeScript setup because TypeScript 7 is not compatible with the programmatic API used
+by this Next.js release. Run `pnpm typecheck` separately; a successful build alone does
+not prove type safety.
+
 ### Squashed baseline
 
 Schema history starts from `20260604_000000_baseline` (includes drafts/version tables and Lexical `body` jsonb columns). The legacy HTML-to-Lexical body import has already been applied and is no longer part of the app interface.
