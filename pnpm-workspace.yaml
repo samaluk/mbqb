@@ -1,7 +1,7 @@
 packages:
   - apps/*
 
-minimumReleaseAge: 0
+minimumReleaseAge: 3
 
 peerDependencyRules:
   allowedVersions:
