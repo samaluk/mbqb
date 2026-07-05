@@ -114,3 +114,21 @@ export const loadEnvForScript = () => {
   if (process.env.NODE_ENV === 'production') loadProductionEnv()
   else loadLocalEnv()
 }
+
+/** Payload CLI loads tsx itself; inheriting `--import=tsx/esm` breaks migrate on 3.85.2+. */
+export const envForPayloadCli = (): NodeJS.ProcessEnv => {
+  const env = { ...process.env }
+  const nodeOptions = env.NODE_OPTIONS?.trim()
+
+  if (!nodeOptions) return env
+
+  const sanitized = nodeOptions
+    .replace(/\s*--import=tsx\/esm\b/g, '')
+    .replace(/\s*--import\s+tsx\/esm\b/g, '')
+    .trim()
+
+  if (sanitized) env.NODE_OPTIONS = sanitized
+  else delete env.NODE_OPTIONS
+
+  return env
+}
