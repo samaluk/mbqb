@@ -90,8 +90,8 @@ importers:
         specifier: 5.0.0
         version: 5.0.0(leaflet@1.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       shadcn:
-        specifier: 4.12.0
-        version: 4.12.0(babel-plugin-macros@3.1.0)(typescript@7.0.1-rc)
+        specifier: 4.13.0
+        version: 4.13.0(babel-plugin-macros@3.1.0)(typescript@7.0.1-rc)
       sharp:
         specifier: 0.35.3
         version: 0.35.3(@types/node@24.13.2)
@@ -5137,8 +5137,8 @@ packages:
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
-  shadcn@4.12.0:
-    resolution: {integrity: sha512-o781ieQziCnXH2FKsEqxp1fnbHdbgAPO9inTSPeZ59hQfsZXuMGp3ul8oFSV5KQS4nbUK9b+DrDE6C7OvfKKQQ==}
+  shadcn@4.13.0:
+    resolution: {integrity: sha512-5fuJ4jI/GcPeA/iTL4cJivCZuYQGXz/N3bIzyd+Gd/FM6xUCy2MxGG+LaDQuw2cjNy9zGPSFPTEmI048UwPTZA==}
     engines: {node: '>=20.18.1'}
     hasBin: true
 
@@ -10707,7 +10707,7 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shadcn@4.12.0(babel-plugin-macros@3.1.0)(typescript@7.0.1-rc):
+  shadcn@4.13.0(babel-plugin-macros@3.1.0)(typescript@7.0.1-rc):
     dependencies:
       '@babel/core': 7.29.7
       '@babel/parser': 7.29.7
@@ -10729,7 +10729,7 @@ snapshots:
       kleur: 4.1.5
       open: 11.0.0
       ora: 8.2.0
-      postcss: 8.5.15
+      postcss: 8.5.16
       postcss-selector-parser: 7.1.1
       prompts: 2.4.2
       recast: 0.23.11
