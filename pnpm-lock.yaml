@@ -90,8 +90,8 @@ importers:
         specifier: 5.0.0
         version: 5.0.0(leaflet@1.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       shadcn:
-        specifier: 4.13.0
-        version: 4.13.0(babel-plugin-macros@3.1.0)(typescript@7.0.2)
+        specifier: 4.14.1
+        version: 4.14.1(babel-plugin-macros@3.1.0)(typescript@7.0.2)
       sharp:
         specifier: 0.35.3
         version: 0.35.3(@types/node@24.13.3)
@@ -5141,8 +5141,8 @@ packages:
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
-  shadcn@4.13.0:
-    resolution: {integrity: sha512-5fuJ4jI/GcPeA/iTL4cJivCZuYQGXz/N3bIzyd+Gd/FM6xUCy2MxGG+LaDQuw2cjNy9zGPSFPTEmI048UwPTZA==}
+  shadcn@4.14.1:
+    resolution: {integrity: sha512-Xb4r150oGNexMBxUnWPG1emcaUlFbhzMOJubdA+k0NTkmhgBBycFZjTz9Aw2yQbpDR6QnIZbk234N20s/s7s9A==}
     engines: {node: '>=20.18.1'}
     hasBin: true
 
@@ -6075,10 +6075,10 @@ snapshots:
       eciesjs: 0.4.18
       enquirer: 2.4.1
       execa: 5.1.1
-      fdir: 6.5.0(picomatch@4.0.4)
+      fdir: 6.5.0(picomatch@4.0.5)
       ignore: 5.3.2
       object-treeify: 1.1.33
-      picomatch: 4.0.4
+      picomatch: 4.0.5
       which: 4.0.0
       yocto-spinner: 1.2.0
 
@@ -9200,6 +9200,10 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.4
 
+  fdir@6.5.0(picomatch@4.0.5):
+    optionalDependencies:
+      picomatch: 4.0.5
+
   figures@6.1.0:
     dependencies:
       is-unicode-supported: 2.1.0
@@ -10715,7 +10719,7 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shadcn@4.13.0(babel-plugin-macros@3.1.0)(typescript@7.0.2):
+  shadcn@4.14.1(babel-plugin-macros@3.1.0)(typescript@7.0.2):
     dependencies:
       '@babel/core': 7.29.7
       '@babel/parser': 7.29.7
