@@ -8,7 +8,6 @@
   ],
   "unused_exports": [
     "apps/web/scripts/loadScriptEnv.ts:loadLocalEnv",
-    "apps/web/src/app/(payload)/admin/[[...segments]]/not-found.tsx:generateMetadata",
     "apps/web/src/components/ui/badge.tsx:badgeVariants",
     "apps/web/src/components/ui/button.tsx:buttonVariants",
     "apps/web/src/components/ui/card.tsx:CardAction",
