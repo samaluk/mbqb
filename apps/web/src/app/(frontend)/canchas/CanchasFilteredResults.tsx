@@ -50,7 +50,7 @@ export function CanchasFilteredResults({ results }: CanchasFilteredResultsProps)
         >
           {canchaDocs.length ? (
             canchaDocs.map((cancha, index) => (
-              <Card className="min-w-0" key={cancha.id} size="compact">
+              <Card className="min-w-0" key={cancha.id} size="sm">
                 <CardHeader>
                   <div className="flex items-start gap-2.5">
                     <span className="grid size-7 shrink-0 place-items-center rounded-full bg-green text-label font-black text-white-soft max-[760px]:size-6 max-[760px]:text-xs">
@@ -87,7 +87,7 @@ export function CanchasFilteredResults({ results }: CanchasFilteredResultsProps)
               </Card>
             ))
           ) : (
-            <Card className="min-w-0" size="compact">
+            <Card className="min-w-0" size="sm">
               <CardContent className="py-6 text-sm text-muted-foreground">
                 {showDistance
                   ? 'No hay canchas con coordenadas dentro del radio elegido. Prueba aumentar la distancia máxima.'

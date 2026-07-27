@@ -81,7 +81,7 @@ export function BogeyficadorForm() {
         void onSubmit(event)
       }}
     >
-      <Card className="shadow-card" size="compact">
+      <Card className="shadow-card" size="sm">
         <CardContent>
           <FieldGroup>
             <Field>
