@@ -197,10 +197,14 @@ export function CanchasLocationFilter() {
               id="canchas-max-distance"
               max={maxMaxDistanceKm}
               min={minMaxDistanceKm}
-              onValueChange={(values) =>
-                schedulePersistMaxDistance(values[0] ?? defaultMaxDistanceKm)
+              onValueChange={(value) =>
+                schedulePersistMaxDistance(
+                  (Array.isArray(value) ? value[0] : value) ?? defaultMaxDistanceKm,
+                )
               }
-              onValueCommit={(values) => commitMaxDistance(values[0] ?? defaultMaxDistanceKm)}
+              onValueCommitted={(value) =>
+                commitMaxDistance((Array.isArray(value) ? value[0] : value) ?? defaultMaxDistanceKm)
+              }
               step={5}
               value={[sliderMaxKm]}
             />
