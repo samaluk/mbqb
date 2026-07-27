@@ -96,15 +96,15 @@ export function CanchasViewControls({ controls }: CanchasViewControlsProps) {
         <ToggleGroup
           aria-label="Vista de canchas"
           onValueChange={(value) => {
-            if (!value) return
+            const nextView = value[0]
+            if (!nextView) return
 
             updateParams({
               page: null,
-              view: value === 'table' ? 'table' : null,
+              view: nextView === 'table' ? 'table' : null,
             })
           }}
-          type="single"
-          value={view}
+          value={[view]}
           variant="outline"
         >
           <ToggleGroupItem value="cards">Mapa</ToggleGroupItem>
