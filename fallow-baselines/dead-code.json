@@ -9,7 +9,6 @@
   "unused_exports": [
     "apps/web/scripts/loadScriptEnv.ts:loadLocalEnv",
     "apps/web/src/components/ui/badge.tsx:badgeVariants",
-    "apps/web/src/components/ui/button.tsx:buttonVariants",
     "apps/web/src/components/ui/card.tsx:CardAction",
     "apps/web/src/components/ui/card.tsx:CardDescription",
     "apps/web/src/components/ui/dropdown-menu.tsx:DropdownMenuPortal",

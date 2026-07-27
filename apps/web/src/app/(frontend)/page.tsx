@@ -10,8 +10,9 @@ import {
   PageShell,
   PageTitle,
 } from '@/components/page'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { getCmsQueryOptions } from '@/lib/cmsQuery'
+import { cn } from '@/lib/utils'
 import type { HomePage as HomePageGlobal, Media } from '@/payload-types'
 
 export const revalidate = 900
@@ -68,12 +69,15 @@ export default async function HomePage() {
           vueltas.
         </PageLede>
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button asChild className="min-h-10 px-4 font-bold">
-            <Link href="/bogeyficador">Bogeyficador</Link>
-          </Button>
-          <Button asChild className="min-h-10 px-4 font-bold" variant="outline">
-            <Link href="/canchas">Ver canchas</Link>
-          </Button>
+          <Link className={cn(buttonVariants(), 'min-h-10 px-4 font-bold')} href="/bogeyficador">
+            Bogeyficador
+          </Link>
+          <Link
+            className={cn(buttonVariants({ variant: 'outline' }), 'min-h-10 px-4 font-bold')}
+            href="/canchas"
+          >
+            Ver canchas
+          </Link>
         </div>
       </HomeHeroContent>
     </PageShell>

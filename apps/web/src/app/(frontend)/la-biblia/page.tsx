@@ -11,9 +11,10 @@ import {
   RichSnippet,
 } from '@/components/page'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getCmsQueryOptions } from '@/lib/cmsQuery'
+import { cn } from '@/lib/utils'
 
 const categoryLabels = {
   canchas: 'Canchas',
@@ -57,9 +58,12 @@ export default async function LaBibliaPage() {
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
               <RichSnippet body={article.body} />
-              <Button asChild className="w-fit font-extrabold" variant="link">
-                <Link href={`/la-biblia/${article.slug}`}>Leer articulo</Link>
-              </Button>
+              <Link
+                className={cn(buttonVariants({ variant: 'link' }), 'w-fit font-extrabold')}
+                href={`/la-biblia/${article.slug}`}
+              >
+                Leer articulo
+              </Link>
             </CardContent>
           </Card>
         ))}

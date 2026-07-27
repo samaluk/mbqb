@@ -1,7 +1,7 @@
 import { ChevronDownIcon, ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -13,6 +13,7 @@ import {
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
 import type { CanchasPaginationModel, CanchasSort, CanchasSortLink } from '@/lib/canchasBrowsing'
 import { formatDistanceKm } from '@/lib/canchasGeo'
+import { cn } from '@/lib/utils'
 
 import { CanchasColumnControls } from './CanchasColumnControls'
 import { CanchasPagination } from './CanchasPagination'
@@ -107,9 +108,15 @@ export function CanchasDataTable({
               canchas.map((cancha) => (
                 <TableRow key={cancha.id}>
                   <TableCell data-column="title">
-                    <Button asChild className="h-auto justify-start p-0 text-left" variant="link">
-                      <Link href={`/canchas/${cancha.slug}`}>{cancha.title}</Link>
-                    </Button>
+                    <Link
+                      className={cn(
+                        buttonVariants({ variant: 'link' }),
+                        'h-auto justify-start p-0 text-left',
+                      )}
+                      href={`/canchas/${cancha.slug}`}
+                    >
+                      {cancha.title}
+                    </Link>
                   </TableCell>
                   {showDistance ? (
                     <TableCell data-column="distance">
@@ -130,15 +137,21 @@ export function CanchasDataTable({
                   </TableCell>
                   <TableCell data-column="actions">
                     <div className="flex justify-end gap-1">
-                      <Button asChild size="sm" variant="outline">
-                        <Link href={`/canchas/${cancha.slug}`}>Ver ficha</Link>
-                      </Button>
-                      <Button asChild size="icon-sm" variant="outline">
-                        <a href={getGoogleMapsUrl(cancha)} rel="noreferrer" target="_blank">
-                          <ExternalLinkIcon />
-                          <span className="sr-only">Google Maps</span>
-                        </a>
-                      </Button>
+                      <Link
+                        className={buttonVariants({ size: 'sm', variant: 'outline' })}
+                        href={`/canchas/${cancha.slug}`}
+                      >
+                        Ver ficha
+                      </Link>
+                      <a
+                        className={buttonVariants({ size: 'icon-sm', variant: 'outline' })}
+                        href={getGoogleMapsUrl(cancha)}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        <ExternalLinkIcon />
+                        <span className="sr-only">Google Maps</span>
+                      </a>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -195,14 +208,15 @@ function SortLink({
   const active = sort.field === sortField
 
   return (
-    <Button asChild className="px-0" size="sm" type="button" variant="ghost">
-      <Link href={sortLink.href}>
-        {label}
-        <ChevronDownIcon
-          className={active && sort.direction === 'asc' ? 'rotate-180' : undefined}
-          data-icon="inline-end"
-        />
-      </Link>
-    </Button>
+    <Link
+      className={cn(buttonVariants({ size: 'sm', variant: 'ghost' }), 'px-0')}
+      href={sortLink.href}
+    >
+      {label}
+      <ChevronDownIcon
+        className={active && sort.direction === 'asc' ? 'rotate-180' : undefined}
+        data-icon="inline-end"
+      />
+    </Link>
   )
 }

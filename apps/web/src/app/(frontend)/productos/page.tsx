@@ -11,9 +11,10 @@ import {
   RichSnippet,
 } from '@/components/page'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getCmsQueryOptions } from '@/lib/cmsQuery'
+import { cn } from '@/lib/utils'
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat('es-CL', {
@@ -63,9 +64,12 @@ export default async function ProductosPage() {
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
               <RichSnippet body={product.body} />
-              <Button asChild className="w-fit font-extrabold" variant="link">
-                <Link href={`/productos/${product.slug}`}>Ver producto</Link>
-              </Button>
+              <Link
+                className={cn(buttonVariants({ variant: 'link' }), 'w-fit font-extrabold')}
+                href={`/productos/${product.slug}`}
+              >
+                Ver producto
+              </Link>
             </CardContent>
           </Card>
         ))}
