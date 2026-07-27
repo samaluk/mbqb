@@ -51,6 +51,7 @@
   ],
   "private_type_leaks": [],
   "unused_dependencies": [
+    "apps/web/package.json:@base-ui/react",
     "apps/web/package.json:@payloadcms/ui",
     "apps/web/package.json:isomorphic-dompurify",
     "apps/web/package.json:shadcn"
