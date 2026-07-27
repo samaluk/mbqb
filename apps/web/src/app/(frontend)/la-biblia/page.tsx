@@ -47,7 +47,7 @@ export default async function LaBibliaPage() {
       </PageLede>
       <PageGrid>
         {articles.docs.map((article) => (
-          <Card className="min-w-0" key={article.id} size="compact">
+          <Card className="min-w-0" key={article.id} size="sm">
             <CardHeader>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline">{categoryLabels[article.category]}</Badge>

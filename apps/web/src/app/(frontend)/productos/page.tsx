@@ -44,7 +44,7 @@ export default async function ProductosPage() {
       </PageLede>
       <PageGrid>
         {products.docs.map((product) => (
-          <Card className="min-w-0" key={product.id} size="compact">
+          <Card className="min-w-0" key={product.id} size="sm">
             {product.imageUrl ? (
               <img
                 alt=""
