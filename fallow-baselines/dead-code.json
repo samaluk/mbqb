@@ -52,6 +52,7 @@
   "unused_dependencies": [
     "apps/web/package.json:@payloadcms/ui",
     "apps/web/package.json:isomorphic-dompurify",
+    "apps/web/package.json:radix-ui",
     "apps/web/package.json:shadcn"
   ],
   "unused_dev_dependencies": [],
