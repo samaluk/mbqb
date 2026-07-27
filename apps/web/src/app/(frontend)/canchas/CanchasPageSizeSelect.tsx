@@ -15,9 +15,17 @@ type CanchasPageSizeSelectProps = {
 }
 
 export function CanchasPageSizeSelect({ pagination }: CanchasPageSizeSelectProps) {
+  const items = pagination.pageSizeOptions.map((option) => ({
+    label: `${option.value}`,
+    value: `${option.value}`,
+  }))
+
   return (
     <Select
+      items={items}
       onValueChange={(value) => {
+        if (value == null) return
+
         const option = pagination.pageSizeOptions.find(
           (pageSizeOption) => `${pageSizeOption.value}` === value,
         )
@@ -28,11 +36,11 @@ export function CanchasPageSizeSelect({ pagination }: CanchasPageSizeSelectProps
       <SelectTrigger aria-label="Filas por pagina" className="w-20" size="sm">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent side="top">
+      <SelectContent alignItemWithTrigger={false} side="top">
         <SelectGroup>
-          {pagination.pageSizeOptions.map((option) => (
-            <SelectItem key={option.value} value={`${option.value}`}>
-              {option.value}
+          {items.map((item) => (
+            <SelectItem key={item.value} value={item.value}>
+              {item.label}
             </SelectItem>
           ))}
         </SelectGroup>

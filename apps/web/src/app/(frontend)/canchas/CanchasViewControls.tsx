@@ -193,21 +193,29 @@ function FilterSelect({
   options: { label: string; value: string }[]
   value: string
 }) {
+  const items = [{ label: allOptionLabel, value: allValue }, ...options]
+
   return (
     <div className="flex flex-col gap-1.5">
       <Label className="text-xs font-normal text-muted-foreground" htmlFor={id}>
         {label}
       </Label>
-      <Select onValueChange={onValueChange} value={value}>
+      <Select
+        items={items}
+        onValueChange={(nextValue) => {
+          if (nextValue == null) return
+          onValueChange(nextValue)
+        }}
+        value={value}
+      >
         <SelectTrigger className="w-full" id={id}>
-          <SelectValue placeholder={allOptionLabel} />
+          <SelectValue />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value={allValue}>{allOptionLabel}</SelectItem>
-            {options.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
+            {items.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.label}
               </SelectItem>
             ))}
           </SelectGroup>
