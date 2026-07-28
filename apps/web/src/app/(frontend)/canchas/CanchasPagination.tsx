@@ -7,8 +7,9 @@ import {
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import type { CanchasPaginationLink, CanchasPaginationModel } from '@/lib/canchasBrowsing'
+import { cn } from '@/lib/utils'
 
 import { CanchasPageSizeSelect } from './CanchasPageSizeSelect'
 
@@ -67,8 +68,8 @@ function PaginationButton({
   }
 
   return (
-    <Button asChild size="icon-sm" variant="outline">
-      <Link href={link.href}>{children}</Link>
-    </Button>
+    <Link className={cn(buttonVariants({ size: 'icon-sm', variant: 'outline' }))} href={link.href}>
+      {children}
+    </Link>
   )
 }

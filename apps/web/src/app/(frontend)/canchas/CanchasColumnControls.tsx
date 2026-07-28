@@ -31,12 +31,10 @@ export function CanchasColumnControls({ columns }: CanchasColumnControlsProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size="sm" variant="outline">
-          <Columns3Icon data-icon="inline-start" />
-          Columnas
-          <ChevronDownIcon data-icon="inline-end" />
-        </Button>
+      <DropdownMenuTrigger render={<Button size="sm" variant="outline" />}>
+        <Columns3Icon data-icon="inline-start" />
+        Columnas
+        <ChevronDownIcon data-icon="inline-end" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
         {columns.map((column) => (

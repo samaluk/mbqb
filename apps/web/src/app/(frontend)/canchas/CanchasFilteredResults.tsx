@@ -3,11 +3,12 @@
 import Link from 'next/link'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { canchaAccessLabels, getGoogleMapsUrl } from '@/lib/canchas'
 import type { CanchasResultsModel } from '@/lib/canchasBrowsing'
 import { formatDistanceKm } from '@/lib/canchasGeo'
+import { cn } from '@/lib/utils'
 
 import { CanchasDataTable } from './CanchasDataTable'
 import { CanchasMapLoader } from './CanchasMapLoader'
@@ -74,14 +75,20 @@ export function CanchasFilteredResults({ results }: CanchasFilteredResultsProps)
                     </p>
                   ) : null}
                   <div className="flex flex-wrap gap-x-3 gap-y-1">
-                    <Button asChild className="font-extrabold" variant="link">
-                      <Link href={`/canchas/${cancha.slug}`}>Ver ficha</Link>
-                    </Button>
-                    <Button asChild className="font-extrabold" variant="link">
-                      <a href={getGoogleMapsUrl(cancha)} rel="noreferrer" target="_blank">
-                        Google Maps
-                      </a>
-                    </Button>
+                    <Link
+                      className={cn(buttonVariants({ variant: 'link' }), 'font-extrabold')}
+                      href={`/canchas/${cancha.slug}`}
+                    >
+                      Ver ficha
+                    </Link>
+                    <a
+                      className={cn(buttonVariants({ variant: 'link' }), 'font-extrabold')}
+                      href={getGoogleMapsUrl(cancha)}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      Google Maps
+                    </a>
                   </div>
                 </CardContent>
               </Card>
