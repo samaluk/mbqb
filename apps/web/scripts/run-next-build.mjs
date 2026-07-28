@@ -40,24 +40,15 @@ if (!isProductionTarget) {
   }
 }
 
-console.log('Skipping Next.js TypeScript setup; run `pnpm typecheck` separately.')
-
 try {
-  for (const mode of ['compile', 'generate']) {
-    const result = spawnSync(
-      process.execPath,
-      [nextBin, 'build', '--experimental-build-mode', mode],
-      {
-        cwd: appDir,
-        env: process.env,
-        stdio: 'inherit',
-      },
-    )
+  const result = spawnSync(process.execPath, [nextBin, 'build'], {
+    cwd: appDir,
+    env: process.env,
+    stdio: 'inherit',
+  })
 
-    if (result.error) throw result.error
-    if (result.status !== 0) process.exitCode = result.status ?? 1
-    if (process.exitCode) break
-  }
+  if (result.error) throw result.error
+  if (result.status !== 0) process.exitCode = result.status ?? 1
 } finally {
   for (const [file, masked] of maskedProductionFiles) {
     renameSync(masked, file)
