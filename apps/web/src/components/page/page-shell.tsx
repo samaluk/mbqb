@@ -11,7 +11,7 @@ function PageShell({ className, variant = 'default', ...props }: PageShellProps)
     <section
       className={cn(
         variant === 'default' && 'page-shell-default',
-        variant === 'hero' && 'group/hero page-shell-hero',
+        variant === 'hero' && 'page-shell-hero',
         className,
       )}
       {...props}

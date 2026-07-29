@@ -267,24 +267,24 @@
     @apply text-hero max-[760px]:text-hero-sm;
   }
 
-  .page-title-hero-video {
-    @apply group-has-[data-slot=hero-video]/hero:text-white-soft group-has-[data-slot=hero-video]/hero:text-shadow-hero;
-  }
-
   .page-lede {
     @apply m-0 max-w-170 text-lg leading-lede text-muted max-[760px]:text-body-sm max-[760px]:leading-lede-sm;
-  }
-
-  .page-lede-hero-video {
-    @apply group-has-[data-slot=hero-video]/hero:max-w-155 group-has-[data-slot=hero-video]/hero:text-white-soft/88 group-has-[data-slot=hero-video]/hero:text-shadow-hero;
   }
 
   .page-kicker {
     @apply text-label leading-none font-display text-green uppercase max-[760px]:text-meta;
   }
 
-  .page-kicker-hero {
-    @apply group-has-[data-slot=hero-video]/hero:text-lime;
+  .page-shell-hero:has([data-slot='hero-video']) .page-title-hero {
+    @apply text-white-soft text-shadow-hero;
+  }
+
+  .page-shell-hero:has([data-slot='hero-video']) .page-lede {
+    @apply max-w-155 text-white-soft/88 text-shadow-hero;
+  }
+
+  .page-shell-hero:has([data-slot='hero-video']) .page-kicker-hero {
+    @apply text-lime;
   }
 
   .meta-pills {
