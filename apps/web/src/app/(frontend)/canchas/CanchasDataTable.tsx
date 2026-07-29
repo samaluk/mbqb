@@ -111,7 +111,7 @@ export function CanchasDataTable({
                     <Link
                       className={cn(
                         buttonVariants({ variant: 'link' }),
-                        'h-auto justify-start p-0 text-left',
+                        'h-auto justify-start p-0 text-start',
                       )}
                       href={`/canchas/${cancha.slug}`}
                     >

@@ -13,7 +13,6 @@ function PageTitle({ className, size = 'default', children, ...props }: PageTitl
         'page-title-base',
         size === 'default' && 'page-title-default',
         size === 'hero' && 'page-title-hero',
-        'page-title-hero-video',
         className,
       )}
       {...props}
