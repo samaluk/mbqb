@@ -12,7 +12,12 @@
     }
   },
   "rules": {
-    "tailwindcss/no-unknown-classes": "warn",
+    "tailwindcss/no-unknown-classes": [
+      "warn",
+      {
+        "allowlist": ["group/hero"]
+      }
+    ],
     "tailwindcss/no-duplicate-classes": "warn",
     "tailwindcss/no-conflicting-classes": "warn",
     "tailwindcss/no-deprecated-classes": "warn",
