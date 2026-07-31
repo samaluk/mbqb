@@ -32,7 +32,7 @@
     "typecheck": "pnpm --filter @mbqb/web typecheck"
   },
   "devDependencies": {
-    "fallow": "3.9.1",
+    "fallow": "3.10.0",
     "oxfmt": "0.61.0",
     "oxlint": "1.75.0",
     "oxlint-tailwindcss": "1.6.0",
