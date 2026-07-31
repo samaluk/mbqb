@@ -1,4 +1,12 @@
 {
+  "analysis_identity": {
+    "mode": "syntactic",
+    "semantic_schema_version": 1,
+    "capabilities": [],
+    "project_config_hash": "",
+    "backend_family": "",
+    "completeness": "complete"
+  },
   "unused_files": [
     "apps/web/scripts/resolve-postgres-url.ts",
     "apps/web/src/components/ui/empty.tsx",
