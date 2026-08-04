@@ -12,6 +12,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Agent skills
 
+### Testing
+
+For testing changes, follow `docs/agents/testing-principles.md` in addition to repository-specific commands and framework guidance.
+
 ### Issue tracker
 
 Issues and PRDs for this repo live as GitHub issues; use the `gh` CLI. See `docs/agents/issue-tracker.md`.
