@@ -1,5 +1,8 @@
 import Link from 'next/link'
 import config from '@payload-config'
+import { cacheLife } from 'next/cache'
+import { draftMode } from 'next/headers'
+import { Suspense } from 'react'
 import { getPayload } from 'payload'
 
 import {
@@ -13,9 +16,8 @@ import {
 import { buttonVariants } from '@/components/ui/button'
 import { getCmsQueryOptions } from '@/lib/cmsQuery'
 import { cn } from '@/lib/utils'
+import { isPayloadUnavailableError } from '@/lib/payloadUnavailableError'
 import type { HomePage as HomePageGlobal, Media } from '@/payload-types'
-
-export const revalidate = 900
 
 function getMediaUrl(media: number | Media | null | undefined) {
   if (!media || typeof media === 'number') {
@@ -25,7 +27,29 @@ function getMediaUrl(media: number | Media | null | undefined) {
   return media.url ?? undefined
 }
 
-async function getHomePageContent(): Promise<HomePageGlobal | null> {
+async function getPublishedHomePageContent(): Promise<HomePageGlobal | null> {
+  'use cache'
+  cacheLife('publicContent')
+
+  try {
+    const payload = await getPayload({ config })
+
+    return await payload.findGlobal({
+      slug: 'home-page',
+      depth: 1,
+      draft: false,
+      overrideAccess: false,
+    })
+  } catch (error) {
+    if (!isPayloadUnavailableError(error)) {
+      console.error('Failed to load home page content', error)
+    }
+
+    return null
+  }
+}
+
+async function getDraftHomePageContent(): Promise<HomePageGlobal | null> {
   try {
     const payload = await getPayload({ config })
     const cmsQuery = await getCmsQueryOptions()
@@ -36,7 +60,7 @@ async function getHomePageContent(): Promise<HomePageGlobal | null> {
       ...cmsQuery,
     })
   } catch (error) {
-    if (!isMissingRelationError(error)) {
+    if (!isPayloadUnavailableError(error)) {
       console.error('Failed to load home page content', error)
     }
 
@@ -44,18 +68,22 @@ async function getHomePageContent(): Promise<HomePageGlobal | null> {
   }
 }
 
-function isMissingRelationError(error: unknown) {
-  if (!error || typeof error !== 'object') {
-    return false
-  }
-
-  const maybeError = error as { cause?: { code?: unknown }; code?: unknown }
-
-  return maybeError.code === '42P01' || maybeError.cause?.code === '42P01'
+export default function HomePage() {
+  return (
+    <Suspense fallback={null}>
+      <HomePageContent />
+    </Suspense>
+  )
 }
 
-export default async function HomePage() {
-  const homePage = await getHomePageContent()
+async function HomePageContent() {
+  const { isEnabled: draft } = await draftMode()
+  const homePage = draft ? await getDraftHomePageContent() : await getPublishedHomePageContent()
+
+  return <HomePageView homePage={homePage} />
+}
+
+function HomePageView({ homePage }: { homePage: HomePageGlobal | null }) {
   const heroVideoUrl = getMediaUrl(homePage?.heroVideo)
 
   return (

@@ -9,6 +9,14 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
+  cacheLife: {
+    publicContent: {
+      expire: 86_400,
+      revalidate: 900,
+      stale: 900,
+    },
+  },
   experimental: {
     // TypeScript 7 has no JS compiler API; use the project-local tsc CLI.
     // https://nextjs.org/docs/app/api-reference/config/typescript#using-typescript-7

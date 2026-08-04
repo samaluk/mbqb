@@ -56,13 +56,13 @@
         "count": 1
       }
     },
-    "apps/web/src/app/(frontend)/page.tsx": {
-      "crap_moderate": {
+    "apps/web/src/app/(frontend)/preview/route.ts": {
+      "crap_high": {
         "count": 1
       }
     },
-    "apps/web/src/app/(frontend)/preview/route.ts": {
-      "crap_high": {
+    "apps/web/src/app/(frontend)/productos/[slug]/page.tsx": {
+      "crap_moderate": {
         "count": 1
       }
     },
@@ -81,6 +81,11 @@
         "count": 1
       },
       "crap_moderate": {
+        "count": 1
+      }
+    },
+    "apps/web/src/lib/payloadUnavailableError.ts": {
+      "crap_high": {
         "count": 1
       }
     }
