@@ -8,3 +8,10 @@ export async function getCmsQueryOptions() {
     overrideAccess: draft,
   } as const
 }
+
+export function getPublishedCmsQueryOptions() {
+  return {
+    draft: false,
+    overrideAccess: false,
+  } as const
+}
