@@ -37,11 +37,8 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Fallow baseline
-        run: pnpm fallow:baseline:check
-
-      - name: Fallow audit
-        run: pnpm fallow:audit
+      - name: Fallow
+        run: pnpm fallow:ci
 
       - name: Unit tests
         run: pnpm test:unit
