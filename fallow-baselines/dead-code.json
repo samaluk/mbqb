@@ -1,66 +1,44 @@
 {
   "analysis_identity": {
-    "mode": "syntactic",
-    "semantic_schema_version": 1,
-    "capabilities": [],
-    "project_config_hash": "",
-    "backend_family": "",
+    "mode": "type-aware",
+    "semantic_schema_version": 2,
+    "capabilities": [
+      "symbol-use",
+      "api-surface"
+    ],
+    "project_config_hash": "sha256:766d07edf00b4474ed898cfc8291fb7f6ea6662930c2393574ad4493a00d8de2",
+    "backend_family": "typescript-go",
     "completeness": "complete"
   },
   "unused_files": [
     "apps/web/scripts/resolve-postgres-url.ts",
     "apps/web/src/components/ui/empty.tsx",
-    "apps/web/src/components/ui/sheet.tsx",
-    "apps/web/src/migrations/20260604_000000_baseline.ts",
-    "apps/web/src/migrations/index.ts"
+    "apps/web/src/components/ui/sheet.tsx"
   ],
   "unused_exports": [
     "apps/web/scripts/loadScriptEnv.ts:loadLocalEnv",
-    "apps/web/src/components/ui/badge.tsx:badgeVariants",
-    "apps/web/src/components/ui/card.tsx:CardAction",
-    "apps/web/src/components/ui/card.tsx:CardDescription",
-    "apps/web/src/components/ui/dropdown-menu.tsx:DropdownMenuPortal",
-    "apps/web/src/components/ui/dropdown-menu.tsx:DropdownMenuGroup",
-    "apps/web/src/components/ui/dropdown-menu.tsx:DropdownMenuLabel",
-    "apps/web/src/components/ui/dropdown-menu.tsx:DropdownMenuItem",
-    "apps/web/src/components/ui/dropdown-menu.tsx:DropdownMenuRadioGroup",
-    "apps/web/src/components/ui/dropdown-menu.tsx:DropdownMenuRadioItem",
-    "apps/web/src/components/ui/dropdown-menu.tsx:DropdownMenuSeparator",
-    "apps/web/src/components/ui/dropdown-menu.tsx:DropdownMenuShortcut",
-    "apps/web/src/components/ui/dropdown-menu.tsx:DropdownMenuSub",
-    "apps/web/src/components/ui/dropdown-menu.tsx:DropdownMenuSubTrigger",
-    "apps/web/src/components/ui/dropdown-menu.tsx:DropdownMenuSubContent",
-    "apps/web/src/components/ui/field.tsx:FieldDescription",
-    "apps/web/src/components/ui/field.tsx:FieldError",
-    "apps/web/src/components/ui/field.tsx:FieldLegend",
-    "apps/web/src/components/ui/field.tsx:FieldSeparator",
-    "apps/web/src/components/ui/field.tsx:FieldSet",
-    "apps/web/src/components/ui/field.tsx:FieldContent",
-    "apps/web/src/components/ui/field.tsx:FieldTitle",
-    "apps/web/src/components/ui/select.tsx:SelectLabel",
-    "apps/web/src/components/ui/select.tsx:SelectScrollDownButton",
-    "apps/web/src/components/ui/select.tsx:SelectScrollUpButton",
-    "apps/web/src/components/ui/select.tsx:SelectSeparator",
-    "apps/web/src/components/ui/table.tsx:TableFooter",
-    "apps/web/src/components/ui/table.tsx:TableCaption",
-    "apps/web/src/components/ui/toggle.tsx:Toggle",
     "apps/web/src/lib/canchasGeoCookie.ts:canchasUserGeoCookieName",
     "apps/web/src/lib/preview.ts:buildPreviewPath",
     "apps/web/src/lib/publicContentPublishing.ts:publicContentRevalidateSeconds",
     "apps/web/src/lib/publicContentPublishing.ts:getPublicContentListingPath",
-    "apps/web/src/lib/publicContentPublishing.ts:getPublicContentDetailPath",
-    "apps/web/src/migrations/20260604_000000_baseline.ts:up",
-    "apps/web/src/migrations/20260604_000000_baseline.ts:down"
+    "apps/web/src/lib/publicContentPublishing.ts:getPublicContentDetailPath"
   ],
   "unused_types": [
     "apps/web/src/access/roles.ts:StaffRole",
     "apps/web/src/lib/canchasBrowsing.ts:CanchasFilters"
   ],
-  "private_type_leaks": [],
+  "private_type_leaks": [
+    "apps/web/src/components/page/home-hero-video.tsx:HomeHeroVideo->HomeHeroVideoProps",
+    "apps/web/src/components/page/meta-pills.tsx:MetaPills->MetaPillsProps",
+    "apps/web/src/components/page/page-kicker.tsx:PageKicker->PageKickerProps",
+    "apps/web/src/components/page/page-shell.tsx:PageShell->PageShellProps",
+    "apps/web/src/components/page/page-title.tsx:PageTitle->PageTitleProps",
+    "apps/web/src/components/page/rich-content.tsx:RichContent->RichContentProps",
+    "apps/web/src/components/page/rich-snippet.tsx:RichSnippet->RichSnippetProps"
+  ],
   "unused_dependencies": [
     "apps/web/package.json:@payloadcms/ui",
-    "apps/web/package.json:isomorphic-dompurify",
-    "apps/web/package.json:shadcn"
+    "apps/web/package.json:isomorphic-dompurify"
   ],
   "unused_dev_dependencies": [],
   "circular_dependencies": [],
