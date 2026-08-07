@@ -43,7 +43,7 @@
     "fallow": "3.14.0",
     "oxfmt": "0.62.0",
     "oxlint": "1.77.0",
-    "oxlint-tailwindcss": "1.6.0",
+    "oxlint-tailwindcss": "1.7.0",
     "oxlint-tsgolint": "7.0.2001"
   }
 }
