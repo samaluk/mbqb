@@ -94,6 +94,9 @@ jobs:
         run: pnpm build
         env:
           NODE_ENV: production
+          # Instant-navigation e2e verdicts need the testing API in the
+          # production build. Never set in real production (see apps/web/instant-nav.rig.md).
+          EXPOSE_TESTING_API: 1
 
       - name: Integration tests
         run: pnpm test:int

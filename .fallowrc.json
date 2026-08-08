@@ -2,7 +2,8 @@
   "$schema": "./node_modules/fallow/schema.json",
   "entry": [
     "apps/web/src/app/**/{page,layout,loading,error,not-found,route,default,template}.{ts,tsx}",
-    "apps/web/src/payload.config.ts"
+    "apps/web/src/payload.config.ts",
+    "apps/web/scripts/seed-e2e-fixtures.ts"
   ],
   "ignorePatterns": [
     "**/.next/**",
@@ -27,6 +28,7 @@
   "ignoreDependencies": [
     "@base-ui/react",
     "class-variance-authority",
+    "@next/playwright",
     "shadcn",
     "tw-animate-css",
     "tailwindcss"

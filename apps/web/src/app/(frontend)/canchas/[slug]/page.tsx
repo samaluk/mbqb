@@ -27,9 +27,15 @@ type PageProps = {
 
 export default function CanchaDetailPage({ params }: PageProps) {
   return (
-    <Suspense fallback={null}>
-      <CanchaDetailContent params={params} />
-    </Suspense>
+    <PageDetail>
+      <Link className="back-link" data-testid="cancha-detail-back-link" href="/canchas">
+        Volver a canchas
+      </Link>
+      <PageKicker>Cancha</PageKicker>
+      <Suspense fallback={null}>
+        <CanchaDetailContent params={params} />
+      </Suspense>
+    </PageDetail>
   )
 }
 
@@ -48,12 +54,8 @@ async function CanchaDetailContent({ params }: PageProps) {
   ]
 
   return (
-    <PageDetail>
-      <Link className="back-link" href="/canchas">
-        Volver a canchas
-      </Link>
-      <PageKicker>Cancha</PageKicker>
-      <PageTitle>{cancha.title}</PageTitle>
+    <>
+      <PageTitle data-testid="cancha-detail-title">{cancha.title}</PageTitle>
       <MetaPills items={metaItems} />
       {cancha.summary ? <PageLede className="max-w-195">{cancha.summary}</PageLede> : null}
       <a
@@ -65,7 +67,7 @@ async function CanchaDetailContent({ params }: PageProps) {
         Abrir en Google Maps
       </a>
       <RichContent body={cancha.body} />
-    </PageDetail>
+    </>
   )
 }
 

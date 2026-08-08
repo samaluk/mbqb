@@ -12,7 +12,7 @@ export default function CanchasPage({ searchParams }: PageProps) {
   return (
     <PageShell>
       <PageKicker>Canchas</PageKicker>
-      <PageTitle>Donde jugar golf en Chile.</PageTitle>
+      <PageTitle data-testid="canchas-list-title">Donde jugar golf en Chile.</PageTitle>
       <PageLede>
         Guia editorial de canchas jugables, tipos de acceso, precios referenciales y datos utiles
         para planificar una salida.

@@ -29,9 +29,15 @@ type PageProps = {
 
 export default function ArticleDetailPage({ params }: PageProps) {
   return (
-    <Suspense fallback={null}>
-      <ArticleDetailContent params={params} />
-    </Suspense>
+    <PageDetail>
+      <Link className="back-link" data-testid="article-detail-back-link" href="/la-biblia">
+        Volver a La Biblia
+      </Link>
+      <PageKicker>La Biblia</PageKicker>
+      <Suspense fallback={null}>
+        <ArticleDetailContent params={params} />
+      </Suspense>
+    </PageDetail>
   )
 }
 
@@ -43,15 +49,11 @@ async function ArticleDetailContent({ params }: PageProps) {
   if (!article) notFound()
 
   return (
-    <PageDetail>
-      <Link className="back-link" href="/la-biblia">
-        Volver a La Biblia
-      </Link>
-      <PageKicker>La Biblia</PageKicker>
-      <PageTitle>{article.title}</PageTitle>
+    <>
+      <PageTitle data-testid="article-detail-title">{article.title}</PageTitle>
       <MetaPills items={[categoryLabels[article.category], article.difficulty]} />
       <RichContent body={article.body} />
-    </PageDetail>
+    </>
   )
 }
 

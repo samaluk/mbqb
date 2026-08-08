@@ -179,7 +179,16 @@ function shouldRevalidatePublicContent(
 }
 
 async function revalidatePublicPaths(paths: string[], revalidate?: RevalidatePath) {
-  const revalidatePath = revalidate ?? (await import('next/cache')).revalidatePath
+  const revalidatePath =
+    revalidate ??
+    (await import('next/cache')
+      .then(({ revalidatePath: nextRevalidatePath }) => nextRevalidatePath)
+      .catch(() => null))
+
+  // Payload scripts (for example, the Playwright fixture seed) can run
+  // outside Next's runtime, where `next/cache` is not resolvable. Revalidation
+  // is best-effort there; the next request still reads the updated document.
+  if (!revalidatePath) return
 
   for (const path of paths) {
     try {

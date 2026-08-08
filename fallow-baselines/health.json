@@ -18,6 +18,11 @@
         "count": 3
       }
     },
+    "apps/web/scripts/seed-e2e-fixtures.ts": {
+      "crap_moderate": {
+        "count": 1
+      }
+    },
     "apps/web/src/app/(frontend)/bogeyficador/BogeyficadorForm.tsx": {
       "crap_high": {
         "count": 1
@@ -117,6 +122,11 @@
       }
     },
     "apps/web/scripts/loadScriptEnv.ts\u0000loadTestEnv": {
+      "crap_moderate": {
+        "count": 1
+      }
+    },
+    "apps/web/scripts/seed-e2e-fixtures.ts\u0000upsertFixtures": {
       "crap_moderate": {
         "count": 1
       }
