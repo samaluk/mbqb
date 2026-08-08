@@ -19,20 +19,27 @@ local web_sources = List(
 )
 
 local fixers = new Mapping<String, Step> {
+  // exclusive = true serializes the mutating fixers (definition order:
+  // oxlint → oxlint-tailwind → oxfmt). Fix steps hold shared read locks, so
+  // concurrent whole-file writers could interleave and silently lose edits;
+  // hk blocks the next fixer until the previous one finishes.
   ["oxlint"] {
     glob = web_sources
+    exclusive = true
     check = "pnpm exec oxlint {{files}} --ignore-path .oxlintignore"
     fix = "pnpm exec oxlint --fix {{files}} --ignore-path .oxlintignore"
     output_summary = "combined"
   }
   ["oxlint-tailwind"] {
     glob = web_sources
+    exclusive = true
     check = "pnpm exec oxlint {{files}} --config .oxlintrc.tailwind.json --ignore-path .oxlintignore"
     fix = "pnpm exec oxlint --fix {{files}} --config .oxlintrc.tailwind.json --ignore-path .oxlintignore"
     output_summary = "combined"
   }
   ["oxfmt"] {
     glob = web_sources
+    exclusive = true
     check = "pnpm exec oxfmt --check {{files}}"
     fix = "pnpm exec oxfmt --write {{files}}"
     output_summary = "combined"
@@ -82,7 +89,8 @@ hooks {
     }
   }
   // hk check / hk fix — the same fast suite as a CLI: `hk check` (read-only,
-  // default: changed files, add --all for the whole tree), `hk fix` (auto-fixes).
+  // default: staged files, --all for the whole tree, --unstaged for working-tree
+  // changes), `hk fix` (auto-fixes).
   ["check"] {
     steps {
       ...fixers
