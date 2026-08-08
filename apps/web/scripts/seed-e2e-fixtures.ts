@@ -101,50 +101,54 @@ async function upsertFixtures() {
   const { default: config } = await import('@payload-config')
   const payload = await getPayload({ config })
 
-  for (const collection of fixtureCollections) {
-    const docs = fixtures[collection] as readonly Record<string, unknown>[]
+  try {
+    for (const collection of fixtureCollections) {
+      const docs = fixtures[collection] as readonly Record<string, unknown>[]
 
-    for (const data of docs) {
-      const slug = String(data.slug)
-      const existing = await payload.find({
-        collection,
-        depth: 0,
-        draft: true,
-        limit: 1,
-        locale: 'es',
-        overrideAccess: true,
-        where: {
-          slug: { equals: slug },
-        },
-      })
-
-      if (existing.docs[0]?.id) {
-        await payload.update({
-          id: existing.docs[0].id,
+      for (const data of docs) {
+        const slug = String(data.slug)
+        const existing = await payload.find({
           collection,
-          data: {
-            ...data,
-            _status: 'published',
-          } as RequiredDataFromCollectionSlug<FixtureCollection>,
-          draft: false,
+          depth: 0,
+          draft: true,
+          limit: 1,
           locale: 'es',
           overrideAccess: true,
+          where: {
+            slug: { equals: slug },
+          },
         })
-        console.log(`[seed] updated ${collection}/${slug}`)
-      } else {
-        await payload.create({
-          collection,
-          data: {
-            ...data,
-            _status: 'published',
-          } as RequiredDataFromCollectionSlug<FixtureCollection>,
-          draft: false,
-          locale: 'es',
-          overrideAccess: true,
-        })
-        console.log(`[seed] created ${collection}/${slug}`)
+
+        if (existing.docs[0]?.id) {
+          await payload.update({
+            id: existing.docs[0].id,
+            collection,
+            data: {
+              ...data,
+              _status: 'published',
+            } as RequiredDataFromCollectionSlug<FixtureCollection>,
+            draft: false,
+            locale: 'es',
+            overrideAccess: true,
+          })
+          console.log(`[seed] updated ${collection}/${slug}`)
+        } else {
+          await payload.create({
+            collection,
+            data: {
+              ...data,
+              _status: 'published',
+            } as RequiredDataFromCollectionSlug<FixtureCollection>,
+            draft: false,
+            locale: 'es',
+            overrideAccess: true,
+          })
+          console.log(`[seed] created ${collection}/${slug}`)
+        }
       }
     }
+  } finally {
+    await payload.destroy()
   }
 }
 
@@ -155,4 +159,8 @@ export async function seedE2eFixtures() {
 
 if (process.argv[1]?.endsWith('seed-e2e-fixtures.ts')) {
   await seedE2eFixtures()
+  // Payload's postgres adapter keeps its initial connection checked out. The
+  // standalone seed command is a short-lived CI process, so exit after the
+  // writes complete instead of waiting forever on that adapter-owned handle.
+  process.exit(0)
 }

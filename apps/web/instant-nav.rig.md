@@ -1,8 +1,11 @@
 # instant-nav rig: MBQB web
 
-- BUILD: `pnpm build:next` (`apps/web`) with `EXPOSE_TESTING_API=1`, served by
-  `pnpm start`. CI builds with `pnpm build` (runs `migrate` first). Both use
-  `POSTGRES_URL` from `.env.local` (local) or CI env.
+- BUILD: seed fixtures before building any cached public lists, then run
+  `EXPOSE_TESTING_API=1 pnpm build:next` (`apps/web`), served by `pnpm start`.
+  CI runs `pnpm migrate && pnpm exec tsx scripts/seed-e2e-fixtures.ts` before
+  the build; local databases already have the schema and should run the seed
+  script before each measured build. Both use `POSTGRES_URL` from `.env.local`
+  (local) or CI env.
 - EXPOSE: `process.env.EXPOSE_TESTING_API === '1'` — set explicitly for every
   measured build (local and CI e2e), never set in real production. The
   Playwright webServer command sets it in CI so `pnpm start` runs an
@@ -23,10 +26,11 @@
   - Locale: fixtures are seeded in `es` (the site's only locale).
   - Geo cookie: canchas list reads a user-geo cookie; seeded canchas have no
     region, so geo must not filter them out.
-- LOOP: local `EXPOSE_TESTING_API=1 pnpm build:next` → `pnpm start` (port 3000)
-  → `pnpm test:e2e`; fully agent-drivable on this machine. CI: push → `pnpm
-  build` (API exposed) → `pnpm test:e2e`; the same suite runs in the
-  `build-and-integration` job. No deploy approvals or secrets needed.
+- LOOP: local seed → `EXPOSE_TESTING_API=1 pnpm build:next` → `pnpm start`
+  (port 3000) → `pnpm test:e2e`; fully agent-drivable on this machine. CI:
+  push → migrate/seed → API-exposed build → `pnpm test:e2e`; the same suite
+  runs in the `build-and-integration` job. No deploy approvals or secrets
+  needed.
 - LIVENESS: n/a for the local `build && start` rig (artifact is freshly
   built). Stop any previous `next start` before starting; fail the loop on
   `EADDRINUSE`.

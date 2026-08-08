@@ -90,8 +90,15 @@ jobs:
       - name: Create integration test database
         run: docker exec postgres psql -U postgres -d mbqb -c "CREATE DATABASE mbqb_test;"
 
+      - name: Migrate and seed E2E fixtures
+        working-directory: apps/web
+        run: pnpm migrate && pnpm exec tsx scripts/seed-e2e-fixtures.ts
+        env:
+          NODE_ENV: production
+
       - name: Build (local/CI target)
-        run: pnpm build
+        working-directory: apps/web
+        run: pnpm build:next
         env:
           NODE_ENV: production
           # Instant-navigation e2e verdicts need the testing API in the
