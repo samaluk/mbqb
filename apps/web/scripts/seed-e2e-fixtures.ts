@@ -36,6 +36,23 @@ const richTextBody = {
   },
 }
 
+const fixtureCollections = ['canchas', 'la-biblia-articles', 'products'] as const
+
+type FixtureCollection = (typeof fixtureCollections)[number]
+
+/**
+ * Per-collection fixture shape: each collection's docs are checked against
+ * its own Payload data type via the `satisfies` map below, so a cancha shape
+ * cannot silently drift into a product shape. `body` is exempted because
+ * Payload's generated rich-text type is lossier than the lexical editor
+ * state fixtures carry (its root demands an indent/alignment `format` the
+ * real serialized state does not emit).
+ */
+type FixtureDoc<C extends FixtureCollection> = Omit<RequiredDataFromCollectionSlug<C>, 'body'> & {
+  body: typeof richTextBody
+  slug: string
+}
+
 const fixtures = {
   canchas: [
     {
@@ -91,11 +108,7 @@ const fixtures = {
       title: 'Producto Fixture Dos',
     },
   ],
-} as const
-
-const fixtureCollections = ['canchas', 'la-biblia-articles', 'products'] as const
-
-type FixtureCollection = (typeof fixtureCollections)[number]
+} satisfies { [K in FixtureCollection]: readonly FixtureDoc<K>[] }
 
 async function upsertFixtures() {
   const { default: config } = await import('@payload-config')
@@ -103,10 +116,10 @@ async function upsertFixtures() {
 
   try {
     for (const collection of fixtureCollections) {
-      const docs = fixtures[collection] as readonly Record<string, unknown>[]
+      const docs = fixtures[collection]
 
       for (const data of docs) {
-        const slug = String(data.slug)
+        const slug = data.slug
         const existing = await payload.find({
           collection,
           depth: 0,
@@ -119,14 +132,23 @@ async function upsertFixtures() {
           },
         })
 
+        // Per-collection shapes are enforced upstream by the `satisfies` map
+        // and `FixtureDoc`; only the rich-text body widens through Payload's
+        // generated type, whose root shape (indent/format) is lossier than
+        // the lexical editor state fixtures carry.
+        // oxlint-disable no-unsafe-type-assertion
+        const payloadData = {
+          ...data,
+          body: data.body as unknown as RequiredDataFromCollectionSlug<FixtureCollection>['body'],
+          _status: 'published',
+        } as RequiredDataFromCollectionSlug<FixtureCollection>
+        // oxlint-enable no-unsafe-type-assertion
+
         if (existing.docs[0]?.id) {
           await payload.update({
             id: existing.docs[0].id,
             collection,
-            data: {
-              ...data,
-              _status: 'published',
-            } as RequiredDataFromCollectionSlug<FixtureCollection>,
+            data: payloadData,
             draft: false,
             locale: 'es',
             overrideAccess: true,
@@ -135,10 +157,7 @@ async function upsertFixtures() {
         } else {
           await payload.create({
             collection,
-            data: {
-              ...data,
-              _status: 'published',
-            } as RequiredDataFromCollectionSlug<FixtureCollection>,
+            data: payloadData,
             draft: false,
             locale: 'es',
             overrideAccess: true,

@@ -115,3 +115,8 @@ jobs:
       - name: E2E tests
         working-directory: apps/web
         run: pnpm test:e2e
+        env:
+          # Opt-in fixture seeding (see apps/web/instant-nav.rig.md): the
+          # global setup only seeds when this is set, keeping the seed from
+          # running as a side effect of every local test run.
+          E2E_SEED_FIXTURES: 1
