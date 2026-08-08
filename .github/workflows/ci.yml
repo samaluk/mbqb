@@ -83,7 +83,11 @@ jobs:
       - name: Wait for PostgreSQL
         run: |
           for i in $(seq 1 30); do
-            docker exec postgres pg_isready -U postgres -d mbqb && break
+            docker exec postgres pg_isready -U postgres -d mbqb >/dev/null 2>&1 || { sleep 1; continue; }
+            # pg_isready succeeds against the entrypoint's temporary postmaster
+            # (used for first-boot initdb.d setup); only proceed once init is
+            # truly complete or CREATE DATABASE gets killed by its fast shutdown.
+            docker logs postgres 2>&1 | grep -q "PostgreSQL init process complete; ready for start up" && break
             sleep 1
           done
 
