@@ -21,6 +21,9 @@ const nextConfig: NextConfig = {
     // TypeScript 7 has no JS compiler API; use the project-local tsc CLI.
     // https://nextjs.org/docs/app/api-reference/config/typescript#using-typescript-7
     useTypeScriptCli: true,
+    // Instant-navigation e2e verdicts come from production builds only; never
+    // in real production. See instant-nav.rig.md.
+    exposeTestingApiInProductionBuild: process.env.EXPOSE_TESTING_API === '1',
   },
   async redirects() {
     return [

@@ -97,7 +97,11 @@ function HomePageView({ homePage }: { homePage: HomePageGlobal | null }) {
           vueltas.
         </PageLede>
         <div className="mt-5 flex flex-wrap gap-2">
-          <Link className={cn(buttonVariants(), 'min-h-10 px-4 font-bold')} href="/bogeyficador">
+          <Link
+            className={cn(buttonVariants(), 'min-h-10 px-4 font-bold')}
+            data-testid="home-bogeyficador-cta"
+            href="/bogeyficador"
+          >
             Bogeyficador
           </Link>
           <Link

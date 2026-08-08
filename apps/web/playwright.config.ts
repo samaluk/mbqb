@@ -12,6 +12,7 @@ const baseURL = process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000'
  */
 export default defineConfig({
   testDir: './tests/e2e',
+  globalSetup: './tests/e2e/global-setup.ts',
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
   workers: isCI ? 1 : undefined,

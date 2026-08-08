@@ -26,9 +26,15 @@ type PageProps = {
 
 export default function ProductDetailPage({ params }: PageProps) {
   return (
-    <Suspense fallback={null}>
-      <ProductDetailContent params={params} />
-    </Suspense>
+    <PageDetail>
+      <Link className="back-link" data-testid="product-detail-back-link" href="/productos">
+        Volver a productos
+      </Link>
+      <PageKicker>Producto</PageKicker>
+      <Suspense fallback={null}>
+        <ProductDetailContent params={params} />
+      </Suspense>
+    </PageDetail>
   )
 }
 
@@ -40,12 +46,8 @@ async function ProductDetailContent({ params }: PageProps) {
   if (!product) notFound()
 
   return (
-    <PageDetail>
-      <Link className="back-link" href="/productos">
-        Volver a productos
-      </Link>
-      <PageKicker>Producto</PageKicker>
-      <PageTitle>{product.title}</PageTitle>
+    <>
+      <PageTitle data-testid="product-detail-title">{product.title}</PageTitle>
       <MetaPills
         items={[
           formatPrice(product.priceCLP),
@@ -60,7 +62,7 @@ async function ProductDetailContent({ params }: PageProps) {
         />
       ) : null}
       <RichContent body={product.body} />
-    </PageDetail>
+    </>
   )
 }
 
