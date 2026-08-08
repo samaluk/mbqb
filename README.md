@@ -24,3 +24,12 @@ Environment variables and local setup: [apps/web/README.md](apps/web/README.md).
 ```sh
 pnpm dev
 ```
+
+### Git hooks
+
+Local checks are managed by [hk](https://hk.jdx.dev/). Install hk once (`brew install hk` or `cargo install hk`), then run `bash scripts/setup-hk.sh` in this repo (or `hk install --global` once on your machine — hk is a silent no-op in repos without an `hk.pkl`).
+
+- `pre-commit` — oxlint and oxfmt on **staged files only** (auto-fixes and re-stages them), then typecheck, fallow gates, and unit tests on the whole repo
+- `pre-push` — typecheck and a local production build (requires `apps/web/.env.local`; run `cd apps/web && pnpm env:pull`)
+
+The full fast suite is also available on demand: `hk check` (defaults to changed files, add `--all` for every tracked file) and `hk fix` to auto-fix.
