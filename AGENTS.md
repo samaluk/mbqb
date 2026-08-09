@@ -1,14 +1,12 @@
 # AGENTS.md
 
+## Next.js agent rules
 
-<!-- BEGIN:nextjs-agent-rules -->
-
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-
-<!-- END:nextjs-agent-rules -->
-
+The version-matched Next.js agent-rules block lives in `apps/web/AGENTS.md`,
+next to the `next` package it references (`node_modules/next/dist/docs/` does not
+resolve from the repo root in this monorepo). `next dev` writes and refreshes
+that block, so run `pnpm dev` once after a Next.js upgrade to update it. Read
+`apps/web/AGENTS.md` before writing code in `apps/web`.
 
 ## Agent skills
 
