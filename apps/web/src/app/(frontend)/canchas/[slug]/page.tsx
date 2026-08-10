@@ -46,6 +46,7 @@ async function CanchaDetailContent({ params }: PageProps) {
 
   if (!cancha) notFound()
 
+  // oxlint-disable-next-line typescript/consistent-type-assertions
   const canchaItem = cancha as CanchaMapItem
   const metaItems = [
     canchaAccessLabels[cancha.accessType],

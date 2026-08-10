@@ -72,12 +72,14 @@ const nextConfig: NextConfig = {
     ],
   },
   webpack: (webpackConfig) => {
+    // oxlint-disable-next-line typescript/no-unsafe-member-access
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
       '.js': ['.ts', '.tsx', '.js', '.jsx'],
       '.mjs': ['.mts', '.mjs'],
     }
 
+    // oxlint-disable-next-line typescript/no-unsafe-return
     return webpackConfig
   },
   turbopack: {

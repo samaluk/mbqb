@@ -1,9 +1,8 @@
-#!/usr/bin/env node
 /**
  * Builds a single squashed schema migration from the current local database.
  * Prerequisite: local DB matches production (e.g. pnpm seed:dev-from-prod).
  *
- * Usage: node scripts/build-baseline-migration.mjs
+ * Usage: pnpm migrate:baseline
  */
 import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
@@ -19,7 +18,7 @@ const migrationPath = path.join(migrationsDir, `${migrationName}.ts`)
 const localPostgresUrl =
   process.env.POSTGRES_URL || 'postgres://postgres:postgres@127.0.0.1:5433/mbqb'
 
-function dumpSchema() {
+function dumpSchema(): string {
   const docker = spawnSync(
     'docker',
     [
@@ -53,7 +52,7 @@ function dumpSchema() {
   return pgDump.stdout
 }
 
-function skipLine(line) {
+function skipLine(line: string): boolean {
   const trimmed = line.trim()
   if (!trimmed) return true
   if (trimmed.startsWith('\\')) return true
@@ -65,7 +64,7 @@ function skipLine(line) {
   return false
 }
 
-function sanitizeDump(raw) {
+function sanitizeDump(raw: string): string {
   const body = raw
     .split('\n')
     .filter((line) => !skipLine(line))
@@ -75,7 +74,7 @@ function sanitizeDump(raw) {
   return ['CREATE EXTENSION IF NOT EXISTS postgis;', body].filter(Boolean).join('\n')
 }
 
-function escapeForTemplateLiteral(sql) {
+function escapeForTemplateLiteral(sql: string): string {
   return sql.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${')
 }
 

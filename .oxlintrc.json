@@ -15,9 +15,16 @@
       "error",
       { "allow": ["_id", "_tag", "_status", "__filename", "__dirname"] }
     ],
-    "typescript/ban-ts-comment": "warn",
+    "typescript/ban-ts-comment": [
+      "error",
+      { "ts-expect-error": "allow-with-description" }
+    ],
+    "typescript/consistent-type-assertions": [
+      "error",
+      { "assertionStyle": "never" }
+    ],
     "typescript/no-empty-object-type": "warn",
-    "typescript/no-explicit-any": "warn",
+    "typescript/no-explicit-any": "error",
     "typescript/no-unused-vars": [
       "warn",
       {
@@ -29,9 +36,15 @@
         "caughtErrorsIgnorePattern": "^(_|ignore)"
       }
     ],
-    "typescript/no-unsafe-type-assertion": "warn",
-    "typescript/no-unnecessary-type-assertion": "warn",
+    "typescript/no-non-null-assertion": "error",
+    "typescript/no-unsafe-type-assertion": "error",
+    "typescript/no-unnecessary-type-assertion": "error",
     "typescript/no-unnecessary-type-conversion": "warn",
+    "typescript/no-unsafe-argument": "error",
+    "typescript/no-unsafe-assignment": "error",
+    "typescript/no-unsafe-call": "error",
+    "typescript/no-unsafe-member-access": "error",
+    "typescript/no-unsafe-return": "error",
     "typescript/consistent-return": "warn",
     "typescript/no-unnecessary-type-arguments": "warn",
     "typescript/no-unnecessary-type-parameters": "warn",

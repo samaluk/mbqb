@@ -3,6 +3,7 @@ export function isPayloadUnavailableError(error: unknown) {
     return false
   }
 
+  // oxlint-disable-next-line typescript/consistent-type-assertions
   const maybeError = error as {
     cause?: { code?: unknown }
     code?: unknown

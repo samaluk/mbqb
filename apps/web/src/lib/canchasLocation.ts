@@ -11,6 +11,7 @@ export type GeoCoordinates = {
 export function isCanchaLocationPoint(value: unknown): value is CanchaLocationPoint {
   if (!Array.isArray(value) || value.length !== 2) return false
 
+  // oxlint-disable-next-line typescript/no-unsafe-assignment
   const [longitude, latitude] = value
 
   return (

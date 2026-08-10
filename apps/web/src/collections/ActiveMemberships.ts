@@ -25,6 +25,7 @@ export const ActiveMemberships: CollectionConfig = {
       ({ data }) => {
         if (!data?.rut) return data
 
+        // oxlint-disable-next-line typescript/no-unsafe-argument
         const privacyFields = getActiveMembershipPrivacyFields(data.rut, env.PAYLOAD_SECRET)
 
         if (!privacyFields) {

@@ -21,7 +21,7 @@
     "migrate": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/run-payload-migrate.ts",
     "migrate:production": "cross-env NODE_ENV=production NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/run-payload-migrate-production.ts",
     "migrate:test": "cross-env NODE_ENV=production NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/run-payload-migrate-test.ts",
-    "migrate:baseline": "node scripts/build-baseline-migration.mjs",
+    "migrate:baseline": "tsx scripts/build-baseline-migration.ts",
     "migrate:create": "pnpm payload migrate:create",
     "migrate:down": "pnpm payload migrate:down",
     "migrate:fresh": "pnpm payload migrate:fresh",

@@ -136,13 +136,13 @@ async function upsertFixtures() {
         // and `FixtureDoc`; only the rich-text body widens through Payload's
         // generated type, whose root shape (indent/format) is lossier than
         // the lexical editor state fixtures carry.
-        // oxlint-disable no-unsafe-type-assertion
+        // oxlint-disable no-unsafe-type-assertion, typescript/consistent-type-assertions
         const payloadData = {
           ...data,
           body: data.body as unknown as RequiredDataFromCollectionSlug<FixtureCollection>['body'],
           _status: 'published',
         } as RequiredDataFromCollectionSlug<FixtureCollection>
-        // oxlint-enable no-unsafe-type-assertion
+        // oxlint-enable no-unsafe-type-assertion, typescript/consistent-type-assertions
 
         if (existing.docs[0]?.id) {
           await payload.update({

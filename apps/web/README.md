@@ -158,5 +158,5 @@ Regenerate the baseline from a DB that matches prod:
 
 ```sh
 cd apps/web
-node scripts/build-baseline-migration.mjs
+pnpm migrate:baseline
 ```
