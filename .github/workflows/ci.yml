@@ -25,9 +25,6 @@ jobs:
 
       - uses: ./.github/actions/setup-toolchain
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
       - name: Lint
         run: pnpm run check:lint
 
@@ -65,9 +62,6 @@ jobs:
           echo "APP_PORT=$APP_PORT" >> "$GITHUB_ENV"
           echo "PORT=$APP_PORT" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_SERVER_URL=http://127.0.0.1:$APP_PORT" >> "$GITHUB_ENV"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Start PostgreSQL
         run: |
