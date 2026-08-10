@@ -2,11 +2,9 @@
 
 MBQB uses [Fallow](https://docs.fallow.tools) 3.14 with type-aware TypeScript analysis as a strict quality ratchet. Existing technical debt is baselined; new debt is rejected.
 
-## Two baseline layers
+## Identity baselines (`fallow-baselines/*.json`)
 
-### Exact baselines (`fallow-baselines/*.json`)
-
-Identity-based snapshots of current findings:
+Identity-based snapshots of current findings, committed to the repo:
 
 | File | Analysis | Matching mode |
 |------|----------|---------------|
@@ -14,28 +12,7 @@ Identity-based snapshots of current findings:
 | `dupes.json` | Semantic clone groups (`minOccurrences: 3`) | Per clone fingerprint |
 | `health.json` | Complexity, CRAP, unit size | Per function identity |
 
-**Gate A** fails when a finding appears that is not in the committed baseline — even if total count stays the same. Example: remove one unused export and add a different one → CI fails.
-
-### Regression baseline (embedded in `.fallowrc.json`)
-
-The `regression.baseline` block stores issue **counts** from a known-good state. It is written by:
-
-```bash
-pnpm exec fallow dead-code --save-regression-baseline
-```
-
-with no path argument (updates `.fallowrc.json` in place).
-
-**Gate B** fails when total dead-code issue count increases beyond tolerance (zero):
-
-```bash
-pnpm fallow:regression
-# runs scripts/fallow-regression-check.mjs, which reads regression.baseline from .fallowrc.json
-```
-
-Fallow exits 1 whenever issues exist; the wrapper parses JSON and fails only when `regression.exceeded` is true.
-
-Regenerating a worse baseline to silence CI is not acceptable — fix the code or justify narrow config changes.
+Per Fallow's [CI integration guide](https://docs.fallow.tools/integrations/ci), baselines are committed to the repo and **never regenerated in CI** — regenerating on every run would mean new issues are never reported. The gate fails when a finding appears that is not in the committed baseline, even if total count stays the same. Example: remove one unused export and add a different one → CI fails.
 
 ## Type-aware analysis
 
@@ -63,17 +40,17 @@ pnpm fallow:status
 ## Commands
 
 ```bash
-pnpm fallow:dead-code      # Gate A: dead-code exact baseline
-pnpm fallow:dupes          # Gate A: duplication exact baseline
-pnpm fallow:health         # Gate A: health identity baseline
-pnpm fallow:regression     # Gate B: embedded count regression
+pnpm fallow:dead-code      # Gate: dead-code identity baseline
+pnpm fallow:dupes          # Gate: duplication identity baseline
+pnpm fallow:health         # Gate: health identity baseline
 pnpm fallow:audit          # Changed-files review (new-only gate)
-pnpm fallow:ci             # Full CI gate (freshness + A + B on full repo)
+pnpm fallow:ci             # Full CI gate (status + the three identity gates)
 pnpm fallow:baseline:update   # Regenerate all baselines after genuine fixes
-pnpm fallow:baseline:check    # Fail if committed baselines are stale
 pnpm fallow:fix:preview    # Type-aware dry-run fixes
 pnpm fallow:fix            # Apply safe fixes (not run in CI)
 ```
+
+Fallow's count-based regression flags (`--save-regression-baseline` / `--fail-on-regression`) are not used: `--fail-on-regression` still exits 1 whenever issues exist (exit 1 means findings, not failure), and the identity gates above already reject every new finding, which subsumes a count regression.
 
 ## Inspecting findings
 
@@ -100,13 +77,10 @@ When you remove findings legitimately:
 
 ```bash
 pnpm fallow:baseline:update
-pnpm fallow:baseline:check
 git add .fallowrc.json fallow-baselines/
 ```
 
-`baseline:update` writes exact baselines to `fallow-baselines/` and embeds regression counts in `.fallowrc.json`.
-
-CI also expects improved baselines to be committed — `fallow:baseline:check` regenerates into a temp workspace and diffs.
+`baseline:update` writes the three exact baselines to `fallow-baselines/`. Committing them keeps the ratchet tight: a finding removed and later re-added fails CI again. Per the docs, regenerate the baselines periodically on `main` — never in CI.
 
 ## Configuration exclusions
 
@@ -122,9 +96,7 @@ CI also expects improved baselines to be committed — `fallow:baseline:check` r
 
 On pull requests, `pnpm fallow:ci`:
 
-1. Verifies Fallow 3.14.0 and type-aware companion
-2. Runs `fallow:baseline:check` so committed exact + regression baselines are not stale
-3. Runs Gate A (exact baselines on the full repo)
-4. Runs Gate B via `scripts/fallow-regression-check.mjs` (parses JSON; fails only when `regression.exceeded` is true)
+1. Verifies the type-aware companion (`fallow type-aware status`)
+2. Runs the three identity gates on the full repo against the committed baselines: `fallow:dead-code`, `fallow:dupes`, `fallow:health`
 
 `pnpm fallow:audit` remains available for local changed-file review. It is not in CI today because type-aware baselines currently fail audit identity checks (`capabilities` mismatch in Fallow 3.14.0).
