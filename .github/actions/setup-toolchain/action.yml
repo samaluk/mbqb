@@ -20,10 +20,12 @@ runs:
       with:
         node-version-file: package.json
 
-    # Composite actions do not pass setup-node's PATH to nested JS actions; standalone
-    # installs @pnpm/exe without using the runner's default Node 20.
-    - uses: pnpm/action-setup@v6.0.10
+    # pnpm/setup downloads the exact self-contained version from packageManager,
+    # avoiding action-setup's bootstrap and self-update path.
+    - uses: pnpm/setup@v2
       with:
-        standalone: true
+        # Self-hosted runners run concurrent jobs on one machine; the default ~/setup-pnpm
+        # is shared and pnpm version switches in one job can break another job's shims.
+        dest: ${{ runner.environment == 'self-hosted' && format('{0}/setup-pnpm', runner.temp) || '~/setup-pnpm' }}
         # GitHub-hosted runners benefit from actions/cache; self-hosted uses PNPM_STORE_DIR above.
         cache: ${{ runner.environment != 'self-hosted' }}
