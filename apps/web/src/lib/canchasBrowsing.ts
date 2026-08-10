@@ -151,6 +151,7 @@ export function createPayloadCanchasAdapter({
       })
 
       return {
+        // oxlint-disable-next-line typescript/consistent-type-assertions, typescript/no-unnecessary-type-assertion
         docs: result.docs as CanchaMapItem[],
         page: result.page ?? undefined,
         totalDocs: result.totalDocs,

@@ -7,6 +7,7 @@ type UserWithRole = {
 }
 
 const hasRole = (user: unknown, roles: StaffRole[]) =>
+  // oxlint-disable-next-line typescript/consistent-type-assertions
   Boolean(user && roles.includes((user as UserWithRole).role ?? 'editor'))
 
 export const isAdmin = ({ req }: AccessArgs) => hasRole(req.user, ['admin'])

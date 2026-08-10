@@ -156,7 +156,9 @@ function revalidatePublicContentChange(
   return async ({ doc, previousDoc }) =>
     revalidatePublicContentDoc({
       collection,
+      // oxlint-disable-next-line typescript/no-unsafe-assignment
       doc,
+      // oxlint-disable-next-line typescript/no-unsafe-assignment
       previousDoc,
     })
 }
@@ -167,6 +169,7 @@ function revalidatePublicContentDelete(
   return async ({ doc }) =>
     revalidateDeletedPublicContentDoc({
       collection,
+      // oxlint-disable-next-line typescript/no-unsafe-assignment
       doc,
     })
 }

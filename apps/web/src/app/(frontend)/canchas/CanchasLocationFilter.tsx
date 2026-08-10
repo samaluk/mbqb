@@ -199,11 +199,15 @@ export function CanchasLocationFilter() {
               min={minMaxDistanceKm}
               onValueChange={(value) =>
                 schedulePersistMaxDistance(
+                  // oxlint-disable-next-line typescript/no-unsafe-argument
                   (Array.isArray(value) ? value[0] : value) ?? defaultMaxDistanceKm,
                 )
               }
               onValueCommitted={(value) =>
-                commitMaxDistance((Array.isArray(value) ? value[0] : value) ?? defaultMaxDistanceKm)
+                commitMaxDistance(
+                  // oxlint-disable-next-line typescript/no-unsafe-argument
+                  (Array.isArray(value) ? value[0] : value) ?? defaultMaxDistanceKm,
+                )
               }
               step={5}
               value={[sliderMaxKm]}
