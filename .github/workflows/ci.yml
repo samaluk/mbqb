@@ -40,15 +40,11 @@ jobs:
       - name: Unit tests (with coverage)
         run: pnpm test:unit:coverage
 
+      # Authoritative ratchet: identity baselines, changed-code audit, the
+      # verifier-filtered security gate (fallow-baselines/security-verdicts.json),
+      # regression counts, and baseline freshness — all in `pnpm fallow:ci`.
       - name: Fallow
         run: pnpm fallow:ci
-
-      # Security gate: `fallow security` candidates are joined with the committed
-      # verifier verdicts (fallow-baselines/security-verdicts.json). The job fails
-      # when a candidate survives verification, needs human review, or is new and
-      # therefore unverdicted. Dispositions are reviewed in the security PR flow.
-      - name: Fallow security gate
-        run: pnpm fallow:security:gate
 
   fallow-pr:
     name: Fallow PR feedback (annotations, review, SARIF)
