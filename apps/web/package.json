@@ -32,7 +32,8 @@
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "pnpm migrate:test && cross-env INTEGRATION_TEST=true NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts --fileParallelism=false tests/int",
     "test:unit": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts tests/unit",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:unit:coverage": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts --coverage tests/unit"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
@@ -74,6 +75,7 @@
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
     "@vitejs/plugin-react": "6.0.5",
+    "@vitest/coverage-istanbul": "4.1.10",
     "jsdom": "30.0.1",
     "tailwindcss": "4.3.3",
     "tsx": "4.23.12",

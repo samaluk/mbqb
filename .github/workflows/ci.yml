@@ -34,11 +34,61 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      # Unit tests with Istanbul coverage: the coverage evidence feeds fallow's
+      # CRAP scoring. Must run before the fallow gate so the health baseline
+      # comparison and baseline-freshness check see identical coverage input.
+      - name: Unit tests (with coverage)
+        run: pnpm test:unit:coverage
+
       - name: Fallow
         run: pnpm fallow:ci
 
-      - name: Unit tests
-        run: pnpm test:unit
+      # Security candidates are advisory (they require human/agent verification,
+      # not a deterministic binary verdict), so findings (exit 1) do not fail the
+      # job; real analyzer/config errors (exit 2) do.
+      - name: Fallow security (advisory)
+        shell: bash
+        run: |
+          set +e
+          pnpm fallow:security
+          code=$?
+          set -e
+          if [ "$code" -eq 2 ]; then
+            exit 2
+          fi
+
+  fallow-pr:
+    name: Fallow PR feedback (annotations, review, SARIF)
+    if: github.event_name == 'pull_request'
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","docker"]') || 'ubuntu-latest') }}
+    permissions:
+      contents: read
+      security-events: write
+      pull-requests: write
+      checks: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-toolchain
+
+      # The official Action runs the same changed-code audit as `pnpm fallow:audit`
+      # (version resolved from the pinned package.json dependency) but renders it as
+      # PR feedback: a sticky summary comment, inline review comments, and SARIF for
+      # Code Scanning. The deterministic ratchet stays in the `quality` job.
+      - name: Fallow changed-code audit
+        uses: fallow-rs/fallow@v3
+        with:
+          command: audit
+          gate: new-only
+          format: sarif
+          sarif: true
+          comment: true
+          review-comments: true
+          type-aware: auto
+          type-aware-require: complete
 
   build-and-integration:
     name: Build, integration, and E2E tests

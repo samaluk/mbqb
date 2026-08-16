@@ -52,13 +52,19 @@ local repo_checks = new Mapping<String, Step> {
   ["typecheck"] {
     check = "pnpm typecheck"
   }
-  ["fallow"] {
+  ["fallow:ci"] {
     check = "pnpm fallow:ci"
   }
   ["test"] {
     check = "pnpm --filter @mbqb/web test"
   }
 }
+
+// Pre-commit: fast changed/staged-code gate. `git diff --cached --unified=0`
+// scopes the audit to lines added by this commit, so untouched code is never
+// re-gated. Inherited findings in touched files are reported but do not fail
+// (`--gate new-only`); the authoritative full ratchet runs in CI and pre-push.
+local staged_fallow_audit = #"""git diff --cached --unified=0 | pnpm exec fallow audit --gate new-only --diff-stdin --quiet"""#
 
 hooks {
   ["pre-commit"] {
@@ -68,7 +74,17 @@ hooks {
       ...fixers
       // wait for the fixers, then gate the fixed tree
       ["repo-checks"] = new Group {
-        steps = repo_checks
+        steps {
+          ["typecheck"] {
+            check = "pnpm typecheck"
+          }
+          ["fallow"] {
+            check = staged_fallow_audit
+          }
+          ["test"] {
+            check = "pnpm --filter @mbqb/web test"
+          }
+        }
       }
     }
   }
@@ -80,6 +96,12 @@ hooks {
       }
       ["typecheck"] {
         check = "pnpm typecheck"
+      }
+      // Full Fallow ratchet: regenerate unit-test coverage, then run the same
+      // gates CI runs (identity baselines, changed-code audit, regression,
+      // baseline freshness).
+      ["fallow"] {
+        check = "pnpm test:unit:coverage && pnpm fallow:ci"
       }
       ["build"] {
         dir = "apps/web"

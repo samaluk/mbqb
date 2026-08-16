@@ -42,7 +42,59 @@
     ]
   },
   "rules": {
-    "private-type-leaks": "warn"
+    "unused-files": "error",
+    "unused-exports": "error",
+    "unused-types": "error",
+    "private-type-leaks": "error",
+    "unused-dependencies": "error",
+    "unused-dev-dependencies": "error",
+    "unused-optional-dependencies": "warn",
+    "unused-enum-members": "error",
+    "unused-class-members": "error",
+    "unused-store-members": "warn",
+    "unprovided-injects": "warn",
+    "unrendered-components": "warn",
+    "unused-component-props": "warn",
+    "unused-component-emits": "warn",
+    "unused-component-inputs": "warn",
+    "unused-component-outputs": "warn",
+    "unused-svelte-events": "warn",
+    "unused-server-actions": "error",
+    "unused-load-data-keys": "warn",
+    "prop-drilling": "off",
+    "thin-wrapper": "off",
+    "duplicate-prop-shape": "off",
+    "css-token-drift": "error",
+    "css-duplicate-block": "error",
+    "css-selector-complexity": "error",
+    "css-dead-surface": "error",
+    "css-broken-reference": "error",
+    "unresolved-imports": "error",
+    "unlisted-dependencies": "error",
+    "duplicate-exports": "error",
+    "type-only-dependencies": "error",
+    "test-only-dependencies": "error",
+    "dev-dependencies-in-production": "error",
+    "circular-dependencies": "error",
+    "re-export-cycle": "error",
+    "boundary-violation": "error",
+    "coverage-gaps": "off",
+    "feature-flags": "off",
+    "stale-suppressions": "error",
+    "require-suppression-reason": "error",
+    "unused-catalog-entries": "error",
+    "empty-catalog-groups": "error",
+    "unresolved-catalog-references": "error",
+    "unused-dependency-overrides": "error",
+    "misconfigured-dependency-overrides": "error",
+    "security-client-server-leak": "off",
+    "security-sink": "off",
+    "policy-violation": "warn",
+    "invalid-client-export": "error",
+    "mixed-client-server-barrel": "error",
+    "misplaced-directive": "error",
+    "route-collision": "error",
+    "dynamic-segment-name-conflict": "error"
   },
   "duplicates": {
     "mode": "semantic",
@@ -60,13 +112,68 @@
   },
   "audit": {
     "gate": "new-only",
-    "deadCodeBaseline": "fallow-baselines/dead-code.json",
+    "typeAware": true,
+    "deadCodeBaseline": "fallow-baselines/audit-dead-code.json",
     "healthBaseline": "fallow-baselines/health.json",
     "dupesBaseline": "fallow-baselines/dupes.json"
   },
   "workspaces": {
     "packages": [
       "apps/*"
+    ]
+  },
+  "boundaries": {
+    "zones": [
+      {
+        "name": "data",
+        "patterns": [
+          "apps/web/src/collections/**",
+          "apps/web/src/globals/**",
+          "apps/web/src/access/**",
+          "apps/web/src/payload.config.ts"
+        ]
+      },
+      {
+        "name": "domain",
+        "patterns": [
+          "apps/web/src/lib/**"
+        ]
+      },
+      {
+        "name": "ui",
+        "patterns": [
+          "apps/web/src/components/**"
+        ]
+      },
+      {
+        "name": "app",
+        "patterns": [
+          "apps/web/src/app/**"
+        ]
+      }
+    ],
+    "rules": [
+      {
+        "from": "ui",
+        "allow": [
+          "ui",
+          "domain"
+        ]
+      },
+      {
+        "from": "domain",
+        "allow": [
+          "domain",
+          "data"
+        ]
+      },
+      {
+        "from": "data",
+        "allow": [
+          "data",
+          "domain"
+        ]
+      }
     ]
   }
 }

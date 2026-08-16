@@ -84,9 +84,6 @@
     "apps/web/src/lib/canchasBrowsing.ts": {
       "complexity_moderate": {
         "count": 1
-      },
-      "crap_moderate": {
-        "count": 1
       }
     },
     "apps/web/src/lib/payloadUnavailableError.ts": {
@@ -192,11 +189,6 @@
       }
     },
     "apps/web/src/components/ui/toggle-group.tsx\u0000ToggleGroupItem": {
-      "crap_moderate": {
-        "count": 1
-      }
-    },
-    "apps/web/src/lib/canchasBrowsing.ts\u0000getCanchasHref": {
       "crap_moderate": {
         "count": 1
       }

@@ -4,7 +4,8 @@
     "semantic_schema_version": 2,
     "capabilities": [
       "symbol-use",
-      "api-surface"
+      "api-surface",
+      "type-coupling"
     ],
     "project_config_hash": "sha256:766d07edf00b4474ed898cfc8291fb7f6ea6662930c2393574ad4493a00d8de2",
     "backend_family": "typescript-go",
