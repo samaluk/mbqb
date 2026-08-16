@@ -1,16 +1,20 @@
 {
   "clone_groups": [
-    "apps/web/src/app/(frontend)/canchas/[slug]/page.tsx:22-47|apps/web/src/app/(frontend)/la-biblia/[slug]/page.tsx:24-49|apps/web/src/app/(frontend)/productos/[slug]/page.tsx:21-46",
-    "apps/web/src/app/(frontend)/canchas/[slug]/page.tsx:69-119|apps/web/src/app/(frontend)/la-biblia/[slug]/page.tsx:55-105|apps/web/src/app/(frontend)/productos/[slug]/page.tsx:64-114",
-    "apps/web/src/components/ui/card.tsx:15-41|apps/web/src/components/ui/card.tsx:53-76|apps/web/src/components/ui/empty.tsx:63-89|apps/web/src/components/ui/field.tsx:110-136|apps/web/src/components/ui/table.tsx:26-47|apps/web/src/components/ui/table.tsx:60-86",
     "apps/web/src/components/ui/card.tsx:23-45|apps/web/src/components/ui/card.tsx:49-68|apps/web/src/components/ui/card.tsx:72-91|apps/web/src/components/ui/empty.tsx:5-24|apps/web/src/components/ui/empty.tsx:58-80|apps/web/src/components/ui/sheet.tsx:83-99|apps/web/src/components/ui/table.tsx:22-38|apps/web/src/components/ui/table.tsx:42-64|apps/web/src/components/ui/table.tsx:68-90",
+    "apps/web/src/components/ui/card.tsx:15-41|apps/web/src/components/ui/card.tsx:53-76|apps/web/src/components/ui/empty.tsx:63-89|apps/web/src/components/ui/field.tsx:110-136|apps/web/src/components/ui/table.tsx:26-47|apps/web/src/components/ui/table.tsx:60-86",
+    "apps/web/src/app/(frontend)/canchas/[slug]/page.tsx:17-44|apps/web/src/app/(frontend)/la-biblia/[slug]/page.tsx:19-46|apps/web/src/app/(frontend)/productos/[slug]/page.tsx:16-43",
     "apps/web/src/components/ui/card.tsx:53-101|apps/web/src/components/ui/empty.tsx:52-103|apps/web/src/components/ui/table.tsx:61-113"
   ],
   "clone_fingerprints": [
-    "dup:b5581283:3",
-    "dup:7c66a2a0:3",
-    "dup:3a63214c:6",
     "dup:7d8148e7:9",
+    "dup:3a63214c:6",
+    "dup:5fd0ec5e:3",
     "dup:5678952a:3"
+  ],
+  "normalized_clone_fingerprints": [
+    "dup:c77b3abb6f87acd9-1:9",
+    "dup:c77b3abb6f87acd9-4:6",
+    "dup:c77b3abb6f87acd9-2:3",
+    "dup:c77b3abb6f87acd9-3:3"
   ]
 }
