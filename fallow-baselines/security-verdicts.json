@@ -1,0 +1,566 @@
+{
+  "_comment": "Verifier verdicts for `fallow security survivors`. Regenerate the verdict skeleton with `pnpm fallow:security:verify`; dispositions are the verifier's (agent/human) responsibility. New candidates without a verdict fail `fallow:security:gate` until dispositioned.",
+  "schema_version": "fallow-security-verdicts/v1",
+  "verdicts": [
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "1c3c9c243297fc88",
+      "verdict": "dismissed",
+      "reason": "The env reads execute server-side only: the trace reaches env.ts through a 'use server' actions module (server action RPC, not client-bundled) or via @/env whose non-NEXT_PUBLIC reads are inlined as undefined by Next.js in client bundles. No secret value reaches client code.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "The env reads execute server-side only: the trace reaches env.ts through a 'use server' actions module (server action RPC, not client-bundled) or via @/env whose non-NEXT_PUBLIC reads are inlined as undefined by Next.js in client bundles. No secret value reaches client code.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "73721bcab4f0d485",
+      "verdict": "dismissed",
+      "reason": "Next.js supported pattern: the client file's only path to server-only code runs through a 'use server' actions module imported as a server action (RPC, never client-bundled); Next.js's bundler enforces the server-only boundary.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Next.js supported pattern: the client file's only path to server-only code runs through a 'use server' actions module imported as a server action (RPC, never client-bundled); Next.js's bundler enforces the server-only boundary.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "40ee620b7d19701f",
+      "verdict": "dismissed",
+      "reason": "The env reads execute server-side only: the trace reaches env.ts through a 'use server' actions module (server action RPC, not client-bundled) or via @/env whose non-NEXT_PUBLIC reads are inlined as undefined by Next.js in client bundles. No secret value reaches client code.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "The env reads execute server-side only: the trace reaches env.ts through a 'use server' actions module (server action RPC, not client-bundled) or via @/env whose non-NEXT_PUBLIC reads are inlined as undefined by Next.js in client bundles. No secret value reaches client code.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "8baf48462643b74c",
+      "verdict": "dismissed",
+      "reason": "Next.js supported pattern: the client file's only path to server-only code runs through a 'use server' actions module imported as a server action (RPC, never client-bundled); Next.js's bundler enforces the server-only boundary.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Next.js supported pattern: the client file's only path to server-only code runs through a 'use server' actions module imported as a server action (RPC, never client-bundled); Next.js's bundler enforces the server-only boundary.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "a7b5427e9d8e3e45",
+      "verdict": "dismissed",
+      "reason": "The env reads execute server-side only: the trace reaches env.ts through a 'use server' actions module (server action RPC, not client-bundled) or via @/env whose non-NEXT_PUBLIC reads are inlined as undefined by Next.js in client bundles. No secret value reaches client code.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "The env reads execute server-side only: the trace reaches env.ts through a 'use server' actions module (server action RPC, not client-bundled) or via @/env whose non-NEXT_PUBLIC reads are inlined as undefined by Next.js in client bundles. No secret value reaches client code.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "f6e7f47bdcdc1c42",
+      "verdict": "dismissed",
+      "reason": "Next.js supported pattern: the client file's only path to server-only code runs through a 'use server' actions module imported as a server action (RPC, never client-bundled); Next.js's bundler enforces the server-only boundary.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Next.js supported pattern: the client file's only path to server-only code runs through a 'use server' actions module imported as a server action (RPC, never client-bundled); Next.js's bundler enforces the server-only boundary.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "7811925333ec688a",
+      "verdict": "dismissed",
+      "reason": "The env reads execute server-side only: the trace reaches env.ts through a 'use server' actions module (server action RPC, not client-bundled) or via @/env whose non-NEXT_PUBLIC reads are inlined as undefined by Next.js in client bundles. No secret value reaches client code.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "The env reads execute server-side only: the trace reaches env.ts through a 'use server' actions module (server action RPC, not client-bundled) or via @/env whose non-NEXT_PUBLIC reads are inlined as undefined by Next.js in client bundles. No secret value reaches client code.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "edde06c43ff110f4",
+      "verdict": "dismissed",
+      "reason": "path.resolve() arguments are the module's own directory and static filenames (build-time constants, not request data).",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "path.resolve() arguments are the module's own directory and static filenames (build-time constants, not request data).",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "ede7f7c43ff94bfc",
+      "verdict": "dismissed",
+      "reason": "path.resolve() arguments are the module's own directory and static filenames (build-time constants, not request data).",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "path.resolve() arguments are the module's own directory and static filenames (build-time constants, not request data).",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "ede7fac43ff95115",
+      "verdict": "dismissed",
+      "reason": "path.resolve() arguments are the module's own directory and static filenames (build-time constants, not request data).",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "path.resolve() arguments are the module's own directory and static filenames (build-time constants, not request data).",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "124465332646b2ab",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "50f806ea0a2cd03f",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "50e703ea0a1e57f3",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "50e080ea0a190dac",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "d47710af54b41765",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "948709c139c61e17",
+      "verdict": "dismissed",
+      "reason": "href is always '/canchas?' + URLSearchParams-encoded values built from internal constants; the target path is fixed and internal.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "href is always '/canchas?' + URLSearchParams-encoded values built from internal constants; the target path is fixed and internal.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "6bb52af5471a1617",
+      "verdict": "dismissed",
+      "reason": "redirect() target is validated relative-only (startsWith('/')) and, for preview, gated by PREVIEW_SECRET verification before use.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "redirect() target is validated relative-only (startsWith('/')) and, for preview, gated by PREVIEW_SECRET verification before use.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "7eb4a6f5af2d7da8",
+      "verdict": "dismissed",
+      "reason": "redirect() target is validated relative-only (startsWith('/')) and, for preview, gated by PREVIEW_SECRET verification before use.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "redirect() target is validated relative-only (startsWith('/')) and, for preview, gated by PREVIEW_SECRET verification before use.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "885f7a2bd74a4bdb",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "885f7f2bd74a545a",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "885f7d2bd74a50f4",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "dcaf552f85d0acc1",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "ce7bbbc0617b3fa5",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "ce78bbc0617909ce",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "ce7532c06175eb2c",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "8f584883bcc5b224",
+      "verdict": "dismissed",
+      "reason": "spawnSync runs a fixed command (process.execPath + resolved next binary + 'build') with no attacker-controlled arguments.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "spawnSync runs a fixed command (process.execPath + resolved next binary + 'build') with no attacker-controlled arguments.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "7ec4e2dcfcf96615",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "b71e9bedafb46160",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "b71ea9edafb4792a",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "5b7635a32f97b16a",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "6d43d9d1bc66da9b",
+      "verdict": "dismissed",
+      "reason": "Payload lexical content authored by authenticated staff (collection access is staff-only); the lexical->HTML converter escapes text nodes. Defense-in-depth follow-up: sanitize with isomorphic-dompurify (already a dependency).",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Payload lexical content authored by authenticated staff (collection access is staff-only); the lexical->HTML converter escapes text nodes. Defense-in-depth follow-up: sanitize with isomorphic-dompurify (already a dependency).",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "5531d24b7d4a8d6f",
+      "verdict": "dismissed",
+      "reason": "Payload lexical content authored by authenticated staff (collection access is staff-only); the lexical->HTML converter escapes text nodes. Defense-in-depth follow-up: sanitize with isomorphic-dompurify (already a dependency).",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Payload lexical content authored by authenticated staff (collection access is staff-only); the lexical->HTML converter escapes text nodes. Defense-in-depth follow-up: sanitize with isomorphic-dompurify (already a dependency).",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "96bc450ffb251a95",
+      "verdict": "dismissed",
+      "reason": "Versioned migration executes static, trusted baseline SQL; no runtime input.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Versioned migration executes static, trusted baseline SQL; no runtime input.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "1c18cdff30bc749c",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    },
+    {
+      "schema_version": "fallow-security-verdict/v1",
+      "finding_id": "26124b6040364b46",
+      "verdict": "dismissed",
+      "reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "impact": null,
+      "evidence_checked": {
+        "source": true,
+        "sink": true,
+        "boundary": true,
+        "trace": true,
+        "source_window": true
+      },
+      "dismissal_reason": "Local tooling script: path components come from process.argv / env vars / static module dirs \u2014 operator-controlled inputs, never attacker-controlled request data.",
+      "fix_direction": null
+    }
+  ]
+}

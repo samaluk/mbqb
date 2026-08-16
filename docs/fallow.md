@@ -37,7 +37,7 @@ baselines with `pnpm fallow:baseline:update` and re-vendor the agent skill from
 | Architecture | 4 custom zones (data / domain / ui / app) with import rules, `boundary-violation: error` |
 | Policy | oxlint `node/no-process-env: error` (no direct `process.env` reads in app code; `apps/web/src/env.ts` is the sanctioned env contract, tooling/scripts/test setup exempt) |
 | Styling | Tailwind/CSS: `css-token-drift`, `css-duplicate-block`, `css-selector-complexity`, `css-dead-surface`, `css-broken-reference` — all `error`, gated on introduced findings via `fallow audit` |
-| Security | opt-in candidates via `fallow security` (advisory, requires verification) |
+| Security | deterministic candidates via `fallow security`; **verifier-filtered survivor gate** (`fallow:security:gate`) joins candidates with committed verdicts and fails CI on survivors, needs-human-review rows, or new unverdicted candidates |
 
 Rules that default `warn` upstream are `error` here whenever they are
 deterministic, applicable, and baselinable (unused dev deps, re-export cycles,
@@ -139,7 +139,8 @@ pnpm fallow:health          # Gate B: health identity baseline (coverage-aware)
 pnpm fallow:audit           # Gate A: changed-code audit (new-only, type-aware)
 pnpm fallow:regression      # Gate C: dead-code count regression
 pnpm fallow:baseline:check  # Gate D: baseline freshness
-pnpm fallow:security        # opt-in security candidates (advisory)
+pnpm fallow:security        # security candidates + attack surface (verifier input)
+pnpm fallow:security:gate  # security gate: survivors/unverdicted fail (in fallow:ci)
 pnpm fallow:suppressions    # suppression inventory
 pnpm fallow:css             # styling/design-system findings (advisory)
 pnpm fallow:fix:preview     # type-aware dry-run of safe fixes
@@ -148,20 +149,46 @@ pnpm fallow:ci              # authoritative local equivalent of the CI gate
 ```
 
 `fallow:ci` = `fallow:status` + the three identity gates + `fallow:audit` +
-`fallow:regression` + `fallow:baseline:check`. The health and audit commands
-consume Istanbul coverage via `scripts/fallow-env.sh`; run `pnpm
-test:unit:coverage` first (CI does). A missing coverage file fails with a
-clear exit-2 error rather than silently switching to static CRAP estimates.
+`fallow:security:gate` + `fallow:regression` + `fallow:baseline:check`. The
+health and audit commands consume Istanbul coverage via
+`scripts/fallow-env.sh`; run `pnpm test:unit:coverage` first (CI does). A
+missing coverage file fails with a clear exit-2 error rather than silently
+switching to static CRAP estimates.
 
 Exit-code semantics (Fallow's ladder): `0` clean, `1` findings (or an
 exceeded gate), `2` real analyzer/config error. Never `|| true` a fallow
 command without preserving the distinction.
 
+### Security verification workflow
+
+`fallow security` produces deterministic candidates, not verdicts. The gate
+(`fallow:security:gate`) works like the other ratchets: candidates are
+dispositioned by a verifier (agent or human) into
+`fallow-baselines/security-verdicts.json`, and CI fails when a candidate
+survives verification, is marked `needs-human-review`, or is new (no verdict
+yet — `--require-verdict-for-each-candidate`).
+
+To disposition candidates (e.g. on a PR that introduces a new one):
+
+1. `pnpm fallow:security > candidates.json` — full inventory with `attack_surface`.
+2. Diff `finding_id`s against `fallow-baselines/security-verdicts.json`;
+   every new/changed id needs a verdict.
+3. For each candidate, read the finding's `trace` and the source window, and
+   apply the verifier contract: is the input attacker-controlled, does it
+   reach the sink, is the boundary relevant, is there a defensive control
+   that dismisses it? Verdicts: `dismissed` / `survivor` / `needs-human-review`.
+4. Update the verdicts file and commit it with the change.
+
+Finding IDs are content-derived and stable across line shifts, so routine
+edits do not invalidate dispositions; only changed security-relevant code
+does.
+
 ## 8. CI behavior
 
 The `quality` job runs `pnpm test:unit:coverage` then `pnpm fallow:ci`, so CI
-fails when any of: a forbidden finding is introduced in changed code, an
-identity baseline is exceeded, regression counts increase, committed baselines
+fails when any of: a forbidden finding is introduced in changed code, a
+security candidate survives verification or is new/unverdicted, an identity
+baseline is exceeded, regression counts increase, committed baselines
 are stale, the type-aware companion is incomplete, or a config/type-aware
 error occurs. A separate `fallow-pr` job runs the official
 `fallow-rs/fallow@v3` Action (`command: audit`) to render the same gate as PR
@@ -223,7 +250,7 @@ flag most of the app, and it is advisory by design.
 | `ignoreDependencies: @base-ui/react, class-variance-authority, @next/playwright, shadcn, tw-animate-css, tailwindcss` | Tooling/CSS deps resolved outside the module graph |
 | `duplicates.minOccurrences: 3` | Pairs would add ~20 clone groups of shadcn/test boilerplate noise; 3+ focuses on meaningful copy-paste |
 | unzoned `src/env.ts`, `src/types/**`, generated payload files | Cross-cutting infrastructure; type imports and the env contract must stay unconstrained |
-| `security-*` rules `off` | Candidates require human/agent verification; exposed via `fallow security` (advisory) |
+| `security-*` rules `off` | Candidates are surfaced by `fallow security` (not in the dead-code envelope); the deterministic security gate is `fallow:security:gate` with committed verifier verdicts |
 | `coverage-gaps` off | Advisory by design; see §11 |
 | `prop-drilling`, `thin-wrapper`, `duplicate-prop-shape` off | Opt-in rules not surfaced in current baseline envelopes (would fail CI invisibly) |
 
@@ -290,9 +317,16 @@ removed and later re-added fails CI again.
 - **Dupes/health `--fail-on-regression`** does not expose a machine-readable
   regression verdict (and dupes did not flag an increased clone count in
   testing); those analyses are gated by identity baselines (Gate B) instead.
-- **Security findings are candidates, not verified vulnerabilities.** The
-  exit-8 `--gate new`/`newly-reachable` mode exists for a stricter posture but
-  requires human/agent verification; this repo runs security advisory in CI.
+- **Security findings are candidates, not verified vulnerabilities.** Fallow
+  never decides exploitability; a verifier (agent or human) must. This repo
+  commits verifier dispositions in `fallow-baselines/security-verdicts.json`
+  and gates CI on `fallow security survivors` — new or surviving candidates
+  block merge until dispositioned. To re-verify when candidates change: run
+  `pnpm fallow:security` (full inventory with attack surface), compare
+  `finding_id`s against the committed verdicts, disposition each new or
+  changed candidate per the verifier contract (see §7), and commit the
+  updated verdicts file. The exit-8 `--gate new`/`newly-reachable` mode is
+  available as an alternative posture.
 - **Paid Fallow Runtime** (production execution evidence, hot-path verdicts,
   `fallow coverage`) is not enabled; it requires a license/account. The static
   layer covers everything above.

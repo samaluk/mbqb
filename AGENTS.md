@@ -32,6 +32,10 @@ Use it before touching code or opening a PR:
 - Respect architecture boundaries (`fallow guard <files>` shows the rules) and
   the env-hygiene policy (oxlint `node/no-process-env`: no direct
   `process.env` reads in app code — use `apps/web/src/env.ts`).
+- Security candidates surface via `fallow security`; the CI gate
+  (`pnpm fallow:security:gate`) fails on survivors or new candidates, so
+  disposition new candidates in `fallow-baselines/security-verdicts.json`
+  (verifier contract in `docs/fallow.md` §7).
 - Existing debt is baselined in `fallow-baselines/`; new debt is rejected.
   After a genuine fix, run `pnpm fallow:baseline:update` and commit the
   reduced baselines. Never regenerate baselines just to silence CI.

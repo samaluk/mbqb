@@ -43,19 +43,12 @@ jobs:
       - name: Fallow
         run: pnpm fallow:ci
 
-      # Security candidates are advisory (they require human/agent verification,
-      # not a deterministic binary verdict), so findings (exit 1) do not fail the
-      # job; real analyzer/config errors (exit 2) do.
-      - name: Fallow security (advisory)
-        shell: bash
-        run: |
-          set +e
-          pnpm fallow:security
-          code=$?
-          set -e
-          if [ "$code" -eq 2 ]; then
-            exit 2
-          fi
+      # Security gate: `fallow security` candidates are joined with the committed
+      # verifier verdicts (fallow-baselines/security-verdicts.json). The job fails
+      # when a candidate survives verification, needs human review, or is new and
+      # therefore unverdicted. Dispositions are reviewed in the security PR flow.
+      - name: Fallow security gate
+        run: pnpm fallow:security:gate
 
   fallow-pr:
     name: Fallow PR feedback (annotations, review, SARIF)

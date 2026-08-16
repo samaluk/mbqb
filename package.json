@@ -17,11 +17,11 @@
     "fallow:dupes": "fallow dupes --baseline fallow-baselines/dupes.json --fail-on-issues",
     "fallow:health": ". scripts/fallow-env.sh && fallow health --baseline fallow-baselines/health.json --baseline-mode identity --fail-on-issues",
     "fallow:audit": ". scripts/fallow-env.sh && fallow audit --gate new-only",
-    "fallow:security": "fallow security --format json --quiet",
+    "fallow:security": "fallow security --format json --surface --quiet",
     "fallow:suppressions": "fallow suppressions",
     "fallow:css": ". scripts/fallow-env.sh && fallow health --css --format json --quiet",
     "fallow:regression": "node scripts/fallow-regression.mjs",
-    "fallow:ci": "pnpm fallow:status && pnpm fallow:dead-code && pnpm fallow:dupes && pnpm fallow:health && pnpm fallow:audit && pnpm fallow:regression && pnpm fallow:baseline:check",
+    "fallow:ci": "pnpm fallow:status && pnpm fallow:dead-code && pnpm fallow:dupes && pnpm fallow:health && pnpm fallow:audit && pnpm fallow:security:gate && pnpm fallow:regression && pnpm fallow:baseline:check",
     "fallow:baseline:update": "bash scripts/fallow-baseline-update.sh",
     "fallow:baseline:check": "node scripts/fallow-baseline-check.mjs",
     "fallow:fix:preview": "fallow fix --type-aware --dry-run",
@@ -43,7 +43,8 @@
     "test:int": "pnpm --filter @mbqb/web test:int",
     "test:unit": "pnpm --filter @mbqb/web test:unit",
     "test:unit:coverage": "pnpm --filter @mbqb/web test:unit:coverage",
-    "typecheck": "pnpm --filter @mbqb/web typecheck"
+    "typecheck": "pnpm --filter @mbqb/web typecheck",
+    "fallow:security:gate": "node scripts/fallow-security-gate.mjs"
   },
   "devDependencies": {
     "fallow": "3.16.0",
