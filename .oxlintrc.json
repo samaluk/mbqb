@@ -8,8 +8,9 @@
     "correctness": "error",
     "suspicious": "error"
   },
-  "plugins": ["typescript", "react", "jsx-a11y", "unicorn"],
+  "plugins": ["typescript", "react", "jsx-a11y", "unicorn", "node"],
   "rules": {
+    "node/no-process-env": "error",
     "react/react-in-jsx-scope": "off",
     "no-underscore-dangle": [
       "error",
@@ -51,5 +52,19 @@
     "typescript/no-redundant-type-constituents": "warn",
     "typescript/no-misused-promises": "warn",
     "typescript/no-floating-promises": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/env.ts",
+        "**/scripts/**",
+        "**/vitest.setup.ts",
+        "**/playwright.config.ts",
+        "**/next.config.ts"
+      ],
+      "rules": {
+        "node/no-process-env": "off"
+      }
+    }
+  ]
 }
