@@ -6,6 +6,7 @@ import type {
 
 import { publishedOrStaff } from '@/access/publishedOrStaff'
 import { isEditorOrAdmin } from '@/access/roles'
+import { env } from '@/env'
 import { buildPreviewUrl, draftVersions } from '@/lib/preview'
 
 export type PublicContentCollection = 'canchas' | 'la-biblia-articles' | 'products'
@@ -192,7 +193,7 @@ async function revalidatePublicPaths(paths: string[], revalidate?: RevalidatePat
         // outside it; revalidation is best-effort there. Inside Next, a
         // resolution failure must stay visible instead of silently disabling
         // public-path revalidation, so rethrow.
-        if (process.env.NEXT_RUNTIME) throw error
+        if (env.NEXT_RUNTIME) throw error
         console.error(`Failed to load next/cache outside Next runtime`, error)
         return null
       }))

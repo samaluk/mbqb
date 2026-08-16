@@ -10,6 +10,7 @@ export const env = createEnv({
     TEST_POSTGRES_URL: z.string().optional(),
     PAYLOAD_SECRET: z.string().min(1),
     PREVIEW_SECRET: z.string().min(1),
+    NEXT_RUNTIME: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_SERVER_URL: z.string().url(),
@@ -22,6 +23,7 @@ export const env = createEnv({
     TEST_POSTGRES_URL: process.env.TEST_POSTGRES_URL,
     PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
     PREVIEW_SECRET: process.env.PREVIEW_SECRET,
+    NEXT_RUNTIME: process.env.NEXT_RUNTIME,
     NEXT_PUBLIC_SERVER_URL: process.env.NEXT_PUBLIC_SERVER_URL,
   },
   emptyStringAsUndefined: true,
