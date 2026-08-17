@@ -144,9 +144,9 @@ duplication baseline exists.
 cyclomatic 20, cognitive 15, CRAP 30, and unit size 60. Fallow consumes the
 coverage file for health and audit/CRAP evidence. Structural coverage gaps were
 evaluated with `fallow health --coverage-gaps`; the current run matches 99 of
-438 analyzed functions and reports no untested-file or untested-export findings.
+438 analyzed functions and reports 74 untested files and 162 untested exports.
 The `coverage-gaps` rule is therefore enabled at advisory `warn`, not blocking
-`error`, during adoption.
+`error` during adoption.
 
 ### Architecture boundaries
 
