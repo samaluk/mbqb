@@ -34,7 +34,10 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Fallow
+      - name: Test with coverage
+        run: pnpm test:coverage
+
+      - name: Fallow migration gate
         run: pnpm fallow:ci
 
       - name: Unit tests

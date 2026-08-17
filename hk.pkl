@@ -53,7 +53,7 @@ local repo_checks = new Mapping<String, Step> {
     check = "pnpm typecheck"
   }
   ["fallow"] {
-    check = "pnpm fallow:ci"
+    check = "pnpm exec fallow audit --gate new-only --type-aware"
   }
   ["test"] {
     check = "pnpm --filter @mbqb/web test"
@@ -84,6 +84,10 @@ hooks {
       ["build"] {
         dir = "apps/web"
         check = "pnpm run build"
+        output_summary = "combined"
+      }
+      ["fallow"] {
+        check = "pnpm test:coverage && pnpm fallow:ci"
         output_summary = "combined"
       }
     }
