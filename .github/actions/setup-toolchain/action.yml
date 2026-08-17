@@ -15,15 +15,12 @@ runs:
         echo "PNPM_STORE_DIR=$RUNNER_TOOL_CACHE/pnpm-store" >> "$GITHUB_ENV"
         echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TOOL_CACHE/playwright" >> "$GITHUB_ENV"
 
-    # Node must be installed before pnpm 11.x (requires Node >=22.13).
-    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-      with:
-        node-version-file: package.json
-
-    # pnpm/setup downloads the exact self-contained version from packageManager,
-    # avoiding action-setup's bootstrap and self-update path.
+    # pnpm/setup installs Node (from devEngines.runtime in the root package.json)
+    # plus the exact self-contained pnpm version from packageManager, then runs
+    # pnpm install. `runtime: node` removes the previous actions/setup-node step.
     - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
       with:
+        runtime: node
         # Self-hosted runners run concurrent jobs on one machine; the default ~/setup-pnpm
         # is shared and pnpm version switches in one job can break another job's shims.
         dest: ${{ runner.environment == 'self-hosted' && format('{0}/setup-pnpm', runner.temp) || '~/setup-pnpm' }}

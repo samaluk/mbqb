@@ -180,8 +180,27 @@ new violations while inherited application debt is addressed later.
   native `new-only` audit, and unit tests.
 - Pre-push checks the local environment, typechecks, builds, generates real
   coverage, and runs `pnpm fallow:ci`.
-- CI runs coverage before the local migration gate. Pull requests additionally
-  receive the native Fallow Action report described above.
+
+CI (`.github/workflows/ci.yml`) is split into parallel jobs so a pull request
+goes green as fast as possible, following the parallelization first applied to
+[fintual-api PR #407](https://github.com/samaluk/fintual-api/pull/407):
+
+- **`Lint, typecheck & format`** — static checks; runs in parallel with tests.
+- **`Test with coverage`** — runs `pnpm test:coverage` once and uploads
+  `coverage/coverage-final.json` as a short-lived artifact.
+- **`Fallow gate`** — runs `pnpm fallow:ci` (the authoritative `new-only`
+  migration gate) against the shared coverage artifact.
+- **`Fallow PR review`** — the version-pinned native Fallow Action renders the
+  sticky summary comment, Check Run, and inline review comments from the same
+  coverage artifact. It is a required check (`fail-on-issues` is on), so Fallow
+  findings block the merge.
+- **`Build, integration, and E2E tests`** — production build, integration
+  tests, and Playwright E2E against PostGIS.
+
+The `gate` and `review` jobs download the coverage artifact instead of
+reinstalling and re-running the suite, so a PR no longer pays for a second full
+install + test run. Each job is its own required status check on the `master`
+branch ruleset.
 
 No baseline regeneration, freshness comparison, regression counter, or custom
 Fallow wrapper is involved.
