@@ -98,9 +98,11 @@ jobs:
         shell: bash
         run: |
           APP_PORT="$(python3 -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()')"
-          echo "APP_PORT=$APP_PORT" >> "$GITHUB_ENV"
-          echo "PORT=$APP_PORT" >> "$GITHUB_ENV"
-          echo "NEXT_PUBLIC_SERVER_URL=http://127.0.0.1:$APP_PORT" >> "$GITHUB_ENV"
+          {
+            echo "APP_PORT=$APP_PORT"
+            echo "PORT=$APP_PORT"
+            echo "NEXT_PUBLIC_SERVER_URL=http://127.0.0.1:$APP_PORT"
+          } >> "$GITHUB_ENV"
 
       - name: Start PostgreSQL
         run: |
@@ -115,7 +117,7 @@ jobs:
 
       - name: Wait for PostgreSQL
         run: |
-          for i in $(seq 1 30); do
+          for _ in $(seq 1 30); do
             docker exec postgres pg_isready -U postgres -d mbqb >/dev/null 2>&1 || { sleep 1; continue; }
             # pg_isready succeeds against the entrypoint's temporary postmaster
             # (used for first-boot initdb.d setup); only proceed once init is
