@@ -2,13 +2,13 @@
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/rule-pack-schema.json",
   "version": 1,
   "name": "env-hygiene",
-  "description": "Centralize process.env access in apps/web/src/env.ts so the env contract stays reviewable in one place. Tooling scripts and test setup read raw env by design and are exempt (they are outside the boundary zones).",
+  "description": "Centralize process.env access in apps/web/src/env.ts so the env contract stays reviewable in one place. Tooling scripts and test setup read raw env by design and are exempt (they are outside the runtime boundary zones).",
   "rules": [
     {
       "id": "env-reads-outside-env-module",
       "kind": "banned-call",
       "callees": ["process.env.*"],
-      "zones": ["data", "domain", "ui", "app"],
+      "zones": ["app", "ui", "logic", "access", "cms", "config"],
       "exclude": ["apps/web/src/env.ts"],
       "message": "Read environment variables through the env contract (apps/web/src/env.ts), not process.env directly.",
       "severity": "error"

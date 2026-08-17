@@ -33,6 +33,9 @@
     "tw-animate-css",
     "tailwindcss"
   ],
+  "rulePacks": [
+    "rule-packs/env-hygiene.jsonc"
+  ],
   "typeAware": {
     "enabled": true,
     "require": "complete",
@@ -42,28 +45,157 @@
     ]
   },
   "rules": {
-    "private-type-leaks": "warn"
+    "private-type-leaks": "error",
+    "stale-suppressions": "error",
+    "require-suppression-reason": "error"
   },
   "duplicates": {
     "mode": "semantic",
     "near": true,
     "minLines": 8,
     "minTokens": 60,
-    "minOccurrences": 3,
+    "minOccurrences": 2,
     "ignoreImports": true
   },
   "health": {
     "maxCyclomatic": 20,
     "maxCognitive": 15,
     "maxCrap": 30,
-    "maxUnitSize": 60
+    "maxUnitSize": 60,
+    "coverage": "coverage/coverage-final.json"
   },
   "audit": {
     "gate": "new-only",
+    "typeAware": true,
     "deadCodeBaseline": "fallow-baselines/dead-code.json",
     "healthBaseline": "fallow-baselines/health.json",
     "dupesBaseline": "fallow-baselines/dupes.json"
   },
+  "boundaries": {
+    "zones": [
+      {
+        "name": "app",
+        "patterns": ["apps/web/src/app/**"]
+      },
+      {
+        "name": "ui",
+        "patterns": ["apps/web/src/components/**"]
+      },
+      {
+        "name": "logic",
+        "patterns": ["apps/web/src/lib/**"]
+      },
+      {
+        "name": "access",
+        "patterns": ["apps/web/src/access/**"]
+      },
+      {
+        "name": "cms",
+        "patterns": [
+          "apps/web/src/collections/**",
+          "apps/web/src/globals/**"
+        ]
+      },
+      {
+        "name": "config",
+        "patterns": [
+          "apps/web/src/payload.config.ts",
+          "apps/web/src/env.ts"
+        ]
+      },
+      {
+        "name": "migrations",
+        "patterns": ["apps/web/src/migrations/**"]
+      },
+      {
+        "name": "tests",
+        "patterns": ["apps/web/tests/**"]
+      },
+      {
+        "name": "scripts",
+        "patterns": ["apps/web/scripts/**"]
+      },
+      {
+        "name": "tooling",
+        "patterns": [
+          "apps/web/next.config.ts",
+          "apps/web/playwright.config.ts",
+          "apps/web/vitest.config.mts",
+          "apps/web/vitest.setup.ts"
+        ]
+      }
+    ],
+    "rules": [
+      {
+        "from": "app",
+        "allow": ["app", "ui", "logic", "access", "cms", "config"]
+      },
+      {
+        "from": "ui",
+        "allow": ["ui", "logic", "config"]
+      },
+      {
+        "from": "logic",
+        "allow": ["logic", "access", "cms", "config"]
+      },
+      {
+        "from": "access",
+        "allow": ["access", "logic", "cms"]
+      },
+      {
+        "from": "cms",
+        "allow": ["cms", "access", "logic", "config"]
+      },
+      {
+        "from": "config",
+        "allow": ["config", "cms", "access", "logic", "migrations"]
+      },
+      {
+        "from": "migrations",
+        "allow": ["migrations", "cms"]
+      },
+      {
+        "from": "tests",
+        "allow": [
+          "tests",
+          "app",
+          "ui",
+          "logic",
+          "access",
+          "cms",
+          "config"
+        ]
+      },
+      {
+        "from": "scripts",
+        "allow": [
+          "scripts",
+          "config",
+          "cms",
+          "access",
+          "logic",
+          "migrations"
+        ]
+      },
+      {
+        "from": "tooling",
+        "allow": ["tooling", "app", "tests", "scripts", "config"]
+      }
+    ],
+    "coverage": {
+      "requireAllFiles": true,
+      "allowUnmatched": [
+        "apps/web/src/types/**",
+        "apps/web/src/**/*.css",
+        "apps/web/src/**/*.scss",
+        "apps/web/next-env.d.ts"
+      ]
+    }
+  },
+  "includeEntryExports": false,
+  "dynamicallyLoaded": [
+    "apps/web/src/migrations/**"
+  ],
   "workspaces": {
     "packages": [
       "apps/*"
