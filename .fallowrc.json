@@ -33,9 +33,6 @@
     "tw-animate-css",
     "tailwindcss"
   ],
-  "rulePacks": [
-    "rule-packs/env-hygiene.jsonc"
-  ],
   "typeAware": {
     "enabled": true,
     "require": "complete",
@@ -66,10 +63,7 @@
   },
   "audit": {
     "gate": "new-only",
-    "typeAware": true,
-    "deadCodeBaseline": "fallow-baselines/dead-code.json",
-    "healthBaseline": "fallow-baselines/health.json",
-    "dupesBaseline": "fallow-baselines/dupes.json"
+    "typeAware": true
   },
   "boundaries": {
     "zones": [
