@@ -34,11 +34,47 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Fallow
+      - name: Test with coverage
+        run: pnpm test:coverage
+
+      - name: Fallow migration gate
         run: pnpm fallow:ci
 
-      - name: Unit tests
-        run: pnpm test:unit
+  fallow-audit:
+    name: Fallow migration audit
+    if: github.event_name == 'pull_request'
+    # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","docker"]') || 'ubuntu-latest') }}
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-toolchain
+
+      - name: Test with coverage
+        run: pnpm test:coverage
+
+      - name: Fallow changed-code audit
+        uses: fallow-rs/fallow@ecf5a314fd3e10974acb4f5a7f867c433030522d # v3.17.0
+        with:
+          version: 3.17.0
+          command: audit
+          gate: new-only
+          type-aware: true
+          coverage: coverage/coverage-final.json
+          coverage-root: ${{ github.workspace }}
+          comment: true
+          comment-layout: compact
+          branded-token: false
+          review-comments: true
+          review-guidance: true
+          sarif: false
 
   build-and-integration:
     name: Build, integration, and E2E tests
@@ -59,9 +95,11 @@ jobs:
         shell: bash
         run: |
           APP_PORT="$(python3 -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()')"
-          echo "APP_PORT=$APP_PORT" >> "$GITHUB_ENV"
-          echo "PORT=$APP_PORT" >> "$GITHUB_ENV"
-          echo "NEXT_PUBLIC_SERVER_URL=http://127.0.0.1:$APP_PORT" >> "$GITHUB_ENV"
+          {
+            echo "APP_PORT=$APP_PORT"
+            echo "PORT=$APP_PORT"
+            echo "NEXT_PUBLIC_SERVER_URL=http://127.0.0.1:$APP_PORT"
+          } >> "$GITHUB_ENV"
 
       - name: Start PostgreSQL
         run: |
@@ -76,7 +114,7 @@ jobs:
 
       - name: Wait for PostgreSQL
         run: |
-          for i in $(seq 1 30); do
+          for _ in $(seq 1 30); do
             docker exec postgres pg_isready -U postgres -d mbqb >/dev/null 2>&1 || { sleep 1; continue; }
             # pg_isready succeeds against the entrypoint's temporary postmaster
             # (used for first-boot initdb.d setup); only proceed once init is
