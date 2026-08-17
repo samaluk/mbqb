@@ -41,7 +41,8 @@
   "rules": {
     "private-type-leaks": "error",
     "stale-suppressions": "error",
-    "require-suppression-reason": "error"
+    "require-suppression-reason": "error",
+    "coverage-gaps": "warn"
   },
   "duplicates": {
     "mode": "semantic",
