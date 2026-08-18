@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   pullfrog:
-    runs-on: ${{ vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","docker"]') || 'ubuntu-latest' }}
+    runs-on: ${{ vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest' }}
     permissions:
       id-token: write
       contents: read

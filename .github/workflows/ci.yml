@@ -25,7 +25,7 @@ jobs:
   static:
     name: Lint, typecheck & format
     # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","docker"]') || 'ubuntu-latest') }}
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
     timeout-minutes: 20
 
     steps:
@@ -47,7 +47,7 @@ jobs:
   test:
     name: Test with coverage
     # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","docker"]') || 'ubuntu-latest') }}
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
     timeout-minutes: 20
 
     steps:
@@ -76,7 +76,7 @@ jobs:
     name: Fallow gate
     needs: test
     # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","docker"]') || 'ubuntu-latest') }}
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
     timeout-minutes: 20
 
     steps:
@@ -108,7 +108,7 @@ jobs:
     if: github.event_name == 'pull_request'
     needs: test
     # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","docker"]') || 'ubuntu-latest') }}
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
     timeout-minutes: 20
     permissions:
       contents: read
