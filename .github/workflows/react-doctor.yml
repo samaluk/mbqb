@@ -1,0 +1,75 @@
+# React Doctor — lightweight, independent React/Next.js quality gate.
+#
+# Scans ONLY the React/Next.js app (`apps/web`) and blocks merges on any NEW
+# React Doctor error OR warning a pull request introduces relative to its merge
+# base. Existing repository debt is reported but never fails the check, so
+# adoption is strict on regressions without turning today's backlog into an
+# immediate blocker.
+#
+# The Action installs its own Node runtime and react-doctor CLI and caches them
+# internally, so this workflow deliberately needs NO dependency install, build,
+# database, migrations, or test setup — it is a separate gate from CI (ci.yml)
+# and does not duplicate Fallow or the other quality jobs.
+name: React Doctor
+
+on:
+  # Baseline scan of the PR's changed files: posts a sticky summary comment,
+  # inline review comments, and a commit status, and fails on new findings.
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  # Full-project health snapshot on every push to master, surfaced via the
+  # commit status and job summary. Never fails the branch on pre-existing
+  # issues, so master does not go red over old debts.
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: react-doctor-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  react-doctor:
+    name: React Doctor
+    # Preserve the repo's safe fork / self-hosted runner routing (same shape as
+    # the other quality jobs): forks always run on GitHub-hosted runners, and
+    # the USE_SELF_HOSTED_RUNNERS repo variable opts in to self-hosted runners.
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","docker"]') || 'ubuntu-latest') }}
+    timeout-minutes: 15
+    # Least-privilege at the workflow scope; the elevated write permissions the
+    # Action needs for PR feedback are scoped to this job only.
+    permissions:
+      contents: read
+      pull-requests: write # inline review comments
+      issues: write        # sticky PR summary comment
+      statuses: write      # commit status (score + error/warning counts)
+
+    steps:
+      # Full history so the Action can resolve the merge base for the baseline
+      # (`changed`) diff scope and derive the PR's changed files locally.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      # Immutable SHA pin to the current v2 release (millionco/react-doctor v2.2.8);
+      # Renovate keeps the digest current via helpers:pinGitHubActionDigests.
+      - uses: millionco/react-doctor@01820bb4fd4d0a4aebcd8df2b2a143a098649cb2 # v2.2.8
+        with:
+          # Scan only the React/Next.js app — isolates this gate from the rest
+          # of the monorepo and avoids workspace-boundary confusion.
+          directory: apps/web
+          # Baseline gate: report only the issues the PR introduces vs its merge
+          # base. Existing debt is surfaced but never fails the check.
+          scope: changed
+          # Fail the workflow on ANY new finding (error OR warning) introduced
+          # by the PR.
+          blocking: warning
+          # Node runtime for the Action's own CLI install (matches the repo's
+          # engines pin of Node 24).
+          node-version: 24
+          # PR feedback surfaces (all on by default; made explicit for intent).
+          comment: true          # sticky summary comment (needs issues: write)
+          review-comments: true  # inline review comments (needs pull-requests: write)
+          commit-status: true    # score + counts on the commit (needs statuses: write)
