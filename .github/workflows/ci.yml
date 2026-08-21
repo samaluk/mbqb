@@ -122,10 +122,39 @@ jobs:
 
       - uses: ./.github/actions/setup-toolchain
 
-      # Fallow installs its CLI globally with npm. The runtime managed by
-      # pnpm/setup lives in a different npm prefix, so expose that bin dir.
-      - name: Expose npm global binaries
-        run: echo "$(npm config get prefix)/bin" >> "$GITHUB_PATH"
+      # The Fallow Action installs its CLI globally with npm and locates the
+      # install by parsing `npm root -g` output. Two quirks of these homerun
+      # runners break that: npm 11 redacts UUID-shaped segments in every
+      # command's stdout (@npmcli/redact rewrites them to a literal '***'),
+      # and the runner directories embed a UUID (.../runners/<uuid>/...), so
+      # any prefix under the runner home makes the Action verify against a
+      # mangled path and fail with platform-package-missing even though the
+      # install succeeded. Newer npm also refuses `npm config get prefix`
+      # outright ("The prefix option is protected"), so a plain bin-dir expose
+      # is a silent no-op. Provision a prefix free of UUID-shaped segments
+      # instead: prefer the shared tool cache, falling back to mktemp while
+      # RUNNER_TOOL_CACHE itself still lives under a runner directory (the
+      # same workaround samaluk/splitty ran until its runners were moved to a
+      # UUID-free tool cache).
+      - name: Provision isolated Fallow npm prefix
+        run: |
+          fallow_prefix="${RUNNER_TOOL_CACHE:-${RUNNER_TEMP}}/fallow-global-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
+          if printf '%s' "$fallow_prefix" | grep -qE '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'; then
+            fallow_prefix="$(mktemp -d)/fallow-global-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
+          fi
+          mkdir -p "$fallow_prefix"
+          echo "NPM_CONFIG_PREFIX=$fallow_prefix" >> "$GITHUB_ENV"
+          echo "$fallow_prefix/bin" >> "$GITHUB_PATH"
+          case "${RUNNER_OS}:${RUNNER_ARCH}" in
+            macOS:ARM64) fallow_platform="@fallow-cli/darwin-arm64" ;;
+            Linux:X64) fallow_platform="@fallow-cli/linux-x64-gnu" ;;
+            *)
+              echo "Unsupported Fallow runner: ${RUNNER_OS}:${RUNNER_ARCH}" >&2
+              exit 1
+              ;;
+          esac
+          NPM_CONFIG_PREFIX="$fallow_prefix" npm install --global --ignore-scripts \
+            "fallow@3.17.0" "${fallow_platform}@3.17.0"
 
       # Same coverage evidence the test job produced, so audit CRAP scoring
       # matches — downloaded rather than regenerated to avoid a second
