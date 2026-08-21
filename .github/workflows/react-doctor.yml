@@ -52,6 +52,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
 
       # Immutable SHA pin to the current v2 release (millionco/react-doctor v2.2.8);
       # Renovate keeps the digest current via helpers:pinGitHubActionDigests.
