@@ -13,7 +13,7 @@ export const env = createEnv({
     NEXT_RUNTIME: z.string().optional(),
   },
   client: {
-    NEXT_PUBLIC_SERVER_URL: z.string().url(),
+    NEXT_PUBLIC_SERVER_URL: z.url(),
   },
   runtimeEnv: {
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
