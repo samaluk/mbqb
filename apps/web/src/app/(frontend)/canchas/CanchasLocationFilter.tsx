@@ -82,59 +82,51 @@ export function CanchasLocationFilter() {
     setUserGeo(null)
   }
 
-  const persistMaxDistance = React.useCallback(
-    (value: number) => {
-      if (!userGeo) {
-        notifyLocationRequired()
-        return
-      }
+  // React Compiler caches these callbacks automatically.
+  const persistMaxDistance = (value: number) => {
+    if (!userGeo) {
+      notifyLocationRequired()
+      return
+    }
 
-      if (persistMaxKmTimeout.current) window.clearTimeout(persistMaxKmTimeout.current)
+    if (persistMaxKmTimeout.current) window.clearTimeout(persistMaxKmTimeout.current)
 
-      setUserGeo({
-        ...userGeo,
-        maxKm: value,
-      })
-    },
-    [setUserGeo, userGeo],
-  )
+    setUserGeo({
+      ...userGeo,
+      maxKm: value,
+    })
+  }
 
-  const schedulePersistMaxDistance = React.useCallback(
-    (value: number) => {
-      if (!userGeo) {
-        notifyLocationRequired()
-        return
-      }
+  const schedulePersistMaxDistance = (value: number) => {
+    if (!userGeo) {
+      notifyLocationRequired()
+      return
+    }
 
-      setSliderMaxKm(value)
+    setSliderMaxKm(value)
 
-      if (persistMaxKmTimeout.current) window.clearTimeout(persistMaxKmTimeout.current)
+    if (persistMaxKmTimeout.current) window.clearTimeout(persistMaxKmTimeout.current)
 
-      persistMaxKmTimeout.current = window.setTimeout(() => {
-        persistMaxDistance(value)
-      }, 300)
-    },
-    [persistMaxDistance, userGeo],
-  )
-
-  const commitMaxDistance = React.useCallback(
-    (value: number) => {
-      if (!userGeo) {
-        notifyLocationRequired()
-        return
-      }
-
-      setSliderMaxKm(value)
-
-      if (persistMaxKmTimeout.current) {
-        window.clearTimeout(persistMaxKmTimeout.current)
-        persistMaxKmTimeout.current = null
-      }
-
+    persistMaxKmTimeout.current = window.setTimeout(() => {
       persistMaxDistance(value)
-    },
-    [persistMaxDistance, userGeo],
-  )
+    }, 300)
+  }
+
+  const commitMaxDistance = (value: number) => {
+    if (!userGeo) {
+      notifyLocationRequired()
+      return
+    }
+
+    setSliderMaxKm(value)
+
+    if (persistMaxKmTimeout.current) {
+      window.clearTimeout(persistMaxKmTimeout.current)
+      persistMaxKmTimeout.current = null
+    }
+
+    persistMaxDistance(value)
+  }
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border bg-card p-4">

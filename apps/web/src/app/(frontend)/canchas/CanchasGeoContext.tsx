@@ -35,40 +35,35 @@ export function CanchasGeoProvider({
     setUserGeoState(initialUserGeo)
   }
 
-  const resetPageAndRefresh = React.useCallback(() => {
+  const resetPageAndRefresh = () => {
     const params = new URLSearchParams(searchParams.toString())
     params.delete('page')
     const nextQuery = params.toString()
     router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname)
     router.refresh()
-  }, [pathname, router, searchParams])
+  }
 
-  const setUserGeo = React.useCallback(
-    (geo: StoredUserGeo | null) => {
-      setUserGeoState(geo)
+  const setUserGeo = (geo: StoredUserGeo | null) => {
+    setUserGeoState(geo)
 
-      startTransition(async () => {
-        if (geo) {
-          await setCanchasUserGeo(geo)
-        } else {
-          await clearCanchasUserGeo()
-        }
+    startTransition(async () => {
+      if (geo) {
+        await setCanchasUserGeo(geo)
+      } else {
+        await clearCanchasUserGeo()
+      }
 
-        resetPageAndRefresh()
-      })
-    },
-    [resetPageAndRefresh],
-  )
+      resetPageAndRefresh()
+    })
+  }
 
-  const value = React.useMemo(
-    () => ({
-      hasGeoFilter: userGeo !== null,
-      isGeoPending,
-      setUserGeo,
-      userGeo,
-    }),
-    [isGeoPending, setUserGeo, userGeo],
-  )
+  // React Compiler caches this value automatically.
+  const value = {
+    hasGeoFilter: userGeo !== null,
+    isGeoPending,
+    setUserGeo,
+    userGeo,
+  }
 
   return <CanchasGeoContext value={value}>{children}</CanchasGeoContext>
 }
