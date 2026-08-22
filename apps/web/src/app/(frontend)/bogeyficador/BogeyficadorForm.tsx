@@ -66,16 +66,32 @@ export function BogeyficadorForm() {
     setIsSubmitting(true)
     setResult(null)
 
-    const response = await fetch('/api/bogeyficador/check', {
-      body: JSON.stringify({ rut }),
-      headers: {
-        'content-type': 'application/json',
-      },
-      method: 'POST',
-    })
+    try {
+      const response = await fetch('/api/bogeyficador/check', {
+        body: JSON.stringify({ rut }),
+        headers: {
+          'content-type': 'application/json',
+        },
+        method: 'POST',
+      })
 
-    const data: unknown = await response.json()
-    setResult(parseCheckResponse(data))
+      if (!response.ok) {
+        // The check API reports outcomes through a `{ message, status }` JSON
+        // body even on HTTP errors (400 invalid RUT, 404 not found, 429 rate
+        // limited), so error responses are parsed and shown like successes.
+        const data: unknown = await response.json()
+        setResult(parseCheckResponse(data))
+        return
+      }
+
+      const data: unknown = await response.json()
+      setResult(parseCheckResponse(data))
+    } catch (error) {
+      console.error('Failed to check membership', error)
+    }
+
+    // Unconditional: the catch above swallows transport failures, so this
+    // runs on every path. (React Compiler cannot compile `finally` blocks.)
     setIsSubmitting(false)
   }
 
