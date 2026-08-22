@@ -58,6 +58,11 @@ local repo_checks = new Mapping<String, Step> {
   ["typecheck"] {
     check = "pnpm typecheck"
   }
+  // Strict React Doctor gate: any diagnostic fails (doctor.config.json sets
+  // blocking = "warning"). Full scan; cheap enough after the fixers.
+  ["react-doctor"] {
+    check = "pnpm react-doctor:check"
+  }
   ["fallow"] {
     check = "pnpm exec fallow audit --gate new-only --type-aware"
   }
@@ -86,6 +91,10 @@ hooks {
       }
       ["typecheck"] {
         check = "pnpm typecheck"
+      }
+      // Strict React Doctor gate over the whole tree: any diagnostic fails.
+      ["react-doctor"] {
+        check = "pnpm react-doctor:check"
       }
       ["build"] {
         dir = "apps/web"
