@@ -60,3 +60,52 @@ export async function getPublishedPayloadDocBySlug<TSlug extends CollectionSlug<
     return null
   }
 }
+
+/**
+ * Latest 20 published docs of a public content collection, cached. Payload
+ * outages degrade to an empty list instead of failing the route.
+ */
+export async function getPublishedPayloadDocs<TSlug extends CollectionSlug<Config>>(
+  collection: TSlug,
+): Promise<DataFromCollectionSlug<TSlug>[]> {
+  'use cache'
+  cacheLife('publicContent')
+
+  try {
+    const payload = await getPayload({ config })
+    const docs = await payload.find({
+      collection,
+      depth: 1,
+      limit: 20,
+      locale: 'es',
+      sort: 'title',
+      ...getPublishedCmsQueryOptions(),
+    })
+
+    return docs.docs
+  } catch (error) {
+    if (!isPayloadUnavailableError(error)) {
+      console.error(`Failed to load ${collection}`, error)
+    }
+
+    return []
+  }
+}
+
+/** Latest 20 docs of a collection including drafts, for draft-mode previews. */
+export async function getDraftPayloadDocs<TSlug extends CollectionSlug<Config>>(
+  collection: TSlug,
+): Promise<DataFromCollectionSlug<TSlug>[]> {
+  // Payload boot and CMS query options are independent, so race them.
+  const [payload, cmsQuery] = await Promise.all([getPayload({ config }), getCmsQueryOptions()])
+  const docs = await payload.find({
+    collection,
+    depth: 1,
+    limit: 20,
+    locale: 'es',
+    sort: 'title',
+    ...cmsQuery,
+  })
+
+  return docs.docs
+}

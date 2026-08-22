@@ -1,10 +1,7 @@
-import config from '@payload-config'
 import Link from 'next/link'
 import Image from 'next/image'
-import { cacheLife } from 'next/cache'
 import { draftMode } from 'next/headers'
 import { Suspense } from 'react'
-import { getPayload } from 'payload'
 
 import {
   PageGrid,
@@ -17,10 +14,8 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button-variants'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { getCmsQueryOptions, getPublishedCmsQueryOptions } from '@/lib/cmsQuery'
+import { getDraftPayloadDocs, getPublishedPayloadDocs } from '@/lib/payloadBySlug'
 import { cn } from '@/lib/utils'
-import { isPayloadUnavailableError } from '@/lib/payloadUnavailableError'
-import type { Product } from '@/payload-types'
 
 // Module scope: constructing an Intl formatter loads locale data, so build
 // the CLP currency formatter once instead of per render.
@@ -50,7 +45,9 @@ export default function ProductosPage() {
 
 async function ProductosGrid() {
   const { isEnabled: draft } = await draftMode()
-  const products = draft ? await getDraftProducts() : await getPublishedProducts()
+  const products = draft
+    ? await getDraftPayloadDocs('products')
+    : await getPublishedPayloadDocs('products')
 
   return (
     <PageGrid>
@@ -92,44 +89,4 @@ async function ProductosGrid() {
       ))}
     </PageGrid>
   )
-}
-
-async function getPublishedProducts(): Promise<Product[]> {
-  'use cache'
-  cacheLife('publicContent')
-
-  try {
-    const payload = await getPayload({ config })
-    const products = await payload.find({
-      collection: 'products',
-      depth: 1,
-      limit: 20,
-      locale: 'es',
-      sort: 'title',
-      ...getPublishedCmsQueryOptions(),
-    })
-
-    return products.docs
-  } catch (error) {
-    if (!isPayloadUnavailableError(error)) {
-      console.error('Failed to load products', error)
-    }
-
-    return []
-  }
-}
-
-async function getDraftProducts(): Promise<Product[]> {
-  // Payload boot and CMS query options are independent, so race them.
-  const [payload, cmsQuery] = await Promise.all([getPayload({ config }), getCmsQueryOptions()])
-  const products = await payload.find({
-    collection: 'products',
-    depth: 1,
-    limit: 20,
-    locale: 'es',
-    sort: 'title',
-    ...cmsQuery,
-  })
-
-  return products.docs
 }

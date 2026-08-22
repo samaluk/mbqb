@@ -1,8 +1,7 @@
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { getPayloadSecret } from '../../scripts/loadScriptEnv'
-
+import { env } from '@/env'
 import config from '@/payload.config'
 import { checkActiveMembership, findActiveMembershipByLookupHash } from '@/lib/bogeyficador'
 import { getActiveMembershipPrivacyFields } from '@/lib/activeMembershipPrivacy'
@@ -11,7 +10,7 @@ let payload: Payload
 
 const testRut = '12.345.678-5'
 const getTestMembershipPrivacyFields = () => {
-  const fields = getActiveMembershipPrivacyFields(testRut, getPayloadSecret())
+  const fields = getActiveMembershipPrivacyFields(testRut, env.PAYLOAD_SECRET)
 
   if (!fields) {
     throw new Error('Invalid test RUT')
@@ -52,7 +51,7 @@ describe('Bogeyficador membership integration', () => {
 
     const result = await checkActiveMembership(testRut, {
       findByLookupHash: (lookupHash) => findActiveMembershipByLookupHash(payload, lookupHash),
-      hashSecret: getPayloadSecret(),
+      hashSecret: env.PAYLOAD_SECRET,
     })
 
     expect(result).toEqual({ status: 'active' })
@@ -72,7 +71,7 @@ describe('Bogeyficador membership integration', () => {
 
     const result = await checkActiveMembership(testRut, {
       findByLookupHash: (lookupHash) => findActiveMembershipByLookupHash(payload, lookupHash),
-      hashSecret: getPayloadSecret(),
+      hashSecret: env.PAYLOAD_SECRET,
     })
 
     expect(result).toEqual({ status: 'not_found' })

@@ -44,13 +44,16 @@
     "require-suppression-reason": "error",
     "coverage-gaps": "warn"
   },
-  "duplicates": {
+   "duplicates": {
     "mode": "semantic",
     "near": true,
     "minLines": 8,
     "minTokens": 60,
     "minOccurrences": 2,
-    "ignoreImports": true
+    "ignoreImports": true,
+    "default": {
+      "ignore": ["apps/web/src/migrations/**"]
+    }
   },
   "health": {
     "maxCyclomatic": 20,

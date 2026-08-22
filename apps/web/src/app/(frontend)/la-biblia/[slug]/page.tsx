@@ -4,17 +4,8 @@ import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 
 import { MetaPills, PageDetail, PageKicker, PageTitle, RichContent } from '@/components/page'
+import { laBibliaCategoryLabels } from '@/lib/laBiblia'
 import { getDraftPayloadDocBySlug, getPublishedPayloadDocBySlug } from '@/lib/payloadBySlug'
-
-const categoryLabels = {
-  canchas: 'Canchas',
-  'cultura-golf': 'Cultura golf',
-  'diccionario-golfistico': 'Diccionario golfistico',
-  equipo: 'Equipo',
-  'primeros-pasos': 'Primeros pasos',
-  'reglas-y-etiqueta': 'Reglas y etiqueta',
-  'tecnica-basica': 'Tecnica basica',
-}
 
 type PageProps = {
   params: Promise<{
@@ -48,7 +39,7 @@ async function ArticleDetailContent({ params }: PageProps) {
   return (
     <>
       <PageTitle data-testid="article-detail-title">{article.title}</PageTitle>
-      <MetaPills items={[categoryLabels[article.category], article.difficulty]} />
+      <MetaPills items={[laBibliaCategoryLabels[article.category], article.difficulty]} />
       <RichContent body={article.body} />
     </>
   )

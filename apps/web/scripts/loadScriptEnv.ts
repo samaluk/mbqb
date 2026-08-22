@@ -28,14 +28,6 @@ const applyBuildDefaults = () => {
   }
 }
 
-/**
- * Hash secret for membership lookups, with the same local/CI default
- * `applyBuildDefaults` uses. Centralized so specs and scripts never read
- * `process.env` directly.
- */
-export const getPayloadSecret = (): string =>
-  process.env.PAYLOAD_SECRET?.trim() || 'development-secret'
-
 /** Fixture seeding is opt-in: CI sets E2E_SEED_FIXTURES=1. */
 export const isE2eFixtureSeedEnabled = (): boolean => process.env.E2E_SEED_FIXTURES === '1'
 
