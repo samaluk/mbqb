@@ -14,7 +14,7 @@ import {
   RichSnippet,
 } from '@/components/page'
 import { Badge } from '@/components/ui/badge'
-import { buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button-variants'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getCmsQueryOptions, getPublishedCmsQueryOptions } from '@/lib/cmsQuery'
 import { cn } from '@/lib/utils'
