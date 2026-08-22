@@ -6,12 +6,15 @@ import { Suspense } from 'react'
 import { MetaPills, PageDetail, PageKicker, PageTitle, RichContent } from '@/components/page'
 import { getDraftPayloadDocBySlug, getPublishedPayloadDocBySlug } from '@/lib/payloadBySlug'
 
-const formatPrice = (value: number) =>
-  new Intl.NumberFormat('es-CL', {
-    currency: 'CLP',
-    maximumFractionDigits: 0,
-    style: 'currency',
-  }).format(value)
+// Module scope: constructing an Intl formatter loads locale data, so build
+// the CLP currency formatter once instead of per render.
+const clpFormatter = new Intl.NumberFormat('es-CL', {
+  currency: 'CLP',
+  maximumFractionDigits: 0,
+  style: 'currency',
+})
+
+const formatPrice = (value: number) => clpFormatter.format(value)
 
 type PageProps = {
   params: Promise<{

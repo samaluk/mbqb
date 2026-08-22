@@ -21,12 +21,15 @@ import { cn } from '@/lib/utils'
 import { isPayloadUnavailableError } from '@/lib/payloadUnavailableError'
 import type { Product } from '@/payload-types'
 
-const formatPrice = (value: number) =>
-  new Intl.NumberFormat('es-CL', {
-    currency: 'CLP',
-    maximumFractionDigits: 0,
-    style: 'currency',
-  }).format(value)
+// Module scope: constructing an Intl formatter loads locale data, so build
+// the CLP currency formatter once instead of per render.
+const clpFormatter = new Intl.NumberFormat('es-CL', {
+  currency: 'CLP',
+  maximumFractionDigits: 0,
+  style: 'currency',
+})
+
+const formatPrice = (value: number) => clpFormatter.format(value)
 
 export default function ProductosPage() {
   return (

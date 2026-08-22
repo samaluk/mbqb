@@ -41,6 +41,10 @@ function parseCheckResponse(data: unknown): CheckResponse {
   return { message, status: 'not_found' }
 }
 
+// Module scope: constructing an Intl formatter loads locale data and is
+// expensive, so build the es-CL formatter once instead of per keystroke.
+const rutBodyFormatter = new Intl.NumberFormat('es-CL')
+
 const formatRutInput = (value: string) => {
   const cleaned = value.replace(/[.\-\s]/g, '').toUpperCase()
   const body = cleaned.slice(0, -1).replace(/\D/g, '')
@@ -49,7 +53,7 @@ const formatRutInput = (value: string) => {
   if (!body && !checkDigit) return ''
   if (!body) return checkDigit
 
-  return `${new Intl.NumberFormat('es-CL').format(Number(body))}${checkDigit ? `-${checkDigit}` : ''}`
+  return `${rutBodyFormatter.format(Number(body))}${checkDigit ? `-${checkDigit}` : ''}`
 }
 
 export function BogeyficadorForm() {
