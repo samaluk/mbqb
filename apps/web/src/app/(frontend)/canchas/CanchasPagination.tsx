@@ -7,7 +7,8 @@ import {
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
-import { Button, buttonVariants } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button-variants'
 import type { CanchasPaginationLink, CanchasPaginationModel } from '@/lib/canchasBrowsing'
 import { cn } from '@/lib/utils'
 

@@ -13,7 +13,7 @@ import {
   PageShell,
   PageTitle,
 } from '@/components/page'
-import { buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button-variants'
 import { getCmsQueryOptions } from '@/lib/cmsQuery'
 import { cn } from '@/lib/utils'
 import { isPayloadUnavailableError } from '@/lib/payloadUnavailableError'

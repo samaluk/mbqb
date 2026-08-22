@@ -38,23 +38,21 @@ export function CanchasViewControls({ controls }: CanchasViewControlsProps) {
   const query = searchParams.get('q') ?? ''
   const searchTimeout = React.useRef<number>(null)
 
-  const updateParams = React.useCallback(
-    (updates: Record<string, null | string>) => {
-      const params = new URLSearchParams(searchParams.toString())
+  // React Compiler caches this callback automatically.
+  const updateParams = (updates: Record<string, null | string>) => {
+    const params = new URLSearchParams(searchParams.toString())
 
-      for (const [key, value] of Object.entries(updates)) {
-        if (value) {
-          params.set(key, value)
-        } else {
-          params.delete(key)
-        }
+    for (const [key, value] of Object.entries(updates)) {
+      if (value) {
+        params.set(key, value)
+      } else {
+        params.delete(key)
       }
+    }
 
-      const nextQuery = params.toString()
-      router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname)
-    },
-    [pathname, router, searchParams],
-  )
+    const nextQuery = params.toString()
+    router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname)
+  }
 
   React.useEffect(
     () => () => {

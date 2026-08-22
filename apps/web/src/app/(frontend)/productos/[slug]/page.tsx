@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
@@ -6,12 +7,15 @@ import { Suspense } from 'react'
 import { MetaPills, PageDetail, PageKicker, PageTitle, RichContent } from '@/components/page'
 import { getDraftPayloadDocBySlug, getPublishedPayloadDocBySlug } from '@/lib/payloadBySlug'
 
-const formatPrice = (value: number) =>
-  new Intl.NumberFormat('es-CL', {
-    currency: 'CLP',
-    maximumFractionDigits: 0,
-    style: 'currency',
-  }).format(value)
+// Module scope: constructing an Intl formatter loads locale data, so build
+// the CLP currency formatter once instead of per render.
+const clpFormatter = new Intl.NumberFormat('es-CL', {
+  currency: 'CLP',
+  maximumFractionDigits: 0,
+  style: 'currency',
+})
+
+const formatPrice = (value: number) => clpFormatter.format(value)
 
 type PageProps = {
   params: Promise<{
@@ -52,10 +56,17 @@ async function ProductDetailContent({ params }: PageProps) {
         ]}
       />
       {product.imageUrl ? (
-        <img
+        // imageUrl is staff-entered and can point at arbitrary external
+        // hosts, so the optimizer is skipped (unoptimized) — next/image
+        // still contributes explicit dimensions, lazy loading, and layout
+        // stability. Intrinsic size matches the 5:3 display aspect.
+        <Image
           alt=""
           className="aspect-5/3 h-auto w-product-image rounded-lg object-cover max-[760px]:aspect-video"
+          height={600}
           src={product.imageUrl}
+          unoptimized
+          width={1000}
         />
       ) : null}
       <RichContent body={product.body} />

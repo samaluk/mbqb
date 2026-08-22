@@ -19,6 +19,10 @@ export type RutValidationResult =
 
 const cleanRut = (input: string) => input.replace(/[.\-\s]/g, '').toUpperCase()
 
+// Module scope: constructing an Intl formatter loads locale data, so build
+// the es-CL formatter once instead of per call.
+const rutBodyFormatter = new Intl.NumberFormat('es-CL')
+
 const calculateCheckDigit = (body: string) => {
   let multiplier = 2
   let sum = 0
@@ -37,7 +41,7 @@ const calculateCheckDigit = (body: string) => {
 }
 
 export const formatRut = (body: string, checkDigit: string) =>
-  `${new Intl.NumberFormat('es-CL').format(Number(body))}-${checkDigit}`
+  `${rutBodyFormatter.format(Number(body))}-${checkDigit}`
 
 export const validateRut = (input: string): RutValidationResult => {
   const cleaned = cleanRut(input)

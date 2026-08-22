@@ -28,6 +28,9 @@ const applyBuildDefaults = () => {
   }
 }
 
+/** Fixture seeding is opt-in: CI sets E2E_SEED_FIXTURES=1. */
+export const isE2eFixtureSeedEnabled = (): boolean => process.env.E2E_SEED_FIXTURES === '1'
+
 const requireEnvFile = (relativePath: string, pullHint: string) => {
   const file = path.join(appDir, relativePath)
   if (!existsSync(file)) {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getPublicContentPreviewUrl,
   getPublicContentPublishing,
   getPublicContentRevalidationPaths,
   revalidateDeletedPublicContentDoc,
@@ -9,19 +10,26 @@ import {
 
 describe('Public Content Publishing', () => {
   it('builds collection preview URLs from the shared route facts', () => {
-    const canchasPublishing = getPublicContentPublishing('canchas')
-    const laBibliaPublishing = getPublicContentPublishing('la-biblia-articles')
-    const productsPublishing = getPublicContentPublishing('products')
     const canchasPreview = parsePreviewUrl(
-      canchasPublishing.admin.preview?.({ slug: 'club-test' }, { locale: 'es' } as never),
+      getPublicContentPreviewUrl({
+        collection: 'canchas',
+        data: { slug: 'club-test' },
+        locale: 'es',
+      }),
     )
     const laBibliaPreview = parsePreviewUrl(
-      laBibliaPublishing.admin.preview?.({ slug: 'reglas-basicas' }, { locale: 'en' } as never),
+      getPublicContentPreviewUrl({
+        collection: 'la-biblia-articles',
+        data: { slug: 'reglas-basicas' },
+        locale: 'en',
+      }),
     )
     const productPreview = parsePreviewUrl(
-      productsPublishing.admin.livePreview?.url({
+      getPublicContentPreviewUrl({
+        collection: 'products',
         data: { slug: 'polera' },
-      } as never),
+        locale: 'es',
+      }),
     )
 
     expect(canchasPreview).toMatchObject({
@@ -43,10 +51,10 @@ describe('Public Content Publishing', () => {
   })
 
   it('does not build preview URLs for content without a slug', () => {
-    const publishing = getPublicContentPublishing('products')
-
-    expect(publishing.admin.preview?.({}, { locale: 'es' } as never)).toBeNull()
-    expect(publishing.admin.livePreview?.url({ data: {} } as never)).toBeNull()
+    expect(
+      getPublicContentPreviewUrl({ collection: 'products', data: {}, locale: 'es' }),
+    ).toBeNull()
+    expect(getPublicContentPreviewUrl({ collection: 'products' })).toBeNull()
   })
 
   it('builds listing and detail revalidation paths from the same route facts', () => {

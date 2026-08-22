@@ -26,22 +26,28 @@ local fixers = new Mapping<String, Step> {
   ["oxlint"] {
     glob = web_sources
     exclusive = true
-    check = "pnpm exec oxlint {{files}} --ignore-path .oxlintignore"
-    fix = "pnpm exec oxlint --fix {{files}} --ignore-path .oxlintignore"
+    // `--no-error-on-unmatched-pattern`: --ignore-path can filter out every
+    // staged file (e.g. a commit touching only vendored ui/** components);
+    // oxlint would otherwise exit 1 with "No files found to lint".
+    check = "pnpm exec oxlint {{files}} --ignore-path .oxlintignore --no-error-on-unmatched-pattern"
+    fix = "pnpm exec oxlint --fix {{files}} --ignore-path .oxlintignore --no-error-on-unmatched-pattern"
     output_summary = "combined"
   }
   ["oxlint-tailwind"] {
     glob = web_sources
     exclusive = true
-    check = "pnpm exec oxlint {{files}} --config .oxlintrc.tailwind.json --ignore-path .oxlintignore"
-    fix = "pnpm exec oxlint --fix {{files}} --config .oxlintrc.tailwind.json --ignore-path .oxlintignore"
+    check = "pnpm exec oxlint {{files}} --config .oxlintrc.tailwind.json --ignore-path .oxlintignore --no-error-on-unmatched-pattern"
+    fix = "pnpm exec oxlint --fix {{files}} --config .oxlintrc.tailwind.json --ignore-path .oxlintignore --no-error-on-unmatched-pattern"
     output_summary = "combined"
   }
   ["oxfmt"] {
     glob = web_sources
     exclusive = true
-    check = "pnpm exec oxfmt --check {{files}}"
-    fix = "pnpm exec oxfmt --write {{files}}"
+    // `--no-error-on-unmatched-pattern`: oxfmt's own ignorePatterns can
+    // exclude every staged file (vendored ui/**, migrations/**); oxfmt would
+    // otherwise exit non-zero with "Expected at least one target file".
+    check = "pnpm exec oxfmt --check {{files}} --no-error-on-unmatched-pattern"
+    fix = "pnpm exec oxfmt --write {{files}} --no-error-on-unmatched-pattern"
     output_summary = "combined"
   }
 }
@@ -51,6 +57,11 @@ local fixers = new Mapping<String, Step> {
 local repo_checks = new Mapping<String, Step> {
   ["typecheck"] {
     check = "pnpm typecheck"
+  }
+  // Strict React Doctor gate: any diagnostic fails (doctor.config.json sets
+  // blocking = "warning"). Full scan; cheap enough after the fixers.
+  ["react-doctor"] {
+    check = "pnpm react-doctor:check"
   }
   ["fallow"] {
     check = "pnpm exec fallow audit --gate new-only --type-aware"
@@ -80,6 +91,10 @@ hooks {
       }
       ["typecheck"] {
         check = "pnpm typecheck"
+      }
+      // Strict React Doctor gate over the whole tree: any diagnostic fails.
+      ["react-doctor"] {
+        check = "pnpm react-doctor:check"
       }
       ["build"] {
         dir = "apps/web"

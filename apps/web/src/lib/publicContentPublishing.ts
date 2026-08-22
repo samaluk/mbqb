@@ -45,8 +45,6 @@ const publicContentTargets = {
   },
 } satisfies Record<PublicContentCollection, PublicContentPublishingTarget>
 
-export const publicContentRevalidateSeconds = 15 * 60
-
 const globalPublicPaths = [
   '/',
   '/canchas',
@@ -58,8 +56,6 @@ const globalPublicPaths = [
 ]
 
 export function getPublicContentPublishing(collection: PublicContentCollection) {
-  const target = publicContentTargets[collection]
-
   return {
     access: {
       create: isEditorOrAdmin,
@@ -69,9 +65,9 @@ export function getPublicContentPublishing(collection: PublicContentCollection) 
     },
     admin: {
       livePreview: {
-        url: ({ data, locale }) => buildPublicContentPreviewUrl(target, data, locale),
+        url: ({ data, locale }) => getPublicContentPreviewUrl({ collection, data, locale }),
       },
-      preview: (data, { locale }) => buildPublicContentPreviewUrl(target, data, locale),
+      preview: (data, { locale }) => getPublicContentPreviewUrl({ collection, data, locale }),
     },
     hooks: {
       afterChange: [revalidatePublicContentChange(collection)],
@@ -79,6 +75,31 @@ export function getPublicContentPublishing(collection: PublicContentCollection) 
     },
     versions: draftVersions,
   } satisfies Pick<CollectionConfig, 'access' | 'admin' | 'hooks' | 'versions'>
+}
+
+/**
+ * Pure preview-URL projection shared by Payload's admin preview and live
+ * preview callbacks. Returns null when the doc has no usable slug.
+ */
+export function getPublicContentPreviewUrl({
+  collection,
+  data,
+  locale,
+}: {
+  collection: PublicContentCollection
+  data?: { slug?: unknown } | null
+  locale?: unknown
+}): string | null {
+  const slug = typeof data?.slug === 'string' ? data.slug : ''
+
+  if (!slug) return null
+
+  return buildPreviewUrl({
+    collection,
+    locale,
+    path: getPublicContentDetailPath(collection, slug),
+    slug,
+  })
 }
 
 export function getPublicContentListingPath(collection: PublicContentCollection) {
@@ -132,23 +153,6 @@ export async function revalidateDeletedPublicContentDoc(args: {
   if (!isPublished(args.doc)) return
 
   await revalidatePublicPaths(getPublicContentRevalidationPaths(args), args.revalidate)
-}
-
-function buildPublicContentPreviewUrl(
-  target: PublicContentPublishingTarget,
-  data: SlugData | undefined,
-  locale: unknown,
-) {
-  const slug = typeof data?.slug === 'string' ? data.slug : ''
-
-  if (!slug) return null
-
-  return buildPreviewUrl({
-    collection: target.collection,
-    locale,
-    path: getPublicContentDetailPath(target.collection, slug),
-    slug,
-  })
 }
 
 function revalidatePublicContentChange(

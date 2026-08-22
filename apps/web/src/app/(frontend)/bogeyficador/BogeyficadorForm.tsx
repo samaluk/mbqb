@@ -41,6 +41,10 @@ function parseCheckResponse(data: unknown): CheckResponse {
   return { message, status: 'not_found' }
 }
 
+// Module scope: constructing an Intl formatter loads locale data and is
+// expensive, so build the es-CL formatter once instead of per keystroke.
+const rutBodyFormatter = new Intl.NumberFormat('es-CL')
+
 const formatRutInput = (value: string) => {
   const cleaned = value.replace(/[.\-\s]/g, '').toUpperCase()
   const body = cleaned.slice(0, -1).replace(/\D/g, '')
@@ -49,7 +53,7 @@ const formatRutInput = (value: string) => {
   if (!body && !checkDigit) return ''
   if (!body) return checkDigit
 
-  return `${new Intl.NumberFormat('es-CL').format(Number(body))}${checkDigit ? `-${checkDigit}` : ''}`
+  return `${rutBodyFormatter.format(Number(body))}${checkDigit ? `-${checkDigit}` : ''}`
 }
 
 export function BogeyficadorForm() {
@@ -62,16 +66,32 @@ export function BogeyficadorForm() {
     setIsSubmitting(true)
     setResult(null)
 
-    const response = await fetch('/api/bogeyficador/check', {
-      body: JSON.stringify({ rut }),
-      headers: {
-        'content-type': 'application/json',
-      },
-      method: 'POST',
-    })
+    try {
+      const response = await fetch('/api/bogeyficador/check', {
+        body: JSON.stringify({ rut }),
+        headers: {
+          'content-type': 'application/json',
+        },
+        method: 'POST',
+      })
 
-    const data: unknown = await response.json()
-    setResult(parseCheckResponse(data))
+      if (!response.ok) {
+        // The check API reports outcomes through a `{ message, status }` JSON
+        // body even on HTTP errors (400 invalid RUT, 404 not found, 429 rate
+        // limited), so error responses are parsed and shown like successes.
+        const data: unknown = await response.json()
+        setResult(parseCheckResponse(data))
+        return
+      }
+
+      const data: unknown = await response.json()
+      setResult(parseCheckResponse(data))
+    } catch (error) {
+      console.error('Failed to check membership', error)
+    }
+
+    // Unconditional: the catch above swallows transport failures, so this
+    // runs on every path. (React Compiler cannot compile `finally` blocks.)
     setIsSubmitting(false)
   }
 
