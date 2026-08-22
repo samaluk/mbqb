@@ -45,8 +45,6 @@ const publicContentTargets = {
   },
 } satisfies Record<PublicContentCollection, PublicContentPublishingTarget>
 
-export const publicContentRevalidateSeconds = 15 * 60
-
 const globalPublicPaths = [
   '/',
   '/canchas',
