@@ -103,8 +103,8 @@ async function getPublishedLaBibliaArticles(): Promise<LaBibliaArticle[]> {
 }
 
 async function getDraftLaBibliaArticles(): Promise<LaBibliaArticle[]> {
-  const payload = await getPayload({ config })
-  const cmsQuery = await getCmsQueryOptions()
+  // Payload boot and CMS query options are independent, so race them.
+  const [payload, cmsQuery] = await Promise.all([getPayload({ config }), getCmsQueryOptions()])
   const articles = await payload.find({
     collection: 'la-biblia-articles',
     depth: 1,

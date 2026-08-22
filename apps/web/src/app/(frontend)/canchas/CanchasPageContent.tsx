@@ -16,14 +16,21 @@ type CanchasPageContentProps = {
 
 export async function CanchasPageContent({ searchParams }: CanchasPageContentProps) {
   const params = await searchParams
-  const userGeo = await readCanchasUserGeoCookie()
-  const payload = await getPayload({ config })
-  const cmsQuery = await getCmsQueryOptions()
-  const browsing = await loadCanchasBrowsing({
-    canchas: createPayloadCanchasAdapter({ cmsQuery, payload }),
-    searchParams: params,
-    userGeo,
-  })
+  // Cookie read, Payload boot, and CMS query options don't depend on each
+  // other, so race them. The browsing load depends on all three results, so
+  // it chains once they settle.
+  const { browsing, userGeo } = await Promise.all([
+    readCanchasUserGeoCookie(),
+    getPayload({ config }),
+    getCmsQueryOptions(),
+  ]).then(async ([geo, payload, cmsQuery]) => ({
+    userGeo: geo,
+    browsing: await loadCanchasBrowsing({
+      canchas: createPayloadCanchasAdapter({ cmsQuery, payload }),
+      searchParams: params,
+      userGeo: geo,
+    }),
+  }))
 
   return (
     <Suspense fallback={null}>

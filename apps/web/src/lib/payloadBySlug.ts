@@ -11,8 +11,8 @@ export async function getDraftPayloadDocBySlug<TSlug extends CollectionSlug<Conf
   collection: TSlug,
   slug: string,
 ): Promise<DataFromCollectionSlug<TSlug> | null> {
-  const payload = await getPayload({ config })
-  const cmsQuery = await getCmsQueryOptions()
+  // Payload boot and CMS query options are independent, so race them.
+  const [payload, cmsQuery] = await Promise.all([getPayload({ config }), getCmsQueryOptions()])
   const docs = await payload.find({
     collection,
     depth: 1,

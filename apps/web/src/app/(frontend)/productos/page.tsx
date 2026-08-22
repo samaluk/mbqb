@@ -112,8 +112,8 @@ async function getPublishedProducts(): Promise<Product[]> {
 }
 
 async function getDraftProducts(): Promise<Product[]> {
-  const payload = await getPayload({ config })
-  const cmsQuery = await getCmsQueryOptions()
+  // Payload boot and CMS query options are independent, so race them.
+  const [payload, cmsQuery] = await Promise.all([getPayload({ config }), getCmsQueryOptions()])
   const products = await payload.find({
     collection: 'products',
     depth: 1,
