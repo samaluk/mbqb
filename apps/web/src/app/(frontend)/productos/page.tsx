@@ -1,5 +1,6 @@
 import config from '@payload-config'
 import Link from 'next/link'
+import Image from 'next/image'
 import { cacheLife } from 'next/cache'
 import { draftMode } from 'next/headers'
 import { Suspense } from 'react'
@@ -56,10 +57,17 @@ async function ProductosGrid() {
       {products.map((product) => (
         <Card className="min-w-0" key={product.id} size="sm">
           {product.imageUrl ? (
-            <img
+            // imageUrl is staff-entered and can point at arbitrary external
+            // hosts, so the optimizer is skipped (unoptimized) — next/image
+            // still contributes explicit dimensions, lazy loading, and layout
+            // stability. Intrinsic size matches the 5:3 display aspect.
+            <Image
               alt=""
               className="aspect-5/3 w-full object-cover max-[760px]:aspect-video"
+              height={600}
               src={product.imageUrl}
+              unoptimized
+              width={1000}
             />
           ) : null}
           <CardHeader>

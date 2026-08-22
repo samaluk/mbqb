@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
@@ -55,10 +56,17 @@ async function ProductDetailContent({ params }: PageProps) {
         ]}
       />
       {product.imageUrl ? (
-        <img
+        // imageUrl is staff-entered and can point at arbitrary external
+        // hosts, so the optimizer is skipped (unoptimized) — next/image
+        // still contributes explicit dimensions, lazy loading, and layout
+        // stability. Intrinsic size matches the 5:3 display aspect.
+        <Image
           alt=""
           className="aspect-5/3 h-auto w-product-image rounded-lg object-cover max-[760px]:aspect-video"
+          height={600}
           src={product.imageUrl}
+          unoptimized
+          width={1000}
         />
       ) : null}
       <RichContent body={product.body} />
