@@ -179,7 +179,7 @@ export async function loadCanchasBrowsing({
       sort: 'title',
     }),
     findTableCanchasPage(canchas, { filters, userGeo, view, where }),
-    findCardPoolCanchas(canchas, { filters, userGeo, view, where }),
+    findCardPoolCanchas(canchas, { userGeo, view, where }),
   ])
 
   const tableDocs = tableResult ? annotatePool(tableResult.docs, userGeo) : []
@@ -251,7 +251,7 @@ function findTableCanchasPage(
 /** Card view fetches one bounded pool and paginates it in memory. */
 function findCardPoolCanchas(
   canchas: CanchasAdapter,
-  { filters, userGeo, view, where }: CanchaFindInput,
+  { userGeo, view, where }: Omit<CanchaFindInput, 'filters'>,
 ): Promise<CanchaFindResult | null> {
   if (view !== 'cards') return Promise.resolve(null)
 
