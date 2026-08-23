@@ -2,6 +2,8 @@ import type { CollectionConfig } from 'payload'
 
 import { getPublicContentPublishing } from '@/lib/publicContentPublishing'
 
+import { localizedRichBodyField, localizedTitleField, uniqueSlugField } from './fields'
+
 const publishing = getPublicContentPublishing('products')
 
 export const Products: CollectionConfig = {
@@ -15,26 +17,9 @@ export const Products: CollectionConfig = {
   hooks: publishing.hooks,
   versions: publishing.versions,
   fields: [
-    {
-      name: 'title',
-      type: 'text',
-      localized: true,
-      required: true,
-    },
-    {
-      name: 'slug',
-      type: 'text',
-      index: true,
-      required: true,
-      unique: true,
-    },
-    {
-      name: 'body',
-      type: 'richText',
-      label: 'Body',
-      localized: true,
-      required: true,
-    },
+    localizedTitleField(),
+    uniqueSlugField(),
+    localizedRichBodyField(),
     {
       name: 'priceCLP',
       type: 'number',

@@ -1,48 +1,34 @@
-import Link from 'next/link'
-import { draftMode } from 'next/headers'
-import { notFound } from 'next/navigation'
-import { Suspense } from 'react'
-
 import {
   MetaPills,
-  PageDetail,
-  PageKicker,
   PageLede,
-  PageTitle,
+  PayloadDocDetail,
   RichContent,
+  type SlugPageProps,
 } from '@/components/page'
 import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/canchas'
-import { getDraftPayloadDocBySlug, getPublishedPayloadDocBySlug } from '@/lib/payloadBySlug'
+import { payloadDocMetadata } from '@/lib/payloadBySlug'
+import type { Cancha } from '@/payload-types'
 
-type PageProps = {
-  params: Promise<{
-    slug: string
-  }>
-}
+export const generateMetadata = payloadDocMetadata('canchas', 'Canchas · MBQB')
 
-export default function CanchaDetailPage({ params }: PageProps) {
+export default function CanchaDetailPage({ params }: SlugPageProps) {
   return (
-    <PageDetail>
-      <Link className="back-link" data-testid="cancha-detail-back-link" href="/canchas">
-        Volver a canchas
-      </Link>
-      <PageKicker>Cancha</PageKicker>
-      <Suspense fallback={null}>
-        <CanchaDetailContent params={params} />
-      </Suspense>
-    </PageDetail>
+    <PayloadDocDetail
+      backHref="/canchas"
+      backLabel="Volver a canchas"
+      backTestId="cancha-detail-back-link"
+      collection="canchas"
+      kicker="Cancha"
+      params={params}
+      titleTestId="cancha-detail-title"
+    >
+      {(cancha) => <CanchaDetailBody cancha={cancha} />}
+    </PayloadDocDetail>
   )
 }
 
-async function CanchaDetailContent({ params }: PageProps) {
-  const { slug } = await params
-  const { isEnabled: draft } = await draftMode()
-  const cancha = draft
-    ? await getDraftPayloadDocBySlug('canchas', slug)
-    : await getPublishedPayloadDocBySlug('canchas', slug)
-
-  if (!cancha) notFound()
-
+function CanchaDetailBody({ cancha }: { cancha: Cancha }) {
+  // getGoogleMapsUrl consumes the narrower map-item shape.
   // oxlint-disable-next-line typescript/consistent-type-assertions
   const canchaItem = cancha as CanchaMapItem
   const metaItems = [
@@ -53,7 +39,6 @@ async function CanchaDetailContent({ params }: PageProps) {
 
   return (
     <>
-      <PageTitle data-testid="cancha-detail-title">{cancha.title}</PageTitle>
       <MetaPills items={metaItems} />
       {cancha.summary ? <PageLede className="max-w-195">{cancha.summary}</PageLede> : null}
       <a

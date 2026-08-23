@@ -1,46 +1,26 @@
-import Link from 'next/link'
-import { draftMode } from 'next/headers'
-import { notFound } from 'next/navigation'
-import { Suspense } from 'react'
-
-import { MetaPills, PageDetail, PageKicker, PageTitle, RichContent } from '@/components/page'
+import { MetaPills, PayloadDocDetail, RichContent, type SlugPageProps } from '@/components/page'
 import { laBibliaCategoryLabels } from '@/lib/laBiblia'
-import { getDraftPayloadDocBySlug, getPublishedPayloadDocBySlug } from '@/lib/payloadBySlug'
+import { payloadDocMetadata } from '@/lib/payloadBySlug'
 
-type PageProps = {
-  params: Promise<{
-    slug: string
-  }>
-}
+export const generateMetadata = payloadDocMetadata('la-biblia-articles', 'La Biblia · MBQB')
 
-export default function ArticleDetailPage({ params }: PageProps) {
+export default function ArticleDetailPage({ params }: SlugPageProps) {
   return (
-    <PageDetail>
-      <Link className="back-link" data-testid="article-detail-back-link" href="/la-biblia">
-        Volver a La Biblia
-      </Link>
-      <PageKicker>La Biblia</PageKicker>
-      <Suspense fallback={null}>
-        <ArticleDetailContent params={params} />
-      </Suspense>
-    </PageDetail>
-  )
-}
-
-async function ArticleDetailContent({ params }: PageProps) {
-  const { slug } = await params
-  const { isEnabled: draft } = await draftMode()
-  const article = draft
-    ? await getDraftPayloadDocBySlug('la-biblia-articles', slug)
-    : await getPublishedPayloadDocBySlug('la-biblia-articles', slug)
-
-  if (!article) notFound()
-
-  return (
-    <>
-      <PageTitle data-testid="article-detail-title">{article.title}</PageTitle>
-      <MetaPills items={[laBibliaCategoryLabels[article.category], article.difficulty]} />
-      <RichContent body={article.body} />
-    </>
+    <PayloadDocDetail
+      backHref="/la-biblia"
+      backLabel="Volver a La Biblia"
+      backTestId="article-detail-back-link"
+      collection="la-biblia-articles"
+      kicker="La Biblia"
+      params={params}
+      titleTestId="article-detail-title"
+    >
+      {(article) => (
+        <>
+          <MetaPills items={[laBibliaCategoryLabels[article.category], article.difficulty]} />
+          <RichContent body={article.body} />
+        </>
+      )}
+    </PayloadDocDetail>
   )
 }
