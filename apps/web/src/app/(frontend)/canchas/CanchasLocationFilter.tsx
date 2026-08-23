@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { defaultMaxDistanceKm, maxMaxDistanceKm, minMaxDistanceKm } from '@/lib/canchasGeo'
-import { createStoredUserGeo } from '@/lib/canchasUserGeo'
+import { createStoredUserGeo, type StoredUserGeo } from '@/lib/canchasUserGeo'
 
 import { useCanchasGeo } from './CanchasGeoContext'
 
@@ -18,15 +18,53 @@ function notifyLocationRequired() {
   })
 }
 
-export function CanchasLocationFilter() {
-  const { isGeoPending, setUserGeo, userGeo } = useCanchasGeo()
-  const [isLocating, setIsLocating] = React.useState(false)
-  const [locationError, setLocationError] = React.useState<string | null>(null)
-  const persistMaxKmTimeout = React.useRef<number>(null)
-  const hasLocation = userGeo !== null
+/** First value of a slider callback payload, falling back to the default. */
+const firstSliderValue = (value: readonly number[] | number): number =>
+  typeof value === 'number' ? value : (value[0] ?? defaultMaxDistanceKm)
+
+type LocateHandlers = {
+  onDenied: (message: string) => void
+  onError: (message: string) => void
+  onResolved: (geo: StoredUserGeo | null) => void
+  fallbackMaxKm: number
+}
+
+/** Browser geolocation wrapped so the component only handles outcomes. */
+function locateCurrentUser({ fallbackMaxKm, onDenied, onError, onResolved }: LocateHandlers) {
+  if (!navigator.geolocation) return onDenied('Tu navegador no permite compartir ubicación.')
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const geo = createStoredUserGeo(
+        position.coords.latitude,
+        position.coords.longitude,
+        fallbackMaxKm,
+      )
+
+      if (!geo) return onError('No pudimos guardar tu ubicación. Intenta de nuevo.')
+
+      onResolved(geo)
+    },
+    () => onError('No pudimos obtener tu ubicación. Revisa los permisos del navegador.'),
+    {
+      enableHighAccuracy: true,
+      maximumAge: 60_000,
+      timeout: 15_000,
+    },
+  )
+}
+
+type SetUserGeo = (geo: StoredUserGeo | null) => void
+
+/**
+ * Slider state for the maximum distance: optimistic local value plus a
+ * debounced persist into the session geo cookie.
+ */
+function useMaxDistanceControls(userGeo: StoredUserGeo | null, setUserGeo: SetUserGeo) {
   const committedMaxKm = userGeo?.maxKm ?? defaultMaxDistanceKm
   const [sliderMaxKm, setSliderMaxKm] = React.useState(committedMaxKm)
   const [syncedCommittedMaxKm, setSyncedCommittedMaxKm] = React.useState(committedMaxKm)
+  const persistMaxKmTimeout = React.useRef<number>(null)
 
   if (committedMaxKm !== syncedCommittedMaxKm) {
     setSyncedCommittedMaxKm(committedMaxKm)
@@ -40,72 +78,22 @@ export function CanchasLocationFilter() {
     [],
   )
 
-  const requestLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationError('Tu navegador no permite compartir ubicación.')
-      return
-    }
-
-    setIsLocating(true)
-    setLocationError(null)
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setIsLocating(false)
-        const geo = createStoredUserGeo(
-          position.coords.latitude,
-          position.coords.longitude,
-          userGeo?.maxKm ?? defaultMaxDistanceKm,
-        )
-
-        if (!geo) {
-          setLocationError('No pudimos guardar tu ubicación. Intenta de nuevo.')
-          return
-        }
-
-        setUserGeo(geo)
-      },
-      () => {
-        setIsLocating(false)
-        setLocationError('No pudimos obtener tu ubicación. Revisa los permisos del navegador.')
-      },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 60_000,
-        timeout: 15_000,
-      },
-    )
-  }
-
-  const clearLocation = () => {
-    setLocationError(null)
-    setUserGeo(null)
-  }
-
   // React Compiler caches these callbacks automatically.
-  const persistMaxDistance = (value: number) => {
-    if (!userGeo) {
-      notifyLocationRequired()
-      return
-    }
-
+  const cancelPendingPersist = () => {
     if (persistMaxKmTimeout.current) window.clearTimeout(persistMaxKmTimeout.current)
+  }
 
-    setUserGeo({
-      ...userGeo,
-      maxKm: value,
-    })
+  const persistMaxDistance = (value: number) => {
+    if (!userGeo) return notifyLocationRequired()
+
+    cancelPendingPersist()
+    setUserGeo({ ...userGeo, maxKm: value })
   }
 
   const schedulePersistMaxDistance = (value: number) => {
-    if (!userGeo) {
-      notifyLocationRequired()
-      return
-    }
-
     setSliderMaxKm(value)
 
-    if (persistMaxKmTimeout.current) window.clearTimeout(persistMaxKmTimeout.current)
+    if (!userGeo) return notifyLocationRequired()
 
     persistMaxKmTimeout.current = window.setTimeout(() => {
       persistMaxDistance(value)
@@ -113,19 +101,42 @@ export function CanchasLocationFilter() {
   }
 
   const commitMaxDistance = (value: number) => {
-    if (!userGeo) {
-      notifyLocationRequired()
-      return
-    }
-
     setSliderMaxKm(value)
-
-    if (persistMaxKmTimeout.current) {
-      window.clearTimeout(persistMaxKmTimeout.current)
-      persistMaxKmTimeout.current = null
-    }
-
+    cancelPendingPersist()
     persistMaxDistance(value)
+  }
+
+  return { commitMaxDistance, persistMaxDistance, schedulePersistMaxDistance, sliderMaxKm }
+}
+
+export function CanchasLocationFilter() {
+  const { isGeoPending, setUserGeo, userGeo } = useCanchasGeo()
+  const [isLocating, setIsLocating] = React.useState(false)
+  const [locationError, setLocationError] = React.useState<string | null>(null)
+  const hasLocation = userGeo !== null
+  const maxDistance = useMaxDistanceControls(userGeo, setUserGeo)
+
+  const requestLocation = () => {
+    setIsLocating(true)
+    setLocationError(null)
+
+    locateCurrentUser({
+      fallbackMaxKm: userGeo?.maxKm ?? defaultMaxDistanceKm,
+      onDenied: setLocationError,
+      onError: (message) => {
+        setIsLocating(false)
+        setLocationError(message)
+      },
+      onResolved: (geo) => {
+        setIsLocating(false)
+        setUserGeo(geo)
+      },
+    })
+  }
+
+  const clearLocation = () => {
+    setLocationError(null)
+    setUserGeo(null)
   }
 
   return (
@@ -140,87 +151,144 @@ export function CanchasLocationFilter() {
             al compartir el enlace de la página.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            disabled={isLocating || isGeoPending}
-            onClick={requestLocation}
-            type="button"
-            variant="outline"
-          >
-            <LocateFixedIcon data-icon="inline-start" />
-            {isLocating
-              ? 'Obteniendo ubicación...'
-              : hasLocation
-                ? 'Actualizar ubicación'
-                : 'Usar mi ubicación'}
-          </Button>
-          {hasLocation ? (
-            <Button disabled={isGeoPending} onClick={clearLocation} type="button" variant="ghost">
-              <LocateOffIcon data-icon="inline-start" />
-              Quitar ubicación
-            </Button>
-          ) : null}
-        </div>
+        <LocationButtons
+          hasLocation={hasLocation}
+          isGeoPending={isGeoPending}
+          isLocating={isLocating}
+          onClear={clearLocation}
+          onRequest={requestLocation}
+          requestDisabled={isLocating || isGeoPending}
+        />
       </div>
       {locationError ? <p className="text-sm text-destructive">{locationError}</p> : null}
-      <div className="flex flex-col gap-3">
-        {hasLocation ? (
-          <p className="text-sm text-muted-foreground">
-            Mostrando canchas a hasta <strong className="text-foreground">{sliderMaxKm} km</strong>{' '}
-            de tu ubicación actual.
-          </p>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            Usa el botón de arriba para compartir tu ubicación y filtrar canchas por distancia.
-          </p>
-        )}
-        <div className="flex flex-col gap-2">
-          <Label
-            className="text-xs font-normal text-muted-foreground"
-            htmlFor="canchas-max-distance"
-          >
-            Distancia máxima: {sliderMaxKm} km
-          </Label>
-          <div className="relative">
-            <Slider
-              aria-disabled={!hasLocation || isGeoPending}
-              aria-label="Distancia máxima en kilómetros"
-              disabled={!hasLocation || isGeoPending}
-              id="canchas-max-distance"
-              max={maxMaxDistanceKm}
-              min={minMaxDistanceKm}
-              onValueChange={(value) =>
-                schedulePersistMaxDistance(
-                  // oxlint-disable-next-line typescript/no-unsafe-argument
-                  (Array.isArray(value) ? value[0] : value) ?? defaultMaxDistanceKm,
-                )
-              }
-              onValueCommitted={(value) =>
-                commitMaxDistance(
-                  // oxlint-disable-next-line typescript/no-unsafe-argument
-                  (Array.isArray(value) ? value[0] : value) ?? defaultMaxDistanceKm,
-                )
-              }
-              step={5}
-              value={[sliderMaxKm]}
-            />
-            {!hasLocation ? (
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 cursor-not-allowed"
-                onPointerDown={(event) => {
-                  event.preventDefault()
-                  notifyLocationRequired()
-                }}
-              />
-            ) : null}
-          </div>
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{minMaxDistanceKm} km</span>
-            <span>{maxMaxDistanceKm} km</span>
-          </div>
+      <DistanceControls
+        disabled={!hasLocation || isGeoPending}
+        maxKm={maxDistance.sliderMaxKm}
+        showSummary={hasLocation}
+        onCommit={maxDistance.commitMaxDistance}
+        onSchedule={maxDistance.schedulePersistMaxDistance}
+      />
+    </div>
+  )
+}
+
+const locationButtonLabel = (isLocating: boolean, hasLocation: boolean) =>
+  isLocating
+    ? 'Obteniendo ubicación...'
+    : hasLocation
+      ? 'Actualizar ubicación'
+      : 'Usar mi ubicación'
+
+function LocationButtons({
+  hasLocation,
+  requestDisabled,
+  isLocating,
+  isGeoPending,
+  onClear,
+  onRequest,
+}: {
+  hasLocation: boolean
+  requestDisabled: boolean
+  isGeoPending: boolean
+  isLocating: boolean
+  onClear: () => void
+  onRequest: () => void
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Button disabled={requestDisabled} onClick={onRequest} type="button" variant="outline">
+        <LocateFixedIcon data-icon="inline-start" />
+        {locationButtonLabel(isLocating, hasLocation)}
+      </Button>
+      {hasLocation ? (
+        <Button disabled={isGeoPending} onClick={onClear} type="button" variant="ghost">
+          <LocateOffIcon data-icon="inline-start" />
+          Quitar ubicación
+        </Button>
+      ) : null}
+    </div>
+  )
+}
+
+function DistanceControls({
+  disabled,
+  maxKm,
+  onCommit,
+  onSchedule,
+  showSummary,
+}: {
+  disabled: boolean
+  maxKm: number
+  onCommit: (value: number) => void
+  onSchedule: (value: number) => void
+  showSummary: boolean
+}) {
+  return (
+    <div className="flex flex-col gap-3">
+      {showSummary ? (
+        <p className="text-sm text-muted-foreground">
+          Mostrando canchas a hasta <strong className="text-foreground">{maxKm} km</strong> de tu
+          ubicación actual.
+        </p>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          Usa el botón de arriba para compartir tu ubicación y filtrar canchas por distancia.
+        </p>
+      )}
+      <div className="flex flex-col gap-2">
+        <Label className="text-xs font-normal text-muted-foreground" htmlFor="canchas-max-distance">
+          Distancia máxima: {maxKm} km
+        </Label>
+        <SliderBlock
+          disabled={disabled}
+          maxKm={maxKm}
+          onCommit={onCommit}
+          onSchedule={onSchedule}
+        />
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>{minMaxDistanceKm} km</span>
+          <span>{maxMaxDistanceKm} km</span>
         </div>
       </div>
+    </div>
+  )
+}
+
+function SliderBlock({
+  disabled,
+  maxKm,
+  onCommit,
+  onSchedule,
+}: {
+  disabled: boolean
+  maxKm: number
+  onCommit: (value: number) => void
+  onSchedule: (value: number) => void
+}) {
+  return (
+    <div className="relative">
+      <Slider
+        aria-disabled={disabled}
+        aria-label="Distancia máxima en kilómetros"
+        disabled={disabled}
+        id="canchas-max-distance"
+        max={maxMaxDistanceKm}
+        min={minMaxDistanceKm}
+        onValueChange={(value) => onSchedule(firstSliderValue(value))}
+        onValueCommitted={(value) => onCommit(firstSliderValue(value))}
+        step={5}
+        value={[maxKm]}
+      />
+      {!disabled ? null : (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 cursor-not-allowed"
+          onPointerDown={(event) => {
+            event.preventDefault()
+            notifyLocationRequired()
+          }}
+        />
+      )}
     </div>
   )
 }

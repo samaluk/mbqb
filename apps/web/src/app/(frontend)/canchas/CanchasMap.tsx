@@ -121,36 +121,58 @@ export default function CanchasMap({
           position={[location.latitude, location.longitude]}
         >
           <Popup>
-            <div className="grid min-w-40 gap-1 text-ink">
-              <strong className="leading-snug">{cancha.title}</strong>
-              <span className="text-label text-muted">{canchaAccessLabels[cancha.accessType]}</span>
-              {cancha.city || cancha.region ? (
-                <span className="text-label text-muted">
-                  {[cancha.city, cancha.region].filter(Boolean).join(', ')}
-                </span>
-              ) : null}
-              {'distanceKm' in cancha && typeof cancha.distanceKm === 'number' ? (
-                <span className="text-label font-semibold text-green">
-                  {formatDistanceKm(cancha.distanceKm)}
-                </span>
-              ) : null}
-              <div className="flex flex-wrap gap-3">
-                <Link className="font-extrabold text-green" href={`/canchas/${cancha.slug}`}>
-                  Ver ficha
-                </Link>
-                <a
-                  className="font-extrabold text-green"
-                  href={getGoogleMapsUrl(cancha)}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  Google Maps
-                </a>
-              </div>
-            </div>
+            <CanchaMarkerPopup cancha={cancha} />
           </Popup>
         </Marker>
       ))}
     </MapContainer>
+  )
+}
+
+function CanchaMarkerPopup({ cancha }: { cancha: CanchaMapItem }) {
+  const location = [cancha.city, cancha.region].filter(Boolean).join(', ')
+
+  return (
+    <div className="grid min-w-40 gap-1 text-ink">
+      <strong className="leading-snug">{cancha.title}</strong>
+      <span className="text-label text-muted">{canchaAccessLabels[cancha.accessType]}</span>
+      <CanchaPopupLocationLine cancha={cancha} location={location} />
+      <DistanceLine cancha={cancha} />
+      <div className="flex flex-wrap gap-3">
+        <Link className="font-extrabold text-green" href={`/canchas/${cancha.slug}`}>
+          Ver ficha
+        </Link>
+        <a
+          className="font-extrabold text-green"
+          href={getGoogleMapsUrl(cancha)}
+          rel="noreferrer"
+          target="_blank"
+        >
+          Google Maps
+        </a>
+      </div>
+    </div>
+  )
+}
+
+function CanchaPopupLocationLine({
+  cancha,
+  location,
+}: {
+  cancha: CanchaMapItem
+  location: string
+}) {
+  if (!cancha.city && !cancha.region) return null
+
+  return <span className="text-label text-muted">{location}</span>
+}
+
+function DistanceLine({ cancha }: { cancha: CanchaMapItem }) {
+  if (!('distanceKm' in cancha) || typeof cancha.distanceKm !== 'number') return null
+
+  return (
+    <span className="text-label font-semibold text-green">
+      {formatDistanceKm(cancha.distanceKm)}
+    </span>
   )
 }
