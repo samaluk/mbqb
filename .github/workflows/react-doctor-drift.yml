@@ -23,6 +23,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write # the scan posts a commit status — the trend marker on master
 
 concurrency:
   group: react-doctor-drift-${{ github.ref }}
@@ -40,10 +41,12 @@ jobs:
         with:
           persist-credentials: false
 
-      # Resolved react-doctor version for the cache key. Read straight from the
-      # root package.json's exact pin rather than require()'ing the installed
-      # package — this workflow intentionally has no dependency install step.
-      - id: ver
+      # Resolved react-doctor version for the cache key AND the Action's
+      # version input below, so the scan runs the exact CLI the cache key (and
+      # the local hk gates) track. Read straight from the root package.json's
+      # exact pin rather than require()'ing the installed package — this
+      # workflow intentionally has no dependency install step.
+      - id: rdver
         run: echo "version=$(node -p "require('./package.json').devDependencies['react-doctor']")" >> "$GITHUB_OUTPUT"
 
       # Cache-as-marker: a hit means this react-doctor version already had its
@@ -52,11 +55,11 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: .rd-drift
-          key: rd-drift-${{ steps.ver.outputs.version }}
+          key: rd-drift-${{ steps.rdver.outputs.version }}
 
       - name: Mark this version as scanned
         if: steps.seen.outputs.cache-hit != 'true'
-        run: mkdir -p .rd-drift && date > ".rd-drift/${{ steps.ver.outputs.version }}"
+        run: mkdir -p .rd-drift && date > ".rd-drift/${{ steps.rdver.outputs.version }}"
 
       # Immutable SHA pin to the current v2 release (millionco/react-doctor
       # v2.2.8); Renovate keeps the digest current via helpers:pinGitHubActionDigests.
@@ -65,5 +68,14 @@ jobs:
         uses: millionco/react-doctor@01820bb4fd4d0a4aebcd8df2b2a143a098649cb2 # v2.2.8
         with:
           directory: apps/web
+          # Deterministic CLI: the workspace-pinned version from the rdver
+          # step — the same string the cache key tracks.
+          version: ${{ steps.rdver.outputs.version }}
           scope: full
           blocking: warning
+          # The commit status is the trend marker on the default branch; drift
+          # runs never leave PR feedback (there is no PR), so the comment
+          # surfaces are explicitly off rather than left at their defaults.
+          commit-status: true
+          comment: false
+          review-comments: false

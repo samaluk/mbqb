@@ -55,6 +55,15 @@ jobs:
           persist-credentials: false
           clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
 
+      # Resolve the react-doctor version the workspace pins so the scan below
+      # runs the exact CLI the local hk gates run — not the Action default
+      # (react-doctor@latest). Read from the root manifest's exact pin rather
+      # than require()'ing the installed package: this workflow deliberately
+      # has no dependency-install step, so node_modules does not exist on a
+      # fresh runner.
+      - id: rdver
+        run: echo "version=$(node -p "require('./package.json').devDependencies['react-doctor']")" >> "$GITHUB_OUTPUT"
+
       # Immutable SHA pin to the current v2 release (millionco/react-doctor v2.2.8);
       # Renovate keeps the digest current via helpers:pinGitHubActionDigests.
       - uses: millionco/react-doctor@01820bb4fd4d0a4aebcd8df2b2a143a098649cb2 # v2.2.8
@@ -62,6 +71,10 @@ jobs:
           # Scan only the React/Next.js app — isolates this gate from the rest
           # of the monorepo and avoids workspace-boundary confusion.
           directory: apps/web
+          # Deterministic CLI: the workspace-pinned react-doctor version
+          # (resolved by the rdver step above), matching local hook scans.
+          # Without this, the Action would install react-doctor@latest.
+          version: ${{ steps.rdver.outputs.version }}
           # Baseline gate: report only the issues the PR introduces vs its merge
           # base. Existing debt is surfaced but never fails the check.
           scope: changed
