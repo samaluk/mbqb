@@ -34,7 +34,8 @@ export type PayloadDocDetailProps<TSlug extends TitledCollectionSlug> = SlugPage
   backLabel: string
   backTestId: string
   kicker: string
-  titleTestId?: string
+  /** Instant-nav e2e targets this attribute; every detail route supplies one. */
+  titleTestId: string
   /** Renders the doc-specific body once the doc is fetched and verified. */
   children: (doc: DataFromCollectionSlug<TSlug>) => React.ReactNode
 }
