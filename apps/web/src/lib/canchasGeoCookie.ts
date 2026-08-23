@@ -6,7 +6,7 @@ import { env } from '@/env'
 
 import { parseStoredUserGeo, type StoredUserGeo } from '@/lib/canchasUserGeo'
 
-export const canchasUserGeoCookieName = 'mbqb.canchas.userGeo'
+const canchasUserGeoCookieName = 'mbqb.canchas.userGeo'
 
 const cookiePath = '/canchas'
 const maxAgeSeconds = 8 * 60 * 60

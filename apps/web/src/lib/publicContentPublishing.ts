@@ -102,11 +102,11 @@ export function getPublicContentPreviewUrl({
   })
 }
 
-export function getPublicContentListingPath(collection: PublicContentCollection) {
+function getPublicContentListingPath(collection: PublicContentCollection) {
   return publicContentTargets[collection].listingPath
 }
 
-export function getPublicContentDetailPath(collection: PublicContentCollection, slug: string) {
+function getPublicContentDetailPath(collection: PublicContentCollection, slug: string) {
   return `${publicContentTargets[collection].detailPrefix}/${slug}`
 }
 

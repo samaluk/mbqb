@@ -12,7 +12,7 @@ export type CanchasSort = {
 
 export type CanchasView = 'cards' | 'table'
 
-export type CanchasFilters = {
+type CanchasFilters = {
   accessType: string
   city: string
   page: number
