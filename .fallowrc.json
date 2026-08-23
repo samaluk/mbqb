@@ -87,7 +87,7 @@
     "maxUnitSize": 60
   },
   "audit": {
-    "gate": "new-only",
+    "gate": "all",
     "typeAware": true
   },
   "boundaries": {
