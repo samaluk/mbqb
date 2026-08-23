@@ -1,0 +1,84 @@
+# Fallow — full-project drift scan.
+#
+# Runs the FULL Fallow scan once per fallow VERSION, not on a cron: the scan
+# fires whenever package.json / pnpm-lock.yaml changes on master, and an
+# actions/cache entry keyed by the resolved fallow version makes each version
+# run exactly once. Exactly-once semantics come entirely from that cache key:
+#   - Dependency bumps that don't touch fallow re-resolve to the same version,
+#     hit the cache, and skip both the marking step and the scan — costing
+#     only this no-op run.
+#   - A failed scan is never cached: actions/cache only saves on job success,
+#     so a crashed scan retries on the next trigger instead of being recorded
+#     as "seen".
+# This is the master-branch counterpart of the PR gate (fallow.yml): it
+# surfaces whole-repo debt introduced by a tool upgrade, fully blocking.
+name: Fallow (drift scan)
+
+on:
+  push:
+    branches: [master]
+    paths: ["**/package.json", "**/pnpm-lock.yaml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fallow-drift-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  drift-scan:
+    # Same fork-safe runner routing as the other quality jobs: forks always run
+    # on GitHub-hosted runners; USE_SELF_HOSTED_RUNNERS opts in to self-hosted.
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Resolved fallow version for the cache key AND the Action's version
+      # input below, so the scan runs the exact CLI the local hk gates track.
+      # Read from pnpm-lock.yaml: there is no dependency install in this
+      # workflow, so node_modules resolution would always fail on runners, and
+      # package.json may hold a Renovate range — the lockfile carries the exact
+      # resolved version instead. (The [[:space:]] anchor matches this repo's
+      # pnpm-lock v9 keys, which have no leading slash, and keeps sibling
+      # packages like @fallow-cli/* from matching.)
+      - id: fver
+        run: |
+          v="$(grep -m1 -oE '[[:space:]]fallow@[0-9]+\.[0-9]+\.[0-9]+' pnpm-lock.yaml | cut -d@ -f2-)"
+          if [ -z "$v" ]; then echo "::error::fallow version not found in pnpm-lock.yaml"; exit 1; fi
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+
+      # Cache-as-marker: a hit means this fallow version already had its full
+      # scan. Only saved if the job succeeds (see header).
+      - id: seen
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .fallow-drift
+          key: fallow-drift-${{ steps.fver.outputs.version }}
+
+      - name: Mark this version as scanned
+        if: steps.seen.outputs.cache-hit != 'true'
+        run: mkdir -p .fallow-drift && date > ".fallow-drift/${{ steps.fver.outputs.version }}"
+
+      # Full-scope scan via the pinned Action (bare command = dead-code +
+      # dupes + health). No coverage is generated here — health falls back to
+      # module-graph CRAP estimation, which matches the covered result set for
+      # this repo; that consistency is what makes per-version drift meaningful.
+      # Fully blocking: fail-on-issues defaults to true.
+      - name: Fallow (full drift scan)
+        if: steps.seen.outputs.cache-hit != 'true'
+        uses: fallow-rs/fallow@ecf5a314fd3e10974acb4f5a7f867c433030522d # v3.17.0
+        with:
+          # Deterministic CLI: the workspace-pinned version from the fver step
+          # above — the same string the cache key tracks.
+          version: ${{ steps.fver.outputs.version }}
+          auto-changed-since: false
+          type-aware: true
+          branded-token: false
+          sarif: false
+          annotations: false
