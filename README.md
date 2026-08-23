@@ -11,7 +11,7 @@ Node and pnpm versions are defined only in the root [`package.json`](package.jso
 
 CI reads both fields via [`.github/actions/setup-toolchain`](.github/actions/setup-toolchain). Docker images must stay aligned with `engines.node` (see comments in `apps/web/Dockerfile`).
 
-CI runs on GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): lint, format, typecheck, fallow checks, unit tests, production build (with migrations), integration tests, and Playwright E2E tests against PostGIS.
+CI runs on GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (lint, format, typecheck, unit tests with coverage, production build with migrations, integration tests, and Playwright E2E against PostGIS) plus [`.github/workflows/fallow.yml`](.github/workflows/fallow.yml) (fully-blocking Fallow quality gate and PR review).
 
 ## Development
 
