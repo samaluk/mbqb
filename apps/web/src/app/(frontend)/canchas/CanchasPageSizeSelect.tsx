@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select'
 import type { CanchasPaginationModel } from '@/lib/canchasBrowsing'
 
-type CanchasPageSizeSelectProps = {
+export type CanchasPageSizeSelectProps = {
   pagination: CanchasPaginationModel
 }
 

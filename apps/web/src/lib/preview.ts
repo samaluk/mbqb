@@ -1,6 +1,6 @@
 import { env } from '@/env'
 
-type PreviewTarget = {
+export type PreviewTarget = {
   collection: string
   path: string
   slug: string

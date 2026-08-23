@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
-type PageKickerProps = ComponentProps<'div'> & {
+export type PageKickerProps = ComponentProps<'div'> & {
   tone?: 'default' | 'hero'
 }
 

@@ -4,7 +4,7 @@ import type { ActiveMembership } from '@/payload-types'
 
 import { getActiveMembershipLookup } from '@/lib/activeMembershipPrivacy'
 
-type MembershipRecord = Pick<
+export type MembershipRecord = Pick<
   ActiveMembership,
   'id' | 'isActive' | 'normalizedRut' | 'rut' | 'rutLookupHash' | 'notes'
 >

@@ -17,15 +17,15 @@ type PublicContentPublishingTarget = {
   listingPath: string
 }
 
-type SlugData = {
+export type SlugData = {
   slug?: unknown
 }
 
-type MaybePublicDoc = SlugData & {
+export type MaybePublicDoc = SlugData & {
   _status?: unknown
 }
 
-type RevalidatePath = (path: string) => void
+export type RevalidatePath = (path: string) => void
 
 const publicContentTargets = {
   canchas: {

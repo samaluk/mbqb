@@ -86,7 +86,7 @@ export type CanchasBrowsingModel = {
   results: CanchasResultsModel
 }
 
-type FindCanchasArgs = {
+export type FindCanchasArgs = {
   depth: 0
   limit: number
   locale: 'es'
@@ -96,7 +96,7 @@ type FindCanchasArgs = {
   where?: Where
 }
 
-type FindCanchasResult = {
+export type FindCanchasResult = {
   docs: CanchaMapItem[]
   page?: number
   totalDocs: number
@@ -109,12 +109,12 @@ export type CanchasAdapter = {
   find: CanchasFinder
 }
 
-type CanchasCmsQueryOptions = {
+export type CanchasCmsQueryOptions = {
   draft: boolean
   overrideAccess: boolean
 }
 
-type LoadCanchasBrowsingArgs = {
+export type LoadCanchasBrowsingArgs = {
   canchas: CanchasAdapter
   searchParams: Record<string, string | string[] | undefined>
   userGeo: StoredUserGeo | null

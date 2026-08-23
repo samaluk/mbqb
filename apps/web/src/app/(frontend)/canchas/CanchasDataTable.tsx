@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils'
 import { CanchasColumnControls } from './CanchasColumnControls'
 import { CanchasPagination } from './CanchasPagination'
 
-type CanchasDataTableProps = {
+export type CanchasDataTableProps = {
   canchas: CanchaMapItem[]
   geoSortActive?: boolean
   pagination: CanchasPaginationModel

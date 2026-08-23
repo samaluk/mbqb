@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
-type HomeHeroVideoProps = ComponentProps<'video'> & {
+export type HomeHeroVideoProps = ComponentProps<'video'> & {
   src: string
 }
 

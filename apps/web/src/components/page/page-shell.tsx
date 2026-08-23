@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
-type PageShellProps = ComponentProps<'section'> & {
+export type PageShellProps = ComponentProps<'section'> & {
   variant?: 'default' | 'hero'
 }
 

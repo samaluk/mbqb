@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
-type PageTitleProps = ComponentProps<'h1'> & {
+export type PageTitleProps = ComponentProps<'h1'> & {
   size?: 'default' | 'hero'
 }
 
