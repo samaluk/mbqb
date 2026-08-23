@@ -4,6 +4,7 @@ import { draftMode } from 'next/headers'
 import { getPayload } from 'payload'
 import type { CollectionSlug, DataFromCollectionSlug } from 'payload'
 import type { Metadata } from 'next'
+import { cache } from 'react'
 
 import { getCmsQueryOptions, getPublishedCmsQueryOptions } from '@/lib/cmsQuery'
 import { isPayloadUnavailableError } from '@/lib/payloadUnavailableError'
@@ -12,17 +13,20 @@ import type { Config } from '@/payload-types'
 /**
  * Draft-mode dispatch shared by every public content route: previews read the
  * draft variants, everyone else reads the published, cached ones.
+ *
+ * React `cache()` memoizes per request, so `generateMetadata` and the page
+ * body resolve a given slug once per render instead of querying Payload twice
+ * (the published path is additionally absorbed by its `'use cache'` function).
  */
-export async function getPayloadDocBySlug<TSlug extends CollectionSlug<Config>>(
-  collection: TSlug,
-  slug: string,
-): Promise<DataFromCollectionSlug<TSlug> | null> {
+export const getPayloadDocBySlug = cache(async function getPayloadDocBySlug<
+  TSlug extends CollectionSlug<Config>,
+>(collection: TSlug, slug: string): Promise<DataFromCollectionSlug<TSlug> | null> {
   const { isEnabled: draft } = await draftMode()
 
   return draft
     ? await getDraftPayloadDocBySlug(collection, slug)
     : await getPublishedPayloadDocBySlug(collection, slug)
-}
+})
 
 /** Draft-mode dispatch for listing routes (see {@link getPayloadDocBySlug}). */
 export async function getPayloadDocs<TSlug extends CollectionSlug<Config>>(
