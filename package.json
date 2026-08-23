@@ -33,6 +33,8 @@
     "generate:types": "pnpm --filter @mbqb/web generate:types",
     "react-doctor": "react-doctor apps/web --verbose",
     "react-doctor:check": "react-doctor apps/web",
+    "react-doctor:staged": "react-doctor apps/web --staged",
+    "react-doctor:changed": "react-doctor apps/web --scope changed --base master",
     "format": "oxfmt --write apps/web",
     "format:check": "oxfmt --check apps/web",
     "check:lint": "oxlint apps/web --ignore-path .oxlintignore && oxlint apps/web --config .oxlintrc.tailwind.json --ignore-path .oxlintignore",
