@@ -1,11 +1,11 @@
 import { getPayload } from 'payload'
 
+import type { StaffRole } from '../src/access/roles.js'
+
 import { loadEnvForScript } from './loadScriptEnv.js'
 
 loadEnvForScript()
 await import('../src/env.js')
-
-type StaffRole = 'admin' | 'editor' | 'validation-manager'
 
 const validRoles = new Set<StaffRole>(['admin', 'editor', 'validation-manager'])
 
