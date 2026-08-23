@@ -84,8 +84,7 @@
     "maxCyclomatic": 20,
     "maxCognitive": 15,
     "maxCrap": 30,
-    "maxUnitSize": 60,
-    "coverage": "coverage/coverage-final.json"
+    "maxUnitSize": 60
   },
   "audit": {
     "gate": "new-only",
