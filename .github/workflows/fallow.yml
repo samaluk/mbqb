@@ -1,0 +1,143 @@
+# Fallow — fully-blocking quality gate plus native PR feedback.
+#
+# The gate job runs the FULL repository scan (`pnpm fallow:full`: dead-code,
+# duplication, complexity/CRAP with fresh coverage, fail-on-issues) over fresh
+# test coverage. There is no pre-existing backlog to grandfather (#264), so a
+# single new finding fails the run.
+#
+# The review job is the PR feedback surface of the same analysis: sticky
+# summary comment, Check Run, and inline review comments from the pinned
+# Fallow Action, consuming the coverage artifact the gate produced.
+#
+# Job display names ("Fallow gate", "Fallow PR review") match the master-branch
+# ruleset's required status checks exactly; they moved here from ci.yml.
+name: Fallow
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fallow-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Fallow gate
+    # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
+
+      - uses: ./.github/actions/setup-toolchain
+
+      # Fresh coverage for accurate per-function CRAP scoring; shared with the
+      # review job below so the Action does not re-run the suite.
+      - name: Test with coverage
+        run: pnpm test:coverage
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-fallow
+          path: coverage/coverage-final.json
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Fallow CI gate
+        run: pnpm fallow:full
+
+  review:
+    name: Fallow PR review
+    if: github.event_name == 'pull_request'
+    needs: gate
+    # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
+    timeout-minutes: 20
+    # Least-privilege at the workflow scope; the elevated write permissions the
+    # Action needs for PR feedback are scoped to this job only.
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
+
+      - uses: ./.github/actions/setup-toolchain
+
+      # The Fallow Action installs its CLI globally with npm and locates the
+      # install by parsing `npm root -g` output. Two quirks of these homerun
+      # runners break that: npm 11 redacts UUID-shaped segments in every
+      # command's stdout (@npmcli/redact rewrites them to a literal '***'),
+      # and the runner directories embed a UUID (.../runners/<uuid>/...), so
+      # any prefix under the runner home makes the Action verify against a
+      # mangled path and fail with platform-package-missing even though the
+      # install succeeded. Newer npm also refuses `npm config get prefix`
+      # outright ("The prefix option is protected"), so a plain bin-dir expose
+      # is a silent no-op. Provision a prefix free of UUID-shaped segments
+      # instead: prefer the shared tool cache, falling back to mktemp while
+      # RUNNER_TOOL_CACHE itself still lives under a runner directory.
+      - name: Provision isolated Fallow npm prefix
+        run: |
+          fallow_prefix="${RUNNER_TOOL_CACHE:-${RUNNER_TEMP}}/fallow-global-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
+          if printf '%s' "$fallow_prefix" | grep -qE '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}'; then
+            fallow_prefix="$(mktemp -d)/fallow-global-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
+          fi
+          mkdir -p "$fallow_prefix"
+          echo "NPM_CONFIG_PREFIX=$fallow_prefix" >> "$GITHUB_ENV"
+          echo "$fallow_prefix/bin" >> "$GITHUB_PATH"
+          case "${RUNNER_OS}:${RUNNER_ARCH}" in
+            macOS:ARM64) fallow_platform="@fallow-cli/darwin-arm64" ;;
+            Linux:X64) fallow_platform="@fallow-cli/linux-x64-gnu" ;;
+            *)
+              echo "Unsupported Fallow runner: ${RUNNER_OS}:${RUNNER_ARCH}" >&2
+              exit 1
+              ;;
+          esac
+          NPM_CONFIG_PREFIX="$fallow_prefix" npm install --global --ignore-scripts \
+            "fallow@3.17.0" "${fallow_platform}@3.17.0"
+
+      # Same coverage evidence the gate job produced, so audit CRAP scoring
+      # matches — downloaded rather than regenerated to avoid a second
+      # install + test run. Homerun gives each job a fresh work directory and
+      # Istanbul coverage keys embed the producing checkout's absolute path,
+      # so re-anchor every key to this checkout before the audit consumes it.
+      - name: Download coverage
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: coverage-fallow
+          path: coverage
+
+      - name: Re-anchor coverage paths to this checkout
+        run: node scripts/reanchor-coverage.mjs coverage/coverage-final.json
+
+      - name: Fallow changed-code audit
+        uses: fallow-rs/fallow@ecf5a314fd3e10974acb4f5a7f867c433030522d # v3.17.0
+        with:
+          version: 3.17.0
+          command: audit
+          # Fully blocking: every finding in changed files counts (there is no
+          # backlog), matching audit.gate: all in .fallowrc.json.
+          gate: all
+          type-aware: true
+          coverage: coverage/coverage-final.json
+          coverage-root: ${{ github.workspace }}
+          comment: true
+          comment-layout: compact
+          branded-token: false
+          review-comments: true
+          review-guidance: true
+          sarif: false
