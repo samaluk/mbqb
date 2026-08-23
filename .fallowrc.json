@@ -3,7 +3,8 @@
   "entry": [
     "apps/web/src/app/**/{page,layout,loading,error,not-found,route,default,template}.{ts,tsx}",
     "apps/web/src/payload.config.ts",
-    "apps/web/scripts/seed-e2e-fixtures.ts"
+    "apps/web/scripts/seed-e2e-fixtures.ts",
+    "apps/web/scripts/resolve-postgres-url.ts"
   ],
   "ignorePatterns": [
     "**/.next/**",
