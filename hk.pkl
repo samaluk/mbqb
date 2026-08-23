@@ -95,10 +95,16 @@ hooks {
       ["typecheck"] {
         check = "pnpm typecheck"
       }
-      // Strict React Doctor gate: only new findings vs master fail
+      // Refresh the local master ref so --scope changed diffs against a
+      // current origin/master (never fails the push; offline-tolerant).
+      ["fetch"] {
+        check = "git fetch origin master || true"
+      }
+      // Strict React Doctor gate: only new findings vs origin/master fail
       // (--scope changed; existing debt is reported but never blocks),
       // matching CI's scope. doctor.config.json sets blocking = "warning".
       ["react-doctor"] {
+        depends = List("fetch")
         check = "pnpm react-doctor:changed"
       }
       ["build"] {
@@ -121,7 +127,7 @@ hooks {
       ...fixers
       ...repo_checks
       ["react-doctor"] {
-        check = "pnpm react-doctor:check"
+        check = "pnpm react-doctor:full"
       }
     }
   }

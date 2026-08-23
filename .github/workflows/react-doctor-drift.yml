@@ -1,0 +1,69 @@
+# React Doctor — full-project drift scan.
+#
+# Runs the FULL React Doctor scan once per react-doctor VERSION, not on a cron:
+# the scan fires whenever package.json / pnpm-lock.yaml changes on master, and
+# an actions/cache entry keyed by the resolved react-doctor version makes each
+# version run exactly once. Exactly-once semantics come entirely from that
+# cache key:
+#   - Dependency bumps that don't touch react-doctor re-resolve to the same
+#     version, hit the cache, and skip both the marking step and the scan —
+#     costing only this no-op run.
+#   - A failed scan is never cached: actions/cache only saves on job success,
+#     so a crashed scan retries on the next trigger instead of being recorded
+#     as "seen".
+# This is the master-branch counterpart of the PR gate (react-doctor.yml): it
+# surfaces whole-repo debt trends without gating anything.
+name: React Doctor (drift scan)
+
+on:
+  push:
+    branches: [master]
+    paths: ["**/package.json", "**/pnpm-lock.yaml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: react-doctor-drift-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  drift-scan:
+    # Same fork-safe runner routing as the other quality jobs: forks always run
+    # on GitHub-hosted runners; USE_SELF_HOSTED_RUNNERS opts in to self-hosted.
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Resolved react-doctor version for the cache key. Read straight from the
+      # root package.json's exact pin rather than require()'ing the installed
+      # package — this workflow intentionally has no dependency install step.
+      - id: ver
+        run: echo "version=$(node -p "require('./package.json').devDependencies['react-doctor']")" >> "$GITHUB_OUTPUT"
+
+      # Cache-as-marker: a hit means this react-doctor version already had its
+      # full scan. Only saved if the job succeeds (see header).
+      - id: seen
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: .rd-drift
+          key: rd-drift-${{ steps.ver.outputs.version }}
+
+      - name: Mark this version as scanned
+        if: steps.seen.outputs.cache-hit != 'true'
+        run: mkdir -p .rd-drift && date > ".rd-drift/${{ steps.ver.outputs.version }}"
+
+      # Immutable SHA pin to the current v2 release (millionco/react-doctor
+      # v2.2.8); Renovate keeps the digest current via helpers:pinGitHubActionDigests.
+      - name: React Doctor (full drift scan)
+        if: steps.seen.outputs.cache-hit != 'true'
+        uses: millionco/react-doctor@01820bb4fd4d0a4aebcd8df2b2a143a098649cb2 # v2.2.8
+        with:
+          directory: apps/web
+          scope: full
+          blocking: warning

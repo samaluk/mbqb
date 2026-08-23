@@ -27,7 +27,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: react-doctor-${{ github.event.pull_request.number || github.ref }}
+  group: react-doctor-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
     # the other quality jobs): forks always run on GitHub-hosted runners, and
     # the USE_SELF_HOSTED_RUNNERS repo variable opts in to self-hosted runners.
     runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
-    timeout-minutes: 15
+    timeout-minutes: 20
     # Least-privilege at the workflow scope; the elevated write permissions the
     # Action needs for PR feedback are scoped to this job only.
     permissions:
@@ -52,6 +52,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
           clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
 
       # Immutable SHA pin to the current v2 release (millionco/react-doctor v2.2.8);
@@ -67,9 +68,6 @@ jobs:
           # Fail the workflow on ANY new finding (error OR warning) introduced
           # by the PR.
           blocking: warning
-          # Node runtime for the Action's own CLI install (matches the repo's
-          # engines pin of Node 24).
-          node-version: 24
           # PR feedback surfaces (all on by default; made explicit for intent).
           comment: true          # sticky summary comment (needs issues: write)
           review-comments: true  # inline review comments (needs pull-requests: write)
