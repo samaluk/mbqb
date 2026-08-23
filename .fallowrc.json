@@ -51,9 +51,7 @@
     "minTokens": 60,
     "minOccurrences": 2,
     "ignoreImports": true,
-    "default": {
-      "ignore": ["apps/web/src/migrations/**"]
-    }
+    "ignore": ["apps/web/src/migrations/**"]
   },
   "health": {
     "maxCyclomatic": 20,
