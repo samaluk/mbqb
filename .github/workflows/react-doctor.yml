@@ -57,12 +57,18 @@ jobs:
 
       # Resolve the react-doctor version the workspace pins so the scan below
       # runs the exact CLI the local hk gates run — not the Action default
-      # (react-doctor@latest). Read from the root manifest's exact pin rather
-      # than require()'ing the installed package: this workflow deliberately
-      # has no dependency-install step, so node_modules does not exist on a
-      # fresh runner.
+      # (react-doctor@latest). Read from pnpm-lock.yaml: there is no dependency
+      # install in this workflow, so node_modules resolution would always fail
+      # on runners, and package.json may hold a Renovate range — the lockfile
+      # carries the exact resolved version instead. (The [[:space:]] anchor
+      # matches this repo's pnpm-lock v9 keys, which have no leading slash,
+      # and keeps sibling packages like oxlint-plugin-react-doctor from
+      # matching.)
       - id: rdver
-        run: echo "version=$(node -p "require('./package.json').devDependencies['react-doctor']")" >> "$GITHUB_OUTPUT"
+        run: |
+          v="$(grep -m1 -oE '[[:space:]]react-doctor@[0-9]+\.[0-9]+\.[0-9]+' pnpm-lock.yaml | cut -d@ -f2-)"
+          if [ -z "$v" ]; then echo "::error::react-doctor version not found in pnpm-lock.yaml"; exit 1; fi
+          echo "version=$v" >> "$GITHUB_OUTPUT"
 
       # Immutable SHA pin to the current v2 release (millionco/react-doctor v2.2.8);
       # Renovate keeps the digest current via helpers:pinGitHubActionDigests.
