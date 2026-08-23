@@ -14,7 +14,7 @@ import { CanchasDataTable } from './CanchasDataTable'
 import { CanchasMapLoader } from './CanchasMapLoader'
 import { CanchasPagination } from './CanchasPagination'
 
-type CanchasFilteredResultsProps = {
+export type CanchasFilteredResultsProps = {
   results: CanchasResultsModel
 }
 

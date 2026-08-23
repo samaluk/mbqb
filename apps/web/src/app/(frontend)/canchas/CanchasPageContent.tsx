@@ -10,7 +10,7 @@ import { CanchasFilteredResults } from './CanchasFilteredResults'
 import { CanchasGeoProvider } from './CanchasGeoContext'
 import { CanchasViewControls } from './CanchasViewControls'
 
-type CanchasPageContentProps = {
+export type CanchasPageContentProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 

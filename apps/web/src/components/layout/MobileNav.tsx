@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-type NavItem = {
+export type NavItem = {
   href: string
   label: string
 }

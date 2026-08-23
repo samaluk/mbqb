@@ -2,12 +2,12 @@ import { createHash } from 'crypto'
 
 import { normalizeRut } from '@/lib/rut'
 
-type ActiveMembershipPrivacyFields = {
+export type ActiveMembershipPrivacyFields = {
   normalizedRut: string
   rutLookupHash: string
 }
 
-type ActiveMembershipLookup =
+export type ActiveMembershipLookup =
   | {
       ok: true
       lookupHash: string

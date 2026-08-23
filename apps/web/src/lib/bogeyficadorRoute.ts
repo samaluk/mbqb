@@ -1,9 +1,9 @@
 import type { BogeyficadorResult } from './bogeyficador'
 import type { RateLimiter } from './rateLimit'
 
-type CheckMembership = (rut: string) => Promise<BogeyficadorResult>
+export type CheckMembership = (rut: string) => Promise<BogeyficadorResult>
 
-type BogeyficadorCheckDependencies = {
+export type BogeyficadorCheckDependencies = {
   checkMembership: CheckMembership
   clientKey: string
   rateLimiter?: RateLimiter

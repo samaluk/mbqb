@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-type CanchasColumnControlsProps = {
+export type CanchasColumnControlsProps = {
   columns: {
     id: string
     label: string
