@@ -64,25 +64,24 @@ const loadLocalEnv = () => requireEnvFile('.env.local', 'cd apps/web && pnpm env
 
 /** Local build/migrate and CI: `.env.local` or injected env — never production pull. */
 export const loadBuildEnv = () => {
-  if (process.env.VERCEL) {
-    applyBuildDefaults()
-    return
-  }
-
   const localFile = path.join(appDir, '.env.local')
+
+  if (process.env.VERCEL) return applyBuildDefaults()
+
   if (existsSync(localFile)) {
     loadDotenvFileSkipEmpty(localFile)
-    applyBuildDefaults()
-    return
+    return applyBuildDefaults()
   }
 
-  if (process.env.CI || process.env.POSTGRES_URL?.trim()) {
-    applyBuildDefaults()
-    return
-  }
+  if (hasInjectedRuntimeEnv()) return applyBuildDefaults()
 
   throw new Error(`Missing ${localFile}. Run: cd apps/web && pnpm env:pull`)
 }
+
+/** CI and docker-style environments inject the DB config instead of pulling a file. */
+const hasInjectedRuntimeEnv = () => Boolean(process.env.CI) || hasProcessEnvValue('POSTGRES_URL')
+
+const hasProcessEnvValue = (name: string) => Boolean(process.env[name]?.trim())
 
 /** Vitest / Playwright: `.env.local` locally; in CI use workflow-injected env. */
 export const loadTestEnv = () => {
@@ -99,17 +98,27 @@ export const loadTestEnv = () => {
 
 /** Production DB scripts only: `pnpm env:pull:production` → `.env.production.local`. */
 export const loadProductionEnv = () => {
-  const configured = process.env.DOTENV_CONFIG_PATH ?? '.env.production.local'
-  const file = path.isAbsolute(configured) ? configured : path.join(appDir, configured)
+  const file = resolveProductionEnvFile()
 
-  if (existsSync(file)) {
-    sanitizePulledEnvFile(file)
-    loadDotenvFileSkipEmpty(file)
-  } else if (process.env.VERCEL || process.env.POSTGRES_URL?.trim()) {
-    // Vercel injects env at build/deploy time — no pulled file on disk.
-  } else {
-    throw new Error(`Missing ${file}. Run: cd apps/web && pnpm env:pull:production`)
-  }
+  if (existsSync(file)) return loadPulledProductionFile(file)
+  if (hasDeployInjectedEnv()) return // Vercel injects env at build/deploy time — no pulled file on disk.
+
+  throw new Error(`Missing ${file}. Run: cd apps/web && pnpm env:pull:production`)
+}
+
+function resolveProductionEnvFile() {
+  const configured = process.env.DOTENV_CONFIG_PATH ?? '.env.production.local'
+
+  return path.isAbsolute(configured) ? configured : path.join(appDir, configured)
+}
+
+function loadPulledProductionFile(file: string) {
+  sanitizePulledEnvFile(file)
+  loadDotenvFileSkipEmpty(file)
+}
+
+function hasDeployInjectedEnv() {
+  return Boolean(process.env.VERCEL) || hasProcessEnvValue('POSTGRES_URL')
 }
 
 /** Payload/DB scripts: production env when `NODE_ENV=production`, else local. */

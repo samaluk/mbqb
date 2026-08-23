@@ -7,16 +7,21 @@ import { loadEnvForScript } from './loadScriptEnv.js'
 loadEnvForScript()
 await import('../src/env.js')
 
-const validRoles = new Set<StaffRole>(['admin', 'editor', 'validation-manager'])
+const staffRolesByName: Record<string, StaffRole> = {
+  admin: 'admin',
+  editor: 'editor',
+  'validation-manager': 'validation-manager',
+}
 
 function parseStaffRole(value: string | undefined): StaffRole {
   const role = value?.trim() || 'admin'
+  const parsed = staffRolesByName[role]
 
-  if (role === 'admin' || role === 'editor' || role === 'validation-manager') {
-    return role
+  if (!parsed) {
+    throw new Error(`CMS_USER_ROLE must be one of: ${Object.keys(staffRolesByName).join(', ')}`)
   }
 
-  throw new Error(`CMS_USER_ROLE must be one of: ${[...validRoles].join(', ')}`)
+  return parsed
 }
 
 const getRequiredEnv = (name: string) => {
