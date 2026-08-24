@@ -16,7 +16,7 @@ them.
 | `hk check` | `pnpm test:coverage && pnpm fallow:ci` | manual deep check, same scope as pre-push |
 | CI — [`.github/workflows/fallow.yml`](.github/workflows/fallow.yml) | gate job runs `pnpm fallow:ci` | blocking on pull_request and push to master |
 | CI — review job | pinned `fallow-rs/fallow` Action at `gate: all` | PR feedback: sticky comment, Check Run, inline review comments |
-| drift — [`fallow-drift.yml`](.github/workflows/fallow-drift.yml) | bare-mode full scan via the Action | once per resolved fallow version, fully blocking |
+| drift — [`fallow-drift.yml`](.github/workflows/fallow-drift.yml) | `pnpm test:coverage && pnpm fallow:ci` | same covered scan as pre-push, once per resolved fallow version, fully blocking |
 
 The canonical scripts live in the root `package.json`:
 
@@ -29,8 +29,13 @@ pnpm fallow:ci       # canonical alias of fallow:full — what pre-push, hk chec
 
 Coverage coupling is explicit: gates that score CRAP pass
 `--coverage coverage/coverage-final.json` and require it to exist (run
-`pnpm test:coverage` first). The shared config carries no coverage key, so a
-zero-install drift scan can run the same config with module-graph estimation.
+`pnpm test:coverage` first). The shared config carries no coverage key. The
+drift scan installs and generates real coverage rather than relying on
+zero-install estimation: without node_modules, fallow warns its results are
+inaccurate, type-aware analysis degrades to partial, and the bare scan
+reported an unused-dependency false positive plus two estimated-CRAP findings
+that real coverage clears — so only covered runs give every surface the same
+verdict.
 
 ## Command reference
 
@@ -97,9 +102,11 @@ count so content or count changes re-report them.
 ### Coverage and health
 
 `pnpm test:coverage` writes Istanbul-format `coverage/coverage-final.json`.
-Health thresholds: cyclomatic 20, cognitive 15, CRAP 30, unit size 60. Every
-flagged function sits below them; the drift scan proves the set stays clean
-across tool upgrades. The `coverage-gaps` rule remains advisory `warn`.
+Health thresholds: cyclomatic 20, cognitive 15, CRAP 30, unit size 60 — a
+function is flagged when it meets or exceeds them, and under covered gates
+none does. The drift scan runs the same covered pipeline per fallow version,
+so tool upgrades cannot silently change the verdict. The `coverage-gaps` rule
+remains advisory `warn`.
 
 ### Architecture boundaries
 
@@ -128,4 +135,5 @@ CI splits quality jobs so a pull request goes green fast:
   PostGIS.
 
 Each is its own required status check on the `master` branch ruleset. The
-drift workflow runs separately per fallow version, also blocking.
+drift workflow runs the same covered scan once per resolved fallow version,
+also blocking.
