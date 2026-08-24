@@ -183,9 +183,10 @@ export async function loadCanchasBrowsing({
   ])
 
   const tableDocs = tableResult ? annotatePool(tableResult.docs, userGeo) : []
+  const annotatedCardPool = poolResult ? annotatePool(poolResult.docs, userGeo) : null
   const pagination = buildResultsPagination({
-    cardsPagination: poolResult
-      ? paginateCanchas(annotatePool(poolResult.docs, userGeo), filters.page, filters.pageSize)
+    cardsPagination: annotatedCardPool
+      ? paginateCanchas(annotatedCardPool, filters.page, filters.pageSize)
       : null,
     filterOptionsSearch: hrefSearchParams,
     filters,
@@ -202,10 +203,7 @@ export async function loadCanchasBrowsing({
     view,
   }
   const results: CanchasResultsModel = {
-    mapCanchas:
-      userGeo && view === 'cards' && poolResult
-        ? annotatePool(poolResult.docs, userGeo)
-        : undefined,
+    mapCanchas: userGeo && annotatedCardPool ? annotatedCardPool : undefined,
     navigation: {
       sortLinks: buildSortLinks(hrefSearchParams, filters.sort, userGeo !== null),
     },
