@@ -79,7 +79,10 @@ function useMaxDistanceControls(userGeo: StoredUserGeo | null, setUserGeo: SetUs
 
   // React Compiler caches these callbacks automatically.
   const cancelPendingPersist = () => {
-    if (persistMaxKmTimeout.current) window.clearTimeout(persistMaxKmTimeout.current)
+    if (persistMaxKmTimeout.current === null) return
+
+    window.clearTimeout(persistMaxKmTimeout.current)
+    persistMaxKmTimeout.current = null
   }
 
   const persistMaxDistance = (value: number) => {
@@ -94,6 +97,7 @@ function useMaxDistanceControls(userGeo: StoredUserGeo | null, setUserGeo: SetUs
 
     if (!userGeo) return notifyLocationRequired()
 
+    cancelPendingPersist()
     persistMaxKmTimeout.current = window.setTimeout(() => {
       persistMaxDistance(value)
     }, 300)
