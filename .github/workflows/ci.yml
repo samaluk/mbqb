@@ -98,13 +98,12 @@ jobs:
           name: coverage
           path: coverage
 
-      # Authoritative strict Fallow migration gate (dead-code, dupes, health,
-      # private-type leaks) for the diff. Mirrors `pnpm fallow:ci`; the review
-      # job below owns the PR feedback surface.
+      # Whole-repository Fallow scan (dead-code, dupes, health with coverage,
+      # fail-on-issues) — `fallow:ci` now resolves to the full scan, so any
+      # finding anywhere in the repo blocks until fixed or suppressed. The
+      # review job below owns the PR feedback surface.
       - name: Fallow CI gate
         run: pnpm fallow:ci
-        env:
-          FALLOW_AUDIT_BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || 'origin/master' }}
 
   review:
     name: Fallow PR review
