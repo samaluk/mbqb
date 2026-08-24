@@ -29,13 +29,13 @@ export const getPayloadDocBySlug = cache(async function getPayloadDocBySlug<
 })
 
 /** Draft-mode dispatch for listing routes (see {@link getPayloadDocBySlug}). */
-export async function getPayloadDocs<TSlug extends CollectionSlug<Config>>(
-  collection: TSlug,
-): Promise<DataFromCollectionSlug<TSlug>[]> {
+export const getPayloadDocs = cache(async function getPayloadDocs<
+  TSlug extends CollectionSlug<Config>,
+>(collection: TSlug): Promise<DataFromCollectionSlug<TSlug>[]> {
   const { isEnabled: draft } = await draftMode()
 
   return draft ? await getDraftPayloadDocs(collection) : await getPublishedPayloadDocs(collection)
-}
+})
 
 /**
  * `generateMetadata` factory for detail routes: titles the page after the
