@@ -1,9 +1,9 @@
 # Fallow — fully-blocking quality gate plus native PR feedback.
 #
-# The gate job runs the FULL repository scan (`pnpm fallow:full`: dead-code,
-# duplication, complexity/CRAP with fresh coverage, fail-on-issues) over fresh
-# test coverage. There is no pre-existing backlog to grandfather (#264), so a
-# single new finding fails the run.
+# The gate job runs the FULL repository scan via `pnpm fallow:ci` (the
+# canonical alias; dead-code, duplication, complexity/CRAP with fresh
+# coverage, fail-on-issues) over fresh test coverage. There is no pre-existing
+# backlog to grandfather (#264), so a single new finding fails the run.
 #
 # The review job is the PR feedback surface of the same analysis: sticky
 # summary comment, Check Run, and inline review comments from the pinned
@@ -56,7 +56,7 @@ jobs:
           retention-days: 1
 
       - name: Fallow CI gate
-        run: pnpm fallow:full
+        run: pnpm fallow:ci
 
   review:
     name: Fallow PR review
