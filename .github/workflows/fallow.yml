@@ -60,7 +60,11 @@ jobs:
 
   review:
     name: Fallow PR review
-    if: github.event_name == 'pull_request'
+    # Run even when the gate failed — that is exactly when the sticky
+    # comment / Check Run / inline comments must render. `!cancelled()` (not
+    # `always()`) keeps a cancelled run from posting; the coverage artifact is
+    # uploaded before the scan step, so it exists whenever the scan itself ran.
+    if: ${{ !cancelled() && github.event_name == 'pull_request' }}
     needs: gate
     # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
     runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
