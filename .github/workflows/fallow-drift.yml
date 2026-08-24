@@ -29,9 +29,10 @@ concurrency:
 
 jobs:
   drift-scan:
-    # Same fork-safe runner routing as the other quality jobs: forks always run
-    # on GitHub-hosted runners; USE_SELF_HOSTED_RUNNERS opts in to self-hosted.
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
+    # Push-only workflow: forks cannot push to master, so the other quality
+    # jobs' pull_request fork check is meaningless here. USE_SELF_HOSTED_RUNNERS
+    # opts in to self-hosted.
+    runs-on: ${{ vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest' }}
     timeout-minutes: 20
 
     steps:
@@ -69,6 +70,9 @@ jobs:
       # dupes + health). No coverage is generated here — health falls back to
       # module-graph CRAP estimation, which matches the covered result set for
       # this repo; that consistency is what makes per-version drift meaningful.
+      # Type-aware works without an install: with `type-aware: true` the
+      # Action provisions an exact-version fallow-type-aware sidecar during
+      # its install step, independent of node_modules.
       # Fully blocking: fail-on-issues defaults to true.
       - name: Fallow (full drift scan)
         if: steps.seen.outputs.cache-hit != 'true'
