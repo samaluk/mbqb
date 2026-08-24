@@ -17,6 +17,7 @@ on:
   push:
     branches: [master]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
@@ -36,6 +37,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
           clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
 
       - uses: ./.github/actions/setup-toolchain
@@ -74,6 +76,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
           clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
 
       - uses: ./.github/actions/setup-toolchain
