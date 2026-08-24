@@ -23,15 +23,14 @@ const firstSliderValue = (value: readonly number[] | number): number =>
   typeof value === 'number' ? value : (value[0] ?? defaultMaxDistanceKm)
 
 type LocateHandlers = {
-  onDenied: (message: string) => void
-  onError: (message: string) => void
+  onFailure: (message: string) => void
   onResolved: (geo: StoredUserGeo | null) => void
   fallbackMaxKm: number
 }
 
 /** Browser geolocation wrapped so the component only handles outcomes. */
-function locateCurrentUser({ fallbackMaxKm, onDenied, onError, onResolved }: LocateHandlers) {
-  if (!navigator.geolocation) return onDenied('Tu navegador no permite compartir ubicación.')
+function locateCurrentUser({ fallbackMaxKm, onFailure, onResolved }: LocateHandlers) {
+  if (!navigator.geolocation) return onFailure('Tu navegador no permite compartir ubicación.')
 
   navigator.geolocation.getCurrentPosition(
     (position) => {
@@ -41,11 +40,11 @@ function locateCurrentUser({ fallbackMaxKm, onDenied, onError, onResolved }: Loc
         fallbackMaxKm,
       )
 
-      if (!geo) return onError('No pudimos guardar tu ubicación. Intenta de nuevo.')
+      if (!geo) return onFailure('No pudimos guardar tu ubicación. Intenta de nuevo.')
 
       onResolved(geo)
     },
-    () => onError('No pudimos obtener tu ubicación. Revisa los permisos del navegador.'),
+    () => onFailure('No pudimos obtener tu ubicación. Revisa los permisos del navegador.'),
     {
       enableHighAccuracy: true,
       maximumAge: 60_000,
@@ -122,8 +121,7 @@ export function CanchasLocationFilter() {
 
     locateCurrentUser({
       fallbackMaxKm: userGeo?.maxKm ?? defaultMaxDistanceKm,
-      onDenied: setLocationError,
-      onError: (message) => {
+      onFailure: (message) => {
         setIsLocating(false)
         setLocationError(message)
       },
