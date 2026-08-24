@@ -66,6 +66,37 @@ jobs:
         if: steps.seen.outputs.cache-hit != 'true'
         run: mkdir -p .fallow-drift && date > ".fallow-drift/${{ steps.fver.outputs.version }}"
 
+      # The Fallow Action installs its CLI globally with npm and locates the
+      # install by parsing `npm root -g` output. Two quirks of the homerun
+      # self-hosted runners break that: npm 11 redacts UUID-shaped segments in
+      # every command's stdout (@npmcli/redact), and the runner directories
+      # embed a UUID — so any prefix under the runner home makes the Action
+      # verify against a mangled path and fail with platform-package-missing.
+      # Provision a UUID-free prefix first: inert on GitHub-hosted runners,
+      # protective on self-hosted ones. Same workaround as fallow.yml's review
+      # job; versions come from the fver step so the pre-install matches what
+      # the Action verifies below.
+      - name: Provision isolated Fallow npm prefix
+        if: steps.seen.outputs.cache-hit != 'true'
+        run: |
+          fallow_prefix="${RUNNER_TOOL_CACHE:-${RUNNER_TEMP}}/fallow-global-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
+          if printf '%s' "$fallow_prefix" | grep -qE '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}'; then
+            fallow_prefix="$(mktemp -d)/fallow-global-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
+          fi
+          mkdir -p "$fallow_prefix"
+          echo "NPM_CONFIG_PREFIX=$fallow_prefix" >> "$GITHUB_ENV"
+          echo "$fallow_prefix/bin" >> "$GITHUB_PATH"
+          case "${RUNNER_OS}:${RUNNER_ARCH}" in
+            macOS:ARM64) fallow_platform="@fallow-cli/darwin-arm64" ;;
+            Linux:X64) fallow_platform="@fallow-cli/linux-x64-gnu" ;;
+            *)
+              echo "Unsupported Fallow runner: ${RUNNER_OS}:${RUNNER_ARCH}" >&2
+              exit 1
+              ;;
+          esac
+          NPM_CONFIG_PREFIX="$fallow_prefix" npm install --global --ignore-scripts \
+            "fallow@${{ steps.fver.outputs.version }}" "${fallow_platform}@${{ steps.fver.outputs.version }}"
+
       # Full-scope scan via the pinned Action (bare command = dead-code +
       # dupes + health). No coverage is generated here — health falls back to
       # module-graph CRAP estimation, which matches the covered result set for
