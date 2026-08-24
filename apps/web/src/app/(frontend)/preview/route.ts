@@ -14,19 +14,22 @@ const notAllowed = () => new Response('You are not allowed to preview this page'
 
 export async function GET(req: Request) {
   const payload = await getPayload({ config })
-  const request = parsePreviewRequest(req)
+  const parsed = parsePreviewRequest(req)
 
-  if (request instanceof Response) return request
+  if ('error' in parsed) return parsed.error
 
   const authError = await enableDraftForAuthenticatedUser(req, payload)
 
   if (authError) return authError
 
-  return redirect(request.path)
+  return redirect(parsed.request.path)
 }
 
-/** Validates preview params; returns the error response or the parsed request. */
-function parsePreviewRequest(req: Request): PreviewRequest | Response {
+/** Outcome of preview param validation and secret check. */
+type ParsedPreviewRequest = { error: Response } | { request: PreviewRequest }
+
+/** Validates preview params and the shared secret; exactly one channel is set. */
+function parsePreviewRequest(req: Request): ParsedPreviewRequest {
   const { searchParams } = new URL(req.url)
   const request = asPreviewRequest({
     path: searchParams.get('path'),
@@ -34,15 +37,17 @@ function parsePreviewRequest(req: Request): PreviewRequest | Response {
     slug: searchParams.get('slug'),
   })
 
-  if (!request) return new Response('Insufficient search params', { status: 404 })
+  if (!request) return { error: new Response('Insufficient search params', { status: 404 }) }
 
-  if (searchParams.get('previewSecret') !== env.PREVIEW_SECRET) return notAllowed()
+  if (searchParams.get('previewSecret') !== env.PREVIEW_SECRET) return { error: notAllowed() }
 
   if (!request.path.startsWith('/')) {
-    return new Response('This endpoint can only be used for relative previews', { status: 500 })
+    return {
+      error: new Response('This endpoint can only be used for relative previews', { status: 500 }),
+    }
   }
 
-  return request
+  return { request }
 }
 
 function asPreviewRequest(raw: {
