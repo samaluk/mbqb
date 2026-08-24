@@ -134,8 +134,18 @@ boundary violations are errors. Existing findings are still mergeable under
 
 Duplication uses semantic mode with near detection, an 8-line/60-token floor,
 `minOccurrences: 2`, and import wiring ignored. Pair-level findings are
-visible. No existing clone fingerprints are placed in `ignoredClones`, and no
-duplication baseline exists.
+visible; no duplication baseline exists.
+
+Reviewed exceptions live in config instead. Ten `ignoredClones` entries — each
+keyed `<fingerprint>:<occurrence count>`, so any content or count change makes
+the group reportable again — cover the vendored shadcn/Base UI primitives under
+`components/ui/*.tsx` (extracting repeated blocks would diverge them from their
+upstream source and complicate shadcn updates) and two intentional `styles.css`
+clone families (the @theme token-mapping and `:root` value definitions are
+different concerns that both happen to be long custom-property lists; the
+hero-video scrim overlays differ by design in gradient angle and stop values).
+Generated surfaces are excluded outright through `duplicates.ignore`:
+migrations and Payload's do-not-modify admin files under `app/(payload)/**`.
 
 ### Coverage and health
 

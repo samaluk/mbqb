@@ -52,7 +52,33 @@
     "minTokens": 60,
     "minOccurrences": 2,
     "ignoreImports": true,
-    "ignore": ["apps/web/src/migrations/**"]
+    // Reviewed clone exceptions — each key is "<fingerprint>:<occurrence count>",
+    // so a content or count change makes the group reportable again.
+    "ignoredClones": [
+      // Vendored shadcn/Base UI primitives under components/ui/*.tsx: the
+      // repeated blocks are upstream's own component patterns; extracting them
+      // would diverge the vendored files from their source and make future
+      // shadcn updates painful.
+      "dup:c77b3abb6f87acd9-1:2",
+      "dup:c77b3abb6f87acd9-2:5",
+      "dup:c77b3abb6f87acd9-3:2",
+      "dup:c77b3abb6f87acd9-4:2",
+      "dup:c77b3abb6f87acd9-5:2",
+      "dup:c77b3abb6f87acd9-6:2",
+      "dup:f7c28f72:2",
+      // styles.css: the @theme token-mapping block and the :root value
+      // definitions are two different concerns that happen to both be long
+      // lists of custom properties.
+      "dup:5994a08b:2",
+      "dup:a74aa6b3:2",
+      // styles.css: hero-video scrim overlays; the desktop and mobile variants
+      // differ intentionally in gradient angle and stop values.
+      "dup:f1c3dcc8:2"
+    ],
+    "ignore": [
+      "apps/web/src/migrations/**",
+      "apps/web/src/app/(payload)/**"
+    ]
   },
   "health": {
     "maxCyclomatic": 20,
