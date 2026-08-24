@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils'
 
 import { CanchasPageSizeSelect } from './CanchasPageSizeSelect'
 
-type CanchasPaginationProps = {
+export type CanchasPaginationProps = {
   pagination: CanchasPaginationModel
 }
 

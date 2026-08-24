@@ -1,6 +1,6 @@
 import { env } from '@/env'
 
-type PreviewTarget = {
+export type PreviewTarget = {
   collection: string
   path: string
   slug: string
@@ -11,7 +11,7 @@ function normalizeLocale(locale: unknown) {
   return typeof locale === 'string' ? locale : null
 }
 
-export function buildPreviewPath(path: string, locale?: unknown) {
+function buildPreviewPath(path: string, locale?: unknown) {
   const normalizedLocale = normalizeLocale(locale)
   if (!normalizedLocale || normalizedLocale === 'es') {
     return path

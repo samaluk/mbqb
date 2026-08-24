@@ -22,7 +22,7 @@ import type { CanchasControlsModel } from '@/lib/canchasBrowsing'
 import { useCanchasGeo } from './CanchasGeoContext'
 import { CanchasLocationFilter } from './CanchasLocationFilter'
 
-type CanchasViewControlsProps = {
+export type CanchasViewControlsProps = {
   controls: CanchasControlsModel
 }
 

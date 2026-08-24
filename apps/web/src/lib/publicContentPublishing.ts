@@ -17,15 +17,15 @@ type PublicContentPublishingTarget = {
   listingPath: string
 }
 
-type SlugData = {
+export type SlugData = {
   slug?: unknown
 }
 
-type MaybePublicDoc = SlugData & {
+export type MaybePublicDoc = SlugData & {
   _status?: unknown
 }
 
-type RevalidatePath = (path: string) => void
+export type RevalidatePath = (path: string) => void
 
 const publicContentTargets = {
   canchas: {
@@ -102,11 +102,11 @@ export function getPublicContentPreviewUrl({
   })
 }
 
-export function getPublicContentListingPath(collection: PublicContentCollection) {
+function getPublicContentListingPath(collection: PublicContentCollection) {
   return publicContentTargets[collection].listingPath
 }
 
-export function getPublicContentDetailPath(collection: PublicContentCollection, slug: string) {
+function getPublicContentDetailPath(collection: PublicContentCollection, slug: string) {
   return `${publicContentTargets[collection].detailPrefix}/${slug}`
 }
 

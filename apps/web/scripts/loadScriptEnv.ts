@@ -60,7 +60,7 @@ export const sanitizePulledEnvFile = (file: string) => {
 }
 
 /** Local dev: Vercel Development env → `pnpm env:pull` → `.env.local`. */
-export const loadLocalEnv = () => requireEnvFile('.env.local', 'cd apps/web && pnpm env:pull')
+const loadLocalEnv = () => requireEnvFile('.env.local', 'cd apps/web && pnpm env:pull')
 
 /** Local build/migrate and CI: `.env.local` or injected env — never production pull. */
 export const loadBuildEnv = () => {
