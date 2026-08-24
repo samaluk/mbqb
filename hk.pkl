@@ -120,7 +120,7 @@ hooks {
       // Full scope, because there is no backlog to grandfather (#264).
       ["fallow"] {
         depends = List("fetch")
-        check = "pnpm test:coverage && pnpm fallow:full"
+        check = "pnpm test:coverage && pnpm fallow:ci"
         output_summary = "combined"
       }
     }
@@ -129,7 +129,8 @@ hooks {
   // default: staged files, --all for the whole tree, --unstaged for working-tree
   // changes), `hk fix` (auto-fixes). React Doctor and Fallow here are the
   // manual deep checks: full-tree scans (the hook variants are scoped — see
-  // above). fallow:full expects coverage from a prior `pnpm test:coverage`.
+  // above). fallow:ci (the canonical full-scan alias) expects coverage from a
+  // prior `pnpm test:coverage`.
   ["check"] {
     steps {
       ...fixers
@@ -138,7 +139,7 @@ hooks {
         check = "pnpm react-doctor:full"
       }
       ["fallow-full"] {
-        check = "pnpm test:coverage && pnpm fallow:full"
+        check = "pnpm test:coverage && pnpm fallow:ci"
         output_summary = "combined"
       }
     }

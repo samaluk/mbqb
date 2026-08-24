@@ -10,12 +10,13 @@ Run coverage before commands that consume it:
 
 ```bash
 pnpm test:coverage
-pnpm fallow:full
+pnpm fallow:ci
 ```
 
 Pre-commit blocks on findings in staged hunks (`pnpm fallow:staged`); pre-push,
-`hk check`, and CI run the full-repository scan (`pnpm fallow:full`; the
-`fallow:ci` alias resolves to it). Config sets `audit.gate: all`, so native
+Pre-commit blocks on findings in staged hunks (`pnpm fallow:staged`); pre-push,
+`hk check`, and CI run the full-repository scan via the `fallow:ci` alias,
+which resolves to `pnpm fallow:full`. Config sets `audit.gate: all`, so native
 audit invocations are strict by default. The hook-path audits are deliberately
 coverage-free, so committing on a fresh clone never requires a generated
 artifact; coverage enters where tests have already run.
