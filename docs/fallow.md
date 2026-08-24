@@ -12,9 +12,9 @@ them.
 | Surface | Command | Scope |
 |---|---|---|
 | pre-commit | `pnpm fallow:staged` | every finding on staged hunks (`audit --diff-stdin --gate all`) |
-| pre-push | `pnpm test:coverage && pnpm fallow:full` | FULL repository scan over fresh coverage |
-| `hk check` | `pnpm test:coverage && pnpm fallow:full` | manual deep check, same scope as pre-push |
-| CI — [`.github/workflows/fallow.yml`](.github/workflows/fallow.yml) | gate job runs `pnpm fallow:full` | blocking on pull_request and push to master |
+| pre-push | `pnpm test:coverage && pnpm fallow:ci` | FULL repository scan over fresh coverage |
+| `hk check` | `pnpm test:coverage && pnpm fallow:ci` | manual deep check, same scope as pre-push |
+| CI — [`.github/workflows/fallow.yml`](.github/workflows/fallow.yml) | gate job runs `pnpm fallow:ci` | blocking on pull_request and push to master |
 | CI — review job | pinned `fallow-rs/fallow` Action at `gate: all` | PR feedback: sticky comment, Check Run, inline review comments |
 | drift — [`fallow-drift.yml`](.github/workflows/fallow-drift.yml) | bare-mode full scan via the Action | once per resolved fallow version, fully blocking |
 
@@ -24,7 +24,7 @@ The canonical scripts live in the root `package.json`:
 pnpm fallow          # passthrough to the CLI
 pnpm fallow:staged   # strict audit over the staged diff (pre-commit)
 pnpm fallow:full     # full scan: dead-code + dupes + health, fail-on-issues
-pnpm fallow:ci       # alias of fallow:full used by CI and pre-push
+pnpm fallow:ci       # canonical alias of fallow:full — what pre-push, hk check, and CI run
 ```
 
 Coverage coupling is explicit: gates that score CRAP pass
@@ -115,7 +115,7 @@ violations.
   `fallow:staged`, unit tests, and the staged React Doctor scan.
 - **Pre-push** checks the environment, typechecks, fetches origin/master,
   runs the changed-scope React Doctor gate, builds, generates fresh coverage,
-  and runs `fallow:full` (depends on the fetch step).
+  and runs the full scan via `fallow:ci` (depends on the fetch step).
 
 CI splits quality jobs so a pull request goes green fast:
 
