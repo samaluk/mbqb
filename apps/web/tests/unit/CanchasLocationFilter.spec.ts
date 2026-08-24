@@ -10,21 +10,27 @@ import type { StoredUserGeo } from '@/lib/canchasUserGeo'
  * filter relies on (`onValueChange` per drag tick, `onValueCommitted` on
  * release).
  */
-const stubs = vi.hoisted(() => ({
-  geo: null as null | {
+const stubs = vi.hoisted(() => {
+  type CapturedGeo = {
     hasGeoFilter: boolean
     isGeoPending: boolean
     setUserGeo: (geo: unknown) => void
     userGeo: unknown
-  },
-  sliderProps: null as null | {
+  }
+
+  type CapturedSliderProps = {
     onValueChange: (value: number[]) => void
     onValueCommitted: (value: number[]) => void
-  },
-}))
+  }
+
+  const geo: { current: CapturedGeo | null } = { current: null }
+  const sliderProps: { current: CapturedSliderProps | null } = { current: null }
+
+  return { geo, sliderProps }
+})
 
 vi.mock('@/app/(frontend)/canchas/CanchasGeoContext', () => ({
-  useCanchasGeo: () => stubs.geo,
+  useCanchasGeo: () => stubs.geo.current,
 }))
 
 vi.mock('@/components/ui/slider', async () => {
@@ -35,7 +41,7 @@ vi.mock('@/components/ui/slider', async () => {
       onValueChange?: (value: number[]) => void
       onValueCommitted?: (value: number[]) => void
     }) {
-      stubs.sliderProps = {
+      stubs.sliderProps.current = {
         onValueChange: props.onValueChange ?? (() => {}),
         onValueCommitted: props.onValueCommitted ?? (() => {}),
       }
@@ -55,16 +61,18 @@ const geoAt = (maxKm: number): StoredUserGeo => ({
 function renderLocationFilter(userGeo: StoredUserGeo | null) {
   const setUserGeo = vi.fn()
 
-  stubs.geo = {
+  stubs.geo.current = {
     hasGeoFilter: userGeo !== null,
     isGeoPending: false,
-    setUserGeo: (geo) => setUserGeo(geo),
+    setUserGeo: (geo) => {
+      setUserGeo(geo)
+    },
     userGeo,
   }
 
   render(React.createElement(CanchasLocationFilter))
 
-  const slider = stubs.sliderProps
+  const slider = stubs.sliderProps.current
   if (!slider) throw new Error('Slider stub did not render')
 
   return {
@@ -78,8 +86,8 @@ describe('CanchasLocationFilter max-distance persistence', () => {
   afterEach(() => {
     cleanup()
     vi.useRealTimers()
-    stubs.geo = null
-    stubs.sliderProps = null
+    stubs.geo.current = null
+    stubs.sliderProps.current = null
   })
 
   it('coalesces a drag into one debounced persist and lets the commit win over trailing timers', () => {
