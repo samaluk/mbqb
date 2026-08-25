@@ -14,7 +14,6 @@ pnpm fallow:ci
 ```
 
 Pre-commit blocks on findings in staged hunks (`pnpm fallow:staged`); pre-push,
-Pre-commit blocks on findings in staged hunks (`pnpm fallow:staged`); pre-push,
 `hk check`, and CI run the full-repository scan via the `fallow:ci` alias,
 which resolves to `pnpm fallow:full`. Config sets `audit.gate: all`, so native
 audit invocations are strict by default. The hook-path audits are deliberately
