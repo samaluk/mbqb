@@ -1,26 +1,24 @@
 # Fallow adoption gate
 
-MBQB is in the Fallow 3.17 ADOPTION state. The repository deliberately keeps
-existing findings visible while blocking newly introduced debt with native
-`fallow audit --gate new-only`. This is a migration guard, not the strict
-zero-debt architecture. The later transition is tracked in [issue #264](https://github.com/samaluk/mbqb/issues/264), with [fintual-api #405](https://github.com/samaluk/fintual-api/pull/405) as the steady-state reference.
+MBQB is converging on the Fallow 3.17 zero-debt state. Config sets
+`audit.gate: all`, so native audits are strict by default: any finding — new or
+inherited — fails the gate. The convergence plan is tracked in [issue #264](https://github.com/samaluk/mbqb/issues/264), with [fintual-api #405](https://github.com/samaluk/fintual-api/pull/405) as the steady-state reference.
 
-## Blocking migration gate
+## Blocking gates
 
-`pnpm fallow:audit` is the authoritative local migration gate:
+Run coverage before commands that consume it:
 
-```text
-fallow audit --gate new-only --type-aware
+```bash
+pnpm test:coverage
+pnpm fallow:ci
 ```
 
-The hook-path audits are deliberately coverage-free, so committing on a fresh
-clone never requires a generated artifact; coverage enters where tests have
-already run (`fallow:full`, the pre-push hook, CI).
-
-Only findings introduced by the changeset drive the verdict. Existing findings
-remain in the report and are mergeable. `pnpm fallow:ci` no longer aliases
-this audit: it resolves to `pnpm fallow:full`, the whole-repository
-zero-tolerance scan that CI gates on.
+Pre-commit blocks on findings in staged hunks (`pnpm fallow:staged`); pre-push,
+`hk check`, and CI run the full-repository scan via the `fallow:ci` alias,
+which resolves to `pnpm fallow:full`. Config sets `audit.gate: all`, so native
+audit invocations are strict by default. The hook-path audits are deliberately
+coverage-free, so committing on a fresh clone never requires a generated
+artifact; coverage enters where tests have already run.
 
 The first migration audit can report a type-aware identity warning because the
 3.15 base and 3.17 head use different semantic schema versions. Fallow falls
@@ -127,8 +125,8 @@ merge base. Activating it belongs in a follow-up once the pack is present on the
 base branch.
 
 Private type leaks, stale suppressions, missing suppression reasons, and
-boundary violations are errors. Existing findings are still mergeable under
-`new-only`; a new finding of any of these kinds blocks the audit.
+boundary violations are errors; under `audit.gate: all` any of them blocks the
+audit.
 
 ### Duplication
 
@@ -181,21 +179,17 @@ The ten zones cover application routes, UI, business/integration logic, access
 policies, Payload collections/globals, runtime configuration, migrations, tests,
 scripts, and tooling. Boundary coverage requires every analyzed source file to
 match a zone, with only narrow unmatched exceptions for declaration files and
-CSS/SCSS assets. The full scan currently has no violations; `new-only` prevents
-new violations while inherited application debt is addressed later.
+CSS/SCSS assets. The full scan currently has no violations; strict gating
+prevents new ones.
 
 ## Hooks and CI
 
 `hk` remains the only hook manager.
 
-- Pre-commit formats and lints staged web files, then runs typecheck, the fast
-  coverage-free `new-only` audit (`pnpm fallow:audit`), and unit tests.
+- Pre-commit formats and lints staged web files, then runs typecheck, the
+  staged-hunk Fallow audit (`pnpm fallow:staged`), and unit tests.
 - Pre-push checks the local environment, typechecks, builds, generates real
-  coverage, and runs `pnpm fallow:ci` (the whole-repository `fallow:full`
-  scan).
-
-`pnpm fallow:staged` audits only the staged hunks under the strict `--gate all`
-verdict; hooks converge onto it in the stacked hook-structure PR.
+  coverage, and runs the full scan via `pnpm fallow:ci`.
 
 CI (`.github/workflows/ci.yml`) is split into parallel jobs so a pull request
 goes green as fast as possible, following the parallelization first applied to

@@ -25,7 +25,6 @@
     "fallow:staged": "git diff --cached | fallow audit --diff-stdin --gate all --type-aware",
     "fallow:full": "fallow --type-aware --fail-on-issues --coverage coverage/coverage-final.json --coverage-root \"$PWD\"",
     "fallow:ci": "pnpm fallow:full",
-    "fallow:audit": "fallow audit --gate new-only --type-aware",
     "fallow:recommend": "fallow recommend",
     "fallow:security": "fallow security",
     "fallow:suppressions": "fallow suppressions",

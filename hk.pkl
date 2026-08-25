@@ -58,10 +58,10 @@ local repo_checks = new Mapping<String, Step> {
   ["typecheck"] {
     check = "pnpm typecheck"
   }
-  // Migration gate: new-only audit over the branch diff. Replaced by
-  // fallow:staged once the hooks converge (see the stacked gate PRs).
+  // Strict staged gate: every finding on a staged hunk fails (--gate all).
+  // There is no pre-existing backlog to grandfather (see issue #264).
   ["fallow"] {
-    check = "pnpm fallow:audit"
+    check = "pnpm fallow:staged"
   }
   ["test"] {
     check = "pnpm --filter @mbqb/web test"
@@ -114,7 +114,12 @@ hooks {
         check = "pnpm run build"
         output_summary = "combined"
       }
+      // Strict full-repository gate: refresh the local master ref first so
+      // react-doctor's changed-scope diff is current (never fails the push;
+      // offline-tolerant), then run the FULL fallow scan over fresh coverage.
+      // Full scope, because there is no backlog to grandfather (#264).
       ["fallow"] {
+        depends = List("fetch")
         check = "pnpm test:coverage && pnpm fallow:ci"
         output_summary = "combined"
       }
@@ -122,14 +127,20 @@ hooks {
   }
   // hk check / hk fix — the same fast suite as a CLI: `hk check` (read-only,
   // default: staged files, --all for the whole tree, --unstaged for working-tree
-  // changes), `hk fix` (auto-fixes). React Doctor here is the manual deep
-  // check: full-tree scan (the hook variants are scoped — see above).
+  // changes), `hk fix` (auto-fixes). React Doctor and Fallow here are the
+  // manual deep checks: full-tree scans (the hook variants are scoped — see
+  // above). fallow:ci (the canonical full-scan alias) expects coverage from a
+  // prior `pnpm test:coverage`.
   ["check"] {
     steps {
       ...fixers
       ...repo_checks
       ["react-doctor"] {
         check = "pnpm react-doctor:full"
+      }
+      ["fallow-full"] {
+        check = "pnpm test:coverage && pnpm fallow:ci"
+        output_summary = "combined"
       }
     }
   }
