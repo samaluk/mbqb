@@ -92,19 +92,28 @@ jobs:
       # Same coverage evidence the test job produced, so audit CRAP scoring
       # matches — downloaded rather than regenerated to avoid a second
       # install + test run.
+      #
+      # Homerun gives each job a fresh work directory, and Istanbul coverage
+      # keys embed the absolute path of the checkout that produced them, so a
+      # gate job landing on a different directory than the test job would
+      # match zero functions and estimate CRAP from export references instead
+      # of real coverage (flaky threshold breaches). Re-anchor every key to
+      # this checkout before scanning so the artifact is producer-independent.
       - name: Download coverage
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: coverage
           path: coverage
 
-      # Authoritative strict Fallow migration gate (dead-code, dupes, health,
-      # private-type leaks) for the diff. Mirrors `pnpm fallow:ci`; the review
-      # job below owns the PR feedback surface.
+      - name: Re-anchor coverage paths to this checkout
+        run: node scripts/reanchor-coverage.mjs coverage/coverage-final.json
+
+      # Whole-repository Fallow scan (dead-code, dupes, health with coverage,
+      # fail-on-issues) — `fallow:ci` now resolves to the full scan, so any
+      # finding anywhere in the repo blocks until fixed or suppressed. The
+      # review job below owns the PR feedback surface.
       - name: Fallow CI gate
         run: pnpm fallow:ci
-        env:
-          FALLOW_AUDIT_BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || 'origin/master' }}
 
   review:
     name: Fallow PR review

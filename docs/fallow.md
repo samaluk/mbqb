@@ -7,24 +7,20 @@ zero-debt architecture. The later transition is tracked in [issue #264](https://
 
 ## Blocking migration gate
 
-Run coverage before commands that consume it:
-
-```bash
-pnpm test:coverage
-pnpm fallow:audit
-```
-
-`pnpm fallow:audit` is the authoritative migration gate:
+`pnpm fallow:audit` is the authoritative local migration gate:
 
 ```text
-fallow audit --gate new-only --type-aware \
-  --coverage coverage/coverage-final.json \
-  --coverage-root "$PWD"
+fallow audit --gate new-only --type-aware
 ```
 
+The hook-path audits are deliberately coverage-free, so committing on a fresh
+clone never requires a generated artifact; coverage enters where tests have
+already run (`fallow:full`, the pre-push hook, CI).
+
 Only findings introduced by the changeset drive the verdict. Existing findings
-remain in the report and are mergeable. `pnpm fallow:ci` is an alias for this
-same gate; it is not a full-repository zero-debt gate.
+remain in the report and are mergeable. `pnpm fallow:ci` no longer aliases
+this audit: it resolves to `pnpm fallow:full`, the whole-repository
+zero-tolerance scan that CI gates on.
 
 The first migration audit can report a type-aware identity warning because the
 3.15 base and 3.17 head use different semantic schema versions. Fallow falls
@@ -69,6 +65,10 @@ pnpm fallow:status          # type-aware companion status
 pnpm fallow:boundaries      # zones and dependency rules
 pnpm fallow:config          # resolved configuration
 ```
+
+`pnpm fallow:full` sits outside this set: the same combined scan run strictly,
+with `--type-aware --fail-on-issues` and explicit coverage flags. It is the
+whole-repository gate behind `pnpm fallow:ci`.
 
 The current snapshot is:
 
@@ -152,7 +152,9 @@ migrations and Payload's do-not-modify admin files under `app/(payload)/**`.
 `pnpm test:coverage` runs the unit suite with the Vitest V8 provider and writes
 `coverage/coverage-final.json` in Istanbul format. The health thresholds remain
 cyclomatic 20, cognitive 15, CRAP 30, and unit size 60. Fallow consumes the
-coverage file for health and audit/CRAP evidence. Structural coverage gaps were
+coverage file wherever it is passed explicitly — `fallow:full` and
+`fallow:health` — for health scoring and CRAP evidence; the local audit
+scripts deliberately run without it. Structural coverage gaps were
 evaluated with `fallow health --coverage-gaps`; the current run matches 99 of
 438 analyzed functions and reports 74 untested files and 162 untested exports.
 The `coverage-gaps` rule is therefore enabled at advisory `warn`, not blocking
@@ -187,9 +189,13 @@ new violations while inherited application debt is addressed later.
 `hk` remains the only hook manager.
 
 - Pre-commit formats and lints staged web files, then runs typecheck, the fast
-  native `new-only` audit, and unit tests.
+  coverage-free `new-only` audit (`pnpm fallow:audit`), and unit tests.
 - Pre-push checks the local environment, typechecks, builds, generates real
-  coverage, and runs `pnpm fallow:ci`.
+  coverage, and runs `pnpm fallow:ci` (the whole-repository `fallow:full`
+  scan).
+
+`pnpm fallow:staged` audits only the staged hunks under the strict `--gate all`
+verdict; hooks converge onto it in the stacked hook-structure PR.
 
 CI (`.github/workflows/ci.yml`) is split into parallel jobs so a pull request
 goes green as fast as possible, following the parallelization first applied to
@@ -198,8 +204,9 @@ goes green as fast as possible, following the parallelization first applied to
 - **`Lint, typecheck & format`** — static checks; runs in parallel with tests.
 - **`Test with coverage`** — runs `pnpm test:coverage` once and uploads
   `coverage/coverage-final.json` as a short-lived artifact.
-- **`Fallow gate`** — runs `pnpm fallow:ci` (the authoritative `new-only`
-  migration gate) against the shared coverage artifact.
+- **`Fallow gate`** — runs `pnpm fallow:ci`, which resolves to `fallow:full`:
+  the whole-repository combined scan (dead code, duplication, coverage-aware
+  health) with `--fail-on-issues` against the shared coverage artifact.
 - **`Fallow PR review`** — the version-pinned native Fallow Action renders the
   sticky summary comment, Check Run, and inline review comments from the same
   coverage artifact. It is a required check (`fail-on-issues` is on), so Fallow
