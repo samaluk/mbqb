@@ -6,7 +6,7 @@
  * the served build reads). Invoked from the Playwright globalSetup and can
  * also be run standalone: `pnpm exec tsx scripts/seed-e2e-fixtures.ts`.
  */
-import { getPayload, type RequiredDataFromCollectionSlug } from 'payload'
+import { getPayload, type Payload, type RequiredDataFromCollectionSlug } from 'payload'
 
 import { loadTestEnv } from './loadScriptEnv.js'
 
@@ -116,59 +116,66 @@ async function upsertFixtures() {
 
   try {
     for (const collection of fixtureCollections) {
-      const docs = fixtures[collection]
-
-      for (const data of docs) {
-        const slug = data.slug
-        const existing = await payload.find({
-          collection,
-          depth: 0,
-          draft: true,
-          limit: 1,
-          locale: 'es',
-          overrideAccess: true,
-          where: {
-            slug: { equals: slug },
-          },
-        })
-
-        // Per-collection shapes are enforced upstream by the `satisfies` map
-        // and `FixtureDoc`; only the rich-text body widens through Payload's
-        // generated type, whose root shape (indent/format) is lossier than
-        // the lexical editor state fixtures carry.
-        // oxlint-disable no-unsafe-type-assertion, typescript/consistent-type-assertions
-        const payloadData = {
-          ...data,
-          body: data.body as unknown as RequiredDataFromCollectionSlug<FixtureCollection>['body'],
-          _status: 'published',
-        } as RequiredDataFromCollectionSlug<FixtureCollection>
-        // oxlint-enable no-unsafe-type-assertion, typescript/consistent-type-assertions
-
-        if (existing.docs[0]?.id) {
-          await payload.update({
-            id: existing.docs[0].id,
-            collection,
-            data: payloadData,
-            draft: false,
-            locale: 'es',
-            overrideAccess: true,
-          })
-          console.log(`[seed] updated ${collection}/${slug}`)
-        } else {
-          await payload.create({
-            collection,
-            data: payloadData,
-            draft: false,
-            locale: 'es',
-            overrideAccess: true,
-          })
-          console.log(`[seed] created ${collection}/${slug}`)
-        }
+      for (const data of fixtures[collection]) {
+        await upsertFixtureDoc(payload, collection, data)
       }
     }
   } finally {
     await payload.destroy()
   }
+}
+
+async function upsertFixtureDoc(
+  payload: Payload,
+  collection: FixtureCollection,
+  data: FixtureDoc<FixtureCollection>,
+) {
+  const slug = data.slug
+  const existing = await payload.find({
+    collection,
+    depth: 0,
+    draft: true,
+    limit: 1,
+    locale: 'es',
+    overrideAccess: true,
+    where: {
+      slug: { equals: slug },
+    },
+  })
+
+  // Per-collection shapes are enforced upstream by the `satisfies` map
+  // and `FixtureDoc`; only the rich-text body widens through Payload's
+  // generated type, whose root shape (indent/format) is lossier than
+  // the lexical editor state fixtures carry.
+  // oxlint-disable no-unsafe-type-assertion, typescript/consistent-type-assertions
+  const payloadData = {
+    ...data,
+    body: data.body as unknown as RequiredDataFromCollectionSlug<FixtureCollection>['body'],
+    _status: 'published',
+  } as RequiredDataFromCollectionSlug<FixtureCollection>
+  // oxlint-enable no-unsafe-type-assertion, typescript/consistent-type-assertions
+
+  if (existing.docs[0]?.id) {
+    await payload.update({
+      id: existing.docs[0].id,
+      collection,
+      data: payloadData,
+      draft: false,
+      locale: 'es',
+      overrideAccess: true,
+    })
+    console.log(`[seed] updated ${collection}/${slug}`)
+    return
+  }
+
+  await payload.create({
+    collection,
+    data: payloadData,
+    draft: false,
+    locale: 'es',
+    overrideAccess: true,
+  })
+  console.log(`[seed] created ${collection}/${slug}`)
 }
 
 export async function seedE2eFixtures() {

@@ -30,15 +30,19 @@ function parseCheckResponse(data: unknown): CheckResponse {
     return { message: 'Respuesta invalida.', status: 'not_found' }
   }
 
-  const message =
-    'message' in data && typeof data.message === 'string' ? data.message : 'Respuesta invalida.'
+  return { message: parseResponseMessage(data), status: parseResponseStatus(data) }
+}
+
+function parseResponseMessage(data: object): string {
+  const fallback = 'Respuesta invalida.'
+
+  return 'message' in data && typeof data.message === 'string' ? data.message : fallback
+}
+
+function parseResponseStatus(data: object): CheckStatus {
   const status = 'status' in data ? data.status : null
 
-  if (isCheckStatus(status)) {
-    return { message, status }
-  }
-
-  return { message, status: 'not_found' }
+  return isCheckStatus(status) ? status : 'not_found'
 }
 
 // Module scope: constructing an Intl formatter loads locale data and is
@@ -46,15 +50,23 @@ function parseCheckResponse(data: unknown): CheckResponse {
 const rutBodyFormatter = new Intl.NumberFormat('es-CL')
 
 const formatRutInput = (value: string) => {
-  const cleaned = value.replace(/[.\-\s]/g, '').toUpperCase()
-  const body = cleaned.slice(0, -1).replace(/\D/g, '')
-  const checkDigit = cleaned.slice(-1).replace(/[^0-9K]/g, '')
+  const { body, check } = splitRut(value)
 
-  if (!body && !checkDigit) return ''
-  if (!body) return checkDigit
+  if (!body && !check) return ''
 
-  return `${rutBodyFormatter.format(Number(body))}${checkDigit ? `-${checkDigit}` : ''}`
+  return body ? `${rutBodyFormatter.format(Number(body))}${formatCheckSuffix(check)}` : check
 }
+
+const splitRut = (value: string) => {
+  const cleaned = value.replace(/[.\-\s]/g, '').toUpperCase()
+
+  return {
+    body: cleaned.slice(0, -1).replace(/\D/g, ''),
+    check: cleaned.slice(-1).replace(/[^0-9K]/g, ''),
+  }
+}
+
+const formatCheckSuffix = (check: string) => (check ? `-${check}` : '')
 
 export function BogeyficadorForm() {
   const [rut, setRut] = useState('')

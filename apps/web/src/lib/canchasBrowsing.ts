@@ -178,74 +178,32 @@ export async function loadCanchasBrowsing({
       locale: 'es',
       sort: 'title',
     }),
-    view === 'table'
-      ? canchas.find({
-          depth: 0,
-          limit: filters.pageSize,
-          locale: 'es',
-          page: filters.page,
-          sort: userGeo ? undefined : getPayloadSort(filters.sort),
-          ...(where ? { where } : {}),
-        })
-      : Promise.resolve(null),
-    view === 'cards'
-      ? canchas.find({
-          depth: 0,
-          limit: geoFetchLimit,
-          locale: 'es',
-          page: 1,
-          sort: userGeo ? undefined : 'title',
-          ...(where ? { where } : {}),
-        })
-      : Promise.resolve(null),
+    findTableCanchasPage(canchas, { filters, userGeo, view, where }),
+    findCardPoolCanchas(canchas, { userGeo, view, where }),
   ])
 
-  const poolDocs = poolResult ? annotatePool(poolResult.docs, userGeo) : []
-  const cardsPagination = poolResult
-    ? paginateCanchas(poolDocs, filters.page, filters.pageSize)
-    : null
   const tableDocs = tableResult ? annotatePool(tableResult.docs, userGeo) : []
-  const pagination =
-    view === 'table' && tableResult
-      ? buildPaginationModel({
-          docs: tableDocs,
-          page: tableResult.page ?? filters.page,
-          pageSize: filters.pageSize,
-          searchParams: hrefSearchParams,
-          totalDocs: tableResult.totalDocs,
-          totalPages: tableResult.totalPages,
-          view,
-        })
-      : cardsPagination
-        ? buildPaginationModel({
-            docs: cardsPagination.docs,
-            page: cardsPagination.page,
-            pageSize: filters.pageSize,
-            searchParams: hrefSearchParams,
-            totalDocs: cardsPagination.totalDocs,
-            totalPages: cardsPagination.totalPages,
-            view,
-          })
-        : buildPaginationModel({
-            docs: [],
-            page: 1,
-            pageSize: filters.pageSize,
-            searchParams: hrefSearchParams,
-            totalDocs: 0,
-            totalPages: 1,
-            view,
-          })
-  const filterOptions = {
-    accessTypes: getUniqueValues(filterOptionsResult.docs, 'accessType'),
-    cities: getUniqueValues(filterOptionsResult.docs, 'city'),
-    regions: getUniqueValues(filterOptionsResult.docs, 'region'),
-  }
+  const annotatedCardPool = poolResult ? annotatePool(poolResult.docs, userGeo) : null
+  const pagination = buildResultsPagination({
+    cardsPagination: annotatedCardPool
+      ? paginateCanchas(annotatedCardPool, filters.page, filters.pageSize)
+      : null,
+    filterOptionsSearch: hrefSearchParams,
+    filters,
+    tableDocs,
+    tableResult,
+    view,
+  })
   const controls: CanchasControlsModel = {
-    filterOptions,
+    filterOptions: {
+      accessTypes: getUniqueValues(filterOptionsResult.docs, 'accessType'),
+      cities: getUniqueValues(filterOptionsResult.docs, 'city'),
+      regions: getUniqueValues(filterOptionsResult.docs, 'region'),
+    },
     view,
   }
   const results: CanchasResultsModel = {
-    mapCanchas: userGeo && view === 'cards' ? poolDocs : undefined,
+    mapCanchas: userGeo && annotatedCardPool ? annotatedCardPool : undefined,
     navigation: {
       sortLinks: buildSortLinks(hrefSearchParams, filters.sort, userGeo !== null),
     },
@@ -260,6 +218,94 @@ export async function loadCanchasBrowsing({
     controls,
     results,
   }
+}
+
+type CanchaFindInput = {
+  filters: CanchasFilters
+  userGeo: StoredUserGeo | null
+  view: CanchasView
+  where?: Where
+}
+
+type CanchaFindResult = Awaited<ReturnType<CanchasAdapter['find']>>
+
+/** Table view pages through the filtered result set server-side. */
+function findTableCanchasPage(
+  canchas: CanchasAdapter,
+  { filters, userGeo, view, where }: CanchaFindInput,
+): Promise<CanchaFindResult | null> {
+  if (view !== 'table') return Promise.resolve(null)
+
+  return canchas.find({
+    depth: 0,
+    limit: filters.pageSize,
+    locale: 'es',
+    page: filters.page,
+    sort: userGeo ? undefined : getPayloadSort(filters.sort),
+    ...(where ? { where } : {}),
+  })
+}
+
+/** Card view fetches one bounded pool and paginates it in memory. */
+function findCardPoolCanchas(
+  canchas: CanchasAdapter,
+  { userGeo, view, where }: Omit<CanchaFindInput, 'filters'>,
+): Promise<CanchaFindResult | null> {
+  if (view !== 'cards') return Promise.resolve(null)
+
+  return canchas.find({
+    depth: 0,
+    limit: geoFetchLimit,
+    locale: 'es',
+    page: 1,
+    sort: userGeo ? undefined : 'title',
+    ...(where ? { where } : {}),
+  })
+}
+
+function buildResultsPagination(args: {
+  cardsPagination: ReturnType<typeof paginateCanchas<CanchaMapItem>> | null
+  filterOptionsSearch: Record<string, string>
+  filters: CanchasFilters
+  tableDocs: CanchaMapItem[]
+  tableResult: CanchaFindResult | null
+  view: CanchasView
+}) {
+  const { cardsPagination, filterOptionsSearch, filters, tableDocs, tableResult, view } = args
+
+  if (view === 'table' && tableResult) {
+    return buildPaginationModel({
+      docs: tableDocs,
+      page: tableResult.page ?? filters.page,
+      pageSize: filters.pageSize,
+      searchParams: filterOptionsSearch,
+      totalDocs: tableResult.totalDocs,
+      totalPages: tableResult.totalPages,
+      view,
+    })
+  }
+
+  if (cardsPagination) {
+    return buildPaginationModel({
+      docs: cardsPagination.docs,
+      page: cardsPagination.page,
+      pageSize: filters.pageSize,
+      searchParams: filterOptionsSearch,
+      totalDocs: cardsPagination.totalDocs,
+      totalPages: cardsPagination.totalPages,
+      view,
+    })
+  }
+
+  return buildPaginationModel({
+    docs: [],
+    page: 1,
+    pageSize: filters.pageSize,
+    searchParams: filterOptionsSearch,
+    totalDocs: 0,
+    totalPages: 1,
+    view,
+  })
 }
 
 function parseCanchasFilters(

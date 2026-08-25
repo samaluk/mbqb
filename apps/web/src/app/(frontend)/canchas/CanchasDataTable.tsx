@@ -106,55 +106,7 @@ export function CanchasDataTable({
           <TableBody>
             {canchas.length ? (
               canchas.map((cancha) => (
-                <TableRow key={cancha.id}>
-                  <TableCell data-column="title">
-                    <Link
-                      className={cn(
-                        buttonVariants({ variant: 'link' }),
-                        'h-auto justify-start p-0 text-start',
-                      )}
-                      href={`/canchas/${cancha.slug}`}
-                    >
-                      {cancha.title}
-                    </Link>
-                  </TableCell>
-                  {showDistance ? (
-                    <TableCell data-column="distance">
-                      {'distanceKm' in cancha && typeof cancha.distanceKm === 'number'
-                        ? formatDistanceKm(cancha.distanceKm)
-                        : '—'}
-                    </TableCell>
-                  ) : null}
-                  <TableCell data-column="accessType">
-                    <Badge variant="outline">{canchaAccessLabels[cancha.accessType]}</Badge>
-                  </TableCell>
-                  <TableCell data-column="region">{cancha.region || 'Sin region'}</TableCell>
-                  <TableCell data-column="city">{cancha.city || 'Sin ciudad'}</TableCell>
-                  <TableCell data-column="summary">
-                    <span className="block max-w-105 truncate text-muted-foreground">
-                      {cancha.summary || 'Sin resumen'}
-                    </span>
-                  </TableCell>
-                  <TableCell data-column="actions">
-                    <div className="flex justify-end gap-1">
-                      <Link
-                        className={buttonVariants({ size: 'sm', variant: 'outline' })}
-                        href={`/canchas/${cancha.slug}`}
-                      >
-                        Ver ficha
-                      </Link>
-                      <a
-                        className={buttonVariants({ size: 'icon-sm', variant: 'outline' })}
-                        href={getGoogleMapsUrl(cancha)}
-                        rel="noreferrer"
-                        target="_blank"
-                      >
-                        <ExternalLinkIcon />
-                        <span className="sr-only">Google Maps</span>
-                      </a>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <CanchaTableRow cancha={cancha} key={cancha.id} showDistance={showDistance} />
               ))
             ) : (
               <TableRow>
@@ -172,6 +124,68 @@ export function CanchasDataTable({
       <CanchasPagination pagination={pagination} />
     </div>
   )
+}
+
+const fallbackText = (value: string | null | undefined, fallback: string) => value || fallback
+
+function CanchaTableRow({
+  cancha,
+  showDistance = false,
+}: {
+  cancha: CanchaMapItem
+  showDistance?: boolean
+}) {
+  return (
+    <TableRow>
+      <TableCell data-column="title">
+        <Link
+          className={cn(buttonVariants({ variant: 'link' }), 'h-auto justify-start p-0 text-start')}
+          href={`/canchas/${cancha.slug}`}
+        >
+          {cancha.title}
+        </Link>
+      </TableCell>
+      {showDistance ? <DistanceTableCell cancha={cancha} /> : null}
+      <TableCell data-column="accessType">
+        <Badge variant="outline">{canchaAccessLabels[cancha.accessType]}</Badge>
+      </TableCell>
+      <TableCell data-column="region">{fallbackText(cancha.region, 'Sin region')}</TableCell>
+      <TableCell data-column="city">{fallbackText(cancha.city, 'Sin ciudad')}</TableCell>
+      <TableCell data-column="summary">
+        <span className="block max-w-105 truncate text-muted-foreground">
+          {fallbackText(cancha.summary, 'Sin resumen')}
+        </span>
+      </TableCell>
+      <TableCell data-column="actions">
+        <div className="flex justify-end gap-1">
+          <Link
+            className={buttonVariants({ size: 'sm', variant: 'outline' })}
+            href={`/canchas/${cancha.slug}`}
+          >
+            Ver ficha
+          </Link>
+          <a
+            className={buttonVariants({ size: 'icon-sm', variant: 'outline' })}
+            href={getGoogleMapsUrl(cancha)}
+            rel="noreferrer"
+            target="_blank"
+          >
+            <ExternalLinkIcon />
+            <span className="sr-only">Google Maps</span>
+          </a>
+        </div>
+      </TableCell>
+    </TableRow>
+  )
+}
+
+function DistanceTableCell({ cancha }: { cancha: CanchaMapItem }) {
+  const distance =
+    'distanceKm' in cancha && typeof cancha.distanceKm === 'number'
+      ? formatDistanceKm(cancha.distanceKm)
+      : '—'
+
+  return <TableCell data-column="distance">{distance}</TableCell>
 }
 
 function ColumnLabel({

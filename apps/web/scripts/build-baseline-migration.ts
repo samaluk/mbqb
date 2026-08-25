@@ -19,6 +19,14 @@ const localPostgresUrl =
   process.env.POSTGRES_URL || 'postgres://postgres:postgres@127.0.0.1:5433/mbqb'
 
 function dumpSchema(): string {
+  const docker = dumpViaDocker()
+
+  if (docker.status === 0 && docker.stdout) return docker.stdout
+
+  return dumpViaLocalPgDump(docker.stderr ?? '')
+}
+
+function dumpViaDocker() {
   const docker = spawnSync(
     'docker',
     [
@@ -34,10 +42,10 @@ function dumpSchema(): string {
     { encoding: 'utf8' },
   )
 
-  if (docker.status === 0 && docker.stdout) {
-    return docker.stdout
-  }
+  return docker
+}
 
+function dumpViaLocalPgDump(fallbackStderr: string): string {
   const pgDump = spawnSync(
     'pg_dump',
     [localPostgresUrl, '--schema-only', '--no-owner', '--no-privileges', '--schema=public'],
@@ -45,7 +53,7 @@ function dumpSchema(): string {
   )
 
   if (pgDump.status !== 0) {
-    console.error(pgDump.stderr || docker.stderr)
+    console.error(pgDump.stderr || fallbackStderr)
     process.exit(1)
   }
 
@@ -54,15 +62,15 @@ function dumpSchema(): string {
 
 function skipLine(line: string): boolean {
   const trimmed = line.trim()
-  if (!trimmed) return true
-  if (trimmed.startsWith('\\')) return true
-  if (trimmed.startsWith('--')) return true
-  if (trimmed.startsWith('SET ')) return true
-  if (trimmed.startsWith('SELECT pg_catalog')) return true
-  if (trimmed.startsWith('COMMENT ON ')) return true
-  if (/^CREATE SCHEMA public\b/i.test(trimmed)) return true
-  return false
+
+  return (
+    !trimmed ||
+    skippedLinePrefixes.some((prefix) => trimmed.startsWith(prefix)) ||
+    /^CREATE SCHEMA public\b/i.test(trimmed)
+  )
 }
+
+const skippedLinePrefixes = ['\\', '--', 'SET ', 'SELECT pg_catalog', 'COMMENT ON ']
 
 function sanitizeDump(raw: string): string {
   const body = raw
