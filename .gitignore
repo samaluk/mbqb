@@ -19,3 +19,4 @@ blob-report/
 *.tsbuildinfo
 .vercel
 .fallow/
+.fallow-drift/
