@@ -23,12 +23,20 @@ The canonical scripts live in the root `package.json`:
 ```bash
 pnpm fallow          # passthrough to the CLI
 pnpm fallow:staged   # strict audit over the staged diff (pre-commit)
-pnpm fallow:full     # full scan: dead-code + dupes + health, fail-on-issues
+pnpm fallow:full     # audit --gate all + blocking dead-code, dupes, and health
 pnpm fallow:ci       # canonical alias of fallow:full — what pre-push, hk check, and CI run
 ```
 
-Coverage coupling is explicit: gates that score CRAP pass
-`--coverage coverage/coverage-final.json` and require it to exist (run
+The canonical `fallow:full` composition is explicit and standalone:
+
+```bash
+fallow audit --gate all --type-aware --coverage coverage/coverage-final.json --coverage-root "$PWD" && pnpm fallow:dead-code && pnpm fallow:dupes && pnpm fallow:health
+```
+
+`fallow:dead-code`, `fallow:dupes`, and `fallow:health` each block independently;
+the first is type-aware and the last is coverage-aware. Coverage coupling is
+explicit: the audit and health gate pass `--coverage coverage/coverage-final.json`
+and `--coverage-root "$PWD"`, and require the file to exist (run
 `pnpm test:coverage` first). The shared config carries no coverage key. The
 drift scan installs and generates real coverage rather than relying on
 zero-install estimation: without node_modules, fallow warns its results are
@@ -40,9 +48,9 @@ verdict.
 ## Command reference
 
 ```bash
-pnpm fallow:dead-code       # unused files, exports, types, deps, leaks
-pnpm fallow:dupes           # semantic and near duplication
-pnpm fallow:health          # thresholds, CRAP, coverage-aware health
+pnpm fallow:dead-code       # blocking type-aware unused files, exports, types, deps, leaks
+pnpm fallow:dupes           # blocking semantic and near duplication gate
+pnpm fallow:health          # blocking thresholds, CRAP, coverage-aware health gate
 pnpm fallow:security        # unverified advisory candidates
 pnpm fallow:suppressions    # suppression inventory
 pnpm fallow:recommend       # stack/config recommendation
