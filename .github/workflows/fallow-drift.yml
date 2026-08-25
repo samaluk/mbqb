@@ -76,6 +76,14 @@ jobs:
         if: steps.seen.outputs.cache-hit != 'true'
         run: mkdir -p .fallow-drift && date > ".fallow-drift/${{ steps.fver.outputs.version }}"
 
+      # Node + pinned pnpm + frozen-lockfile install — the same provisioning
+      # every covered surface runs. Gated on the cache miss so no-op runs
+      # stay no-ops; without it the job reaches the scan with no pnpm on PATH
+      # (ubuntu-latest ships none, and the image's default Node misses this
+      # repo's engines pin).
+      - uses: ./.github/actions/setup-toolchain
+        if: steps.seen.outputs.cache-hit != 'true'
+
       # Same covered pipeline as pre-push, hk check, and the CI gate — the
       # frozen-lockfile install resolves fallow to exactly the version in the
       # cache key above, so "once per version" runs that version's CLI.
