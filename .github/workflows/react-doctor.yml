@@ -17,11 +17,6 @@ on:
   # inline review comments, and a commit status, and fails on new findings.
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-  # Full-project health snapshot on every push to master, surfaced via the
-  # commit status and job summary. Never fails the branch on pre-existing
-  # issues, so master does not go red over old debts.
-  push:
-    branches: [master]
 
 permissions:
   contents: read

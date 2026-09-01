@@ -11,7 +11,7 @@ Node and pnpm versions are defined only in the root [`package.json`](package.jso
 
 CI reads both fields via [`.github/actions/setup-toolchain`](.github/actions/setup-toolchain). Docker images must stay aligned with `engines.node` (see comments in `apps/web/Dockerfile`).
 
-CI runs on GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (lint, format, typecheck, unit tests with coverage, production build with migrations, integration tests, and Playwright E2E against PostGIS) plus [`.github/workflows/fallow.yml`](.github/workflows/fallow.yml) (fully-blocking Fallow quality gate and PR review).
+CI runs on GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (lint, format, typecheck, production build with migrations, integration tests, and Playwright E2E against PostGIS) plus [`.github/workflows/fallow.yml`](.github/workflows/fallow.yml) (unit tests with coverage, the fully-blocking Fallow quality gate, and PR review). Generic validation runs on pull requests; version-keyed drift scans are the intentional default-branch exception.
 
 ## Development
 
@@ -32,6 +32,6 @@ Local checks are managed by [hk](https://hk.jdx.dev/). Install hk once (`brew in
 > If you previously ran `scripts/setup-githooks.sh` (pre-hk), run `bash scripts/setup-hk.sh` once: it removes the stale `include.path` pointing at the deleted `.githooks/mbqb.config`. If you use `hk install --global` instead, clear it manually with `git config --local --fixed-value --unset-all include.path '../.githooks/mbqb.config'`.
 
 - `pre-commit` — oxlint and oxfmt on **staged files only** (auto-fixes and re-stages them), then typecheck, fallow gates, and unit tests on the whole repo
-- `pre-push` — typecheck and a local production build (requires `apps/web/.env.local`; run `cd apps/web && pnpm env:pull`)
+- `pre-push` — checks the environment, typechecks, fetches `origin/master`, runs the changed-scope React Doctor gate, builds, generates fresh coverage, and runs the full Fallow scan (requires `apps/web/.env.local`; run `cd apps/web && pnpm env:pull`)
 
 The full fast suite is also available on demand: `hk check` (defaults to staged files; `--all` for every tracked file, `--unstaged` for working-tree changes) and `hk fix` to auto-fix.

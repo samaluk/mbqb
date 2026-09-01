@@ -1,34 +1,62 @@
 # Fallow — fully-blocking quality gate plus native PR feedback.
 #
-# The gate job runs the FULL repository scan via `pnpm fallow:ci` (the
-# canonical alias; dead-code, duplication, complexity/CRAP with fresh
-# coverage, fail-on-issues) over fresh test coverage. There is no pre-existing
-# backlog to grandfather (#264), so a single new finding fails the run.
+# The test job produces the one fresh coverage artifact. The gate then runs the
+# FULL repository scan via `pnpm fallow:ci` (the canonical alias; dead-code,
+# duplication, complexity/CRAP, fail-on-issues) over that artifact. There is no
+# pre-existing backlog to grandfather (#264), so a single new finding fails.
 #
 # The review job is the PR feedback surface of the same analysis: sticky
 # summary comment, Check Run, and inline review comments from the pinned
-# Fallow Action, consuming the coverage artifact the gate produced.
+# Fallow Action, consuming the coverage artifact the test job produced.
 #
 # Job display names ("Fallow gate", "Fallow PR review") match the master-branch
 # ruleset's required status checks exactly; they moved here from ci.yml.
 name: Fallow
 
 on:
-  push:
-    branches: [master]
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
 
+env:
+  PAYLOAD_SECRET: ci-payload-secret-for-github-actions
+  PREVIEW_SECRET: ci-preview-secret-for-github-actions
+
 concurrency:
   group: fallow-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  test:
+    name: Test with coverage
+    # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
+
+      - uses: ./.github/actions/setup-toolchain
+
+      - name: Test with coverage
+        run: pnpm test:coverage
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-fallow
+          path: coverage/coverage-final.json
+          if-no-files-found: error
+          retention-days: 1
+
   gate:
     name: Fallow gate
+    needs: test
     # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
     runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
     timeout-minutes: 20
@@ -42,18 +70,17 @@ jobs:
 
       - uses: ./.github/actions/setup-toolchain
 
-      # Fresh coverage for accurate per-function CRAP scoring; shared with the
-      # review job below so the Action does not re-run the suite.
-      - name: Test with coverage
-        run: pnpm test:coverage
-
-      - name: Upload coverage
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      # Download the one coverage result produced by the test job. Homerun gives
+      # each job a fresh work directory and Istanbul keys contain the producing
+      # checkout's absolute path, so re-anchor before Fallow consumes it.
+      - name: Download coverage
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: coverage-fallow
-          path: coverage/coverage-final.json
-          if-no-files-found: error
-          retention-days: 1
+          path: coverage
+
+      - name: Re-anchor coverage paths to this checkout
+        run: node scripts/reanchor-coverage.mjs coverage/coverage-final.json
 
       - name: Fallow CI gate
         run: pnpm fallow:ci
@@ -61,11 +88,11 @@ jobs:
   review:
     name: Fallow PR review
     # Run even when the gate failed — that is exactly when the sticky
-    # comment / Check Run / inline comments must render. `!cancelled()` (not
-    # `always()`) keeps a cancelled run from posting; the coverage artifact is
-    # uploaded before the scan step, so it exists whenever the scan itself ran.
-    if: ${{ !cancelled() && github.event_name == 'pull_request' }}
-    needs: gate
+    # comment / Check Run / inline comments must render. The shared test job is
+    # the evidence boundary: a failed test or artifact upload skips both
+    # quality consumers, while a gate failure does not suppress review feedback.
+    if: ${{ needs.test.result == 'success' && !cancelled() && github.event_name == 'pull_request' }}
+    needs: test
     # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
     runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
     timeout-minutes: 20
@@ -84,6 +111,19 @@ jobs:
           clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
 
       - uses: ./.github/actions/setup-toolchain
+
+      # Resolve the exact workspace-pinned Fallow version after setup. Keeping
+      # this value derived from installed package metadata prevents the global
+      # workaround from drifting away from package.json/pnpm-lock.yaml.
+      - id: fver
+        name: Resolve Fallow version
+        run: |
+          fallow_version="$(node -p "require('./node_modules/fallow/package.json').version")"
+          if [ -z "$fallow_version" ]; then
+            echo "::error::Fallow version not found in installed workspace dependencies"
+            exit 1
+          fi
+          echo "version=$fallow_version" >> "$GITHUB_OUTPUT"
 
       # The Fallow Action installs its CLI globally with npm and locates the
       # install by parsing `npm root -g` output. Two quirks of these homerun
@@ -115,9 +155,9 @@ jobs:
               ;;
           esac
           NPM_CONFIG_PREFIX="$fallow_prefix" npm install --global --ignore-scripts \
-            "fallow@3.17.0" "${fallow_platform}@3.17.0"
+            "fallow@${{ steps.fver.outputs.version }}" "${fallow_platform}@${{ steps.fver.outputs.version }}"
 
-      # Same coverage evidence the gate job produced, so audit CRAP scoring
+      # Same coverage evidence the test job produced, so audit CRAP scoring
       # matches — downloaded rather than regenerated to avoid a second
       # install + test run. Homerun gives each job a fresh work directory and
       # Istanbul coverage keys embed the producing checkout's absolute path,

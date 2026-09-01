@@ -70,7 +70,7 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .fallow-drift
-          key: fallow-drift-${{ steps.fver.outputs.version }}
+          key: fallow-drift-${{ steps.fver.outputs.version }}-${{ runner.os }}-${{ runner.arch }}-${{ vars.USE_SELF_HOSTED_RUNNERS == 'true' && 'self-hosted-macos-arm64' || 'hosted-ubuntu-latest' }}
 
       - name: Mark this version as scanned
         if: steps.seen.outputs.cache-hit != 'true'
