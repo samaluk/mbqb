@@ -1,8 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches: [master]
   pull_request:
 
 permissions:
@@ -17,10 +15,10 @@ env:
   PREVIEW_SECRET: ci-preview-secret-for-github-actions
 
 jobs:
-  # Static quality checks and tests run as parallel jobs so a pull request goes
-  # green as fast as possible. Each job is its own required status check (the
-  # master-branch ruleset lists these exact names), so every one must pass for a
-  # merge. The Fallow gate and PR review jobs live in fallow.yml.
+  # Static quality checks and the integration/E2E suite run as parallel jobs so
+  # a pull request goes green as fast as possible. Each job is its own required
+  # status check (the master-branch ruleset lists these exact names), so every
+  # one must pass for a merge. Coverage and Fallow jobs live in fallow.yml.
   static:
     name: Lint, typecheck & format
     # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
@@ -43,23 +41,6 @@ jobs:
 
       - name: Typecheck
         run: pnpm typecheck
-
-  test:
-    name: Test with coverage
-    # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
-
-      - uses: ./.github/actions/setup-toolchain
-
-      - name: Test with coverage
-        run: pnpm test:coverage
 
   build-and-integration:
     name: Build, integration, and E2E tests

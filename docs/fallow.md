@@ -4,8 +4,7 @@ MBQB is in the Fallow ZERO-DEBT steady state (see
 [issue #264](https://github.com/samaluk/mbqb/issues/264), with
 [fintual-api #405](https://github.com/samaluk/fintual-api/pull/405) as the
 reference). The full repository scan reports zero findings, and every surface
-— pre-commit, pre-push, `hk check`, CI, and drift watch — blocks on any of
-them.
+— pre-commit, pre-push, `hk check`, and CI — blocks on any of them.
 
 ## Gates
 
@@ -14,9 +13,8 @@ them.
 | pre-commit | `pnpm fallow:staged` | every finding on staged hunks (`audit --diff-stdin --gate all`) |
 | pre-push | `pnpm test:coverage && pnpm fallow:ci` | FULL repository scan over fresh coverage |
 | `hk check` | `pnpm test:coverage && pnpm fallow:ci` | manual deep check, same scope as pre-push |
-| CI — [`.github/workflows/fallow.yml`](.github/workflows/fallow.yml) | gate job runs `pnpm fallow:ci` | blocking on pull_request and push to master |
+| CI — [`.github/workflows/fallow.yml`](.github/workflows/fallow.yml) | `Test with coverage` produces one `coverage-fallow` artifact; gate and review consume it | blocking pull-request validation; no generic default-branch rerun |
 | CI — review job | pinned `fallow-rs/fallow` Action at `gate: all` | PR feedback: sticky comment, Check Run, inline review comments |
-| drift — [`fallow-drift.yml`](.github/workflows/fallow-drift.yml) | `pnpm test:coverage && pnpm fallow:ci` | same covered scan as pre-push, once per resolved fallow version, fully blocking |
 
 The canonical scripts live in the root `package.json`:
 
@@ -37,13 +35,8 @@ fallow audit --gate all --type-aware --coverage coverage/coverage-final.json --c
 the first is type-aware and the last is coverage-aware. Coverage coupling is
 explicit: the audit and health gate pass `--coverage coverage/coverage-final.json`
 and `--coverage-root "$PWD"`, and require the file to exist (run
-`pnpm test:coverage` first). The shared config carries no coverage key. The
-drift scan installs and generates real coverage rather than relying on
-zero-install estimation: without node_modules, fallow warns its results are
-inaccurate, type-aware analysis degrades to partial, and the bare scan
-reported an unused-dependency false positive plus two estimated-CRAP findings
-that real coverage clears — so only covered runs give every surface the same
-verdict.
+`pnpm test:coverage` first). The shared config carries no coverage key, so only
+covered runs provide the complete health verdict.
 
 ## Command reference
 
@@ -70,7 +63,7 @@ Type-aware analysis is enabled and required to be `complete` for:
 - `apps/web/tsconfig.json` — application and production sources;
 - `apps/web/tsconfig.tests.json` — Vitest and Playwright configuration/tests.
 
-Fallow 3.17 reports TypeScript-Go protocol 7, zero abstentions, zero unresolved
+Fallow 3.20 reports TypeScript-Go protocol 7, zero abstentions, zero unresolved
 queries, and zero warnings for these projects. This is Fallow-owned semantic
 evidence; `tsc --noEmit` remains responsible for compiler correctness and
 Oxlint remains responsible for typed lint rules.
@@ -113,9 +106,7 @@ the group.
 `pnpm test:coverage` writes Istanbul-format `coverage/coverage-final.json`.
 Health thresholds: cyclomatic 20, cognitive 15, CRAP 30, unit size 60 — a
 function is flagged when it meets or exceeds them, and under covered gates
-none does. The drift scan runs the same covered pipeline per fallow version,
-so tool upgrades cannot silently change the verdict. The `coverage-gaps` rule
-remains advisory `warn`.
+none does. The `coverage-gaps` rule remains advisory `warn`.
 
 ### Architecture boundaries
 
@@ -136,13 +127,14 @@ violations.
 CI splits quality jobs so a pull request goes green fast:
 
 - **`Lint, typecheck & format`** (ci.yml) — static checks.
-- **`Test with coverage`** (ci.yml) — the unit suite.
-- **`Fallow gate`** (fallow.yml) — fresh coverage + the full scan, blocking.
-- **`Fallow PR review`** (fallow.yml) — native Fallow PR feedback from the
-  same coverage artifact.
+- **`Test with coverage`** (fallow.yml) — the unit suite, producing one
+  `coverage-fallow` artifact.
+- **`Fallow gate`** (fallow.yml) — consumes that artifact and runs the full
+  scan, blocking.
+- **`Fallow PR review`** (fallow.yml) — independently consumes the same
+  artifact for native Fallow PR feedback, even when the gate fails.
 - **`Build, integration, and E2E tests`** (ci.yml) — Playwright against
   PostGIS.
 
-Each is its own required status check on the `master` branch ruleset. The
-drift workflow runs the same covered scan once per resolved fallow version,
-also blocking.
+Each is its own required status check on the `master` branch ruleset. Generic
+CI/Fallow/React Doctor validation is pull-request-only.

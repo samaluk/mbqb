@@ -5,6 +5,10 @@
 # base. Existing repository debt is reported but never fails the check, so
 # adoption is strict on regressions without turning today's backlog into an
 # immediate blocker.
+# Dependency-only pull requests intentionally use this changed-scope gate; a
+# React Doctor version bump with no app-file changes may therefore scan zero
+# files. Whole-project audits remain an explicit local/manual operation rather
+# than a separate default-branch workflow.
 #
 # The Action installs its own Node runtime and react-doctor CLI and caches them
 # internally, so this workflow deliberately needs NO dependency install, build,
@@ -17,11 +21,6 @@ on:
   # inline review comments, and a commit status, and fails on new findings.
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-  # Full-project health snapshot on every push to master, surfaced via the
-  # commit status and job summary. Never fails the branch on pre-existing
-  # issues, so master does not go red over old debts.
-  push:
-    branches: [master]
 
 permissions:
   contents: read
