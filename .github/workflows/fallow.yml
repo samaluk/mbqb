@@ -114,7 +114,7 @@ jobs:
 
       # Resolve the exact workspace-pinned Fallow version after setup. Keeping
       # this value derived from installed package metadata prevents the global
-      # workaround from drifting away from package.json/pnpm-lock.yaml.
+      # workaround from becoming unsynchronized with package.json/pnpm-lock.yaml.
       - id: fver
         name: Resolve Fallow version
         run: |
