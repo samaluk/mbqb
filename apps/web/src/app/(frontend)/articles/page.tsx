@@ -39,21 +39,25 @@ async function ArticlesContent({ searchParams }: PageProps) {
     <>
       <ArticlesCategoryFilter categories={categories} selectedCategory={selectedCategory} />
       <PageGrid>
-        {filteredArticles.map((article) => (
-          <DocCard
-            badges={
-              <>
-                {article.category ? <Badge variant="outline">{article.category}</Badge> : null}
-                <Badge variant="outline">{formatDifficulty(article.difficulty)}</Badge>
-              </>
-            }
-            body={article.body}
-            href={`/articles/${article.slug}`}
-            key={article.id}
-            linkLabel="Read article"
-            title={article.title}
-          />
-        ))}
+        {filteredArticles.map((article) => {
+          const difficulty = formatDifficulty(article.difficulty)
+
+          return (
+            <DocCard
+              badges={
+                <>
+                  {article.category ? <Badge variant="outline">{article.category}</Badge> : null}
+                  {difficulty ? <Badge variant="outline">{difficulty}</Badge> : null}
+                </>
+              }
+              body={article.body}
+              href={`/articles/${article.slug}`}
+              key={article.id}
+              linkLabel="Read article"
+              title={article.title}
+            />
+          )
+        })}
       </PageGrid>
     </>
   )

@@ -20,7 +20,7 @@ describe('articles browsing & categorization', () => {
       title: 'Course Etiquette',
     },
     {
-      category: 'rules', // lowercase to test deduplication / casing
+      category: 'rules', // same category with different casing should be deduplicated
       difficulty: 'advanced' as const,
       id: 3,
       slug: 'advanced-rules',
@@ -42,10 +42,20 @@ describe('articles browsing & categorization', () => {
     },
   ]
 
-  it('extracts unique, sorted, non-empty categories from articles', () => {
+  it('extracts case-insensitively unique, sorted, non-empty categories', () => {
     const categories = getArticleCategories(sampleArticles)
 
-    expect(categories).toEqual(['Etiquette', 'Rules', 'rules'])
+    expect(categories).toEqual(['Etiquette', 'Rules'])
+  })
+
+  it('retains the first encountered trimmed display form for duplicate categories', () => {
+    const categories = getArticleCategories([
+      { category: '  putting  ' },
+      { category: 'PUTTING' },
+      { category: 'Putting' },
+    ])
+
+    expect(categories).toEqual(['putting'])
   })
 
   it('filters articles by category case-insensitively', () => {

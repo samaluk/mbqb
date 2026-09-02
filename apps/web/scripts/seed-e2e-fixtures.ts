@@ -1,6 +1,6 @@
 /**
  * Seeds the fixture content the instant-navigation e2e suite runs against:
- * published canchas, La Biblia articles, and products with fixed slugs.
+ * published canchas, articles, and products with fixed slugs.
  *
  * Idempotent: upserts by slug. Runs against POSTGRES_URL (the same database
  * the served build reads). Invoked from the Playwright globalSetup and can
