@@ -1,6 +1,7 @@
 export { HomeHeroContent, PageShell } from './page-shell'
 export { HomeHeroVideo } from './home-hero-video'
 export { MetaPills } from './meta-pills'
+export { PageGrid } from './page-grid'
 export { PageKicker } from './page-kicker'
 export { PageLede } from './page-lede'
 export { DocCard, PayloadCollectionListing } from './payload-collection-listing'

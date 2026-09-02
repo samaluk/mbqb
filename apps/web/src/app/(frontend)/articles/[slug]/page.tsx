@@ -1,23 +1,27 @@
 import { MetaPills, PayloadDocDetail, RichContent, type SlugPageProps } from '@/components/page'
-import { laBibliaCategoryLabels } from '@/lib/laBiblia'
+import { formatDifficulty } from '@/lib/articles'
 import { payloadDocMetadata } from '@/lib/payloadBySlug'
 
-export const generateMetadata = payloadDocMetadata('la-biblia-articles', 'La Biblia')
+export const generateMetadata = payloadDocMetadata('articles', 'Articles')
 
 export default function ArticleDetailPage({ params }: SlugPageProps) {
   return (
     <PayloadDocDetail
-      backHref="/la-biblia"
-      backLabel="Volver a La Biblia"
+      backHref="/articles"
+      backLabel="Back to articles"
       backTestId="article-detail-back-link"
-      collection="la-biblia-articles"
-      kicker="La Biblia"
+      collection="articles"
+      kicker="Articles"
       params={params}
       titleTestId="article-detail-title"
     >
       {(article) => (
         <>
-          <MetaPills items={[laBibliaCategoryLabels[article.category], article.difficulty]} />
+          <MetaPills
+            items={[article.category, formatDifficulty(article.difficulty)].filter(
+              (item): item is string => Boolean(item),
+            )}
+          />
           <RichContent body={article.body} />
         </>
       )}

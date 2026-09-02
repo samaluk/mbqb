@@ -51,48 +51,25 @@ export const enum__canchas_v_published_locale = pgEnum(
   "enum__canchas_v_published_locale",
   ["es", "en"],
 );
-export const enum_la_biblia_articles_category = pgEnum(
-  "enum_la_biblia_articles_category",
-  [
-    "primeros-pasos",
-    "reglas-y-etiqueta",
-    "equipo",
-    "canchas",
-    "tecnica-basica",
-    "diccionario-golfistico",
-    "cultura-golf",
-  ],
+export const enum_articles_difficulty = pgEnum("enum_articles_difficulty", [
+  "beginner",
+  "intermediate",
+  "advanced",
+]);
+export const enum_articles_status = pgEnum("enum_articles_status", [
+  "draft",
+  "published",
+]);
+export const enum__articles_v_version_difficulty = pgEnum(
+  "enum__articles_v_version_difficulty",
+  ["beginner", "intermediate", "advanced"],
 );
-export const enum_la_biblia_articles_difficulty = pgEnum(
-  "enum_la_biblia_articles_difficulty",
-  ["principiante", "intermedio", "avanzado"],
-);
-export const enum_la_biblia_articles_status = pgEnum(
-  "enum_la_biblia_articles_status",
+export const enum__articles_v_version_status = pgEnum(
+  "enum__articles_v_version_status",
   ["draft", "published"],
 );
-export const enum__la_biblia_articles_v_version_category = pgEnum(
-  "enum__la_biblia_articles_v_version_category",
-  [
-    "primeros-pasos",
-    "reglas-y-etiqueta",
-    "equipo",
-    "canchas",
-    "tecnica-basica",
-    "diccionario-golfistico",
-    "cultura-golf",
-  ],
-);
-export const enum__la_biblia_articles_v_version_difficulty = pgEnum(
-  "enum__la_biblia_articles_v_version_difficulty",
-  ["principiante", "intermedio", "avanzado"],
-);
-export const enum__la_biblia_articles_v_version_status = pgEnum(
-  "enum__la_biblia_articles_v_version_status",
-  ["draft", "published"],
-);
-export const enum__la_biblia_articles_v_published_locale = pgEnum(
-  "enum__la_biblia_articles_v_published_locale",
+export const enum__articles_v_published_locale = pgEnum(
+  "enum__articles_v_published_locale",
   ["es", "en"],
 );
 export const enum_products_stock_status = pgEnum("enum_products_stock_status", [
@@ -114,6 +91,10 @@ export const enum__products_v_version_status = pgEnum(
 export const enum__products_v_published_locale = pgEnum(
   "enum__products_v_published_locale",
   ["es", "en"],
+);
+export const enum_site_settings_member_identifier_type = pgEnum(
+  "enum_site_settings_member_identifier_type",
+  ["generic", "cl_rut"],
 );
 export const enum_home_page_status = pgEnum("enum_home_page_status", [
   "draft",
@@ -485,14 +466,13 @@ export const _canchas_v_locales = pgTable(
   ],
 );
 
-export const la_biblia_articles = pgTable(
-  "la_biblia_articles",
+export const articles = pgTable(
+  "articles",
   {
     id: serial("id").primaryKey(),
     slug: varchar("slug"),
-    category: enum_la_biblia_articles_category("category").default("equipo"),
-    difficulty:
-      enum_la_biblia_articles_difficulty("difficulty").default("principiante"),
+    category: varchar("category"),
+    difficulty: enum_articles_difficulty("difficulty").default("beginner"),
     reviewedAt: timestamp("reviewed_at", {
       mode: "string",
       withTimezone: true,
@@ -518,18 +498,18 @@ export const la_biblia_articles = pgTable(
     })
       .defaultNow()
       .notNull(),
-    _status: enum_la_biblia_articles_status("_status").default("draft"),
+    _status: enum_articles_status("_status").default("draft"),
   },
   (columns) => [
-    uniqueIndex("la_biblia_articles_slug_idx").on(columns.slug),
-    index("la_biblia_articles_updated_at_idx").on(columns.updatedAt),
-    index("la_biblia_articles_created_at_idx").on(columns.createdAt),
-    index("la_biblia_articles__status_idx").on(columns._status),
+    uniqueIndex("articles_slug_idx").on(columns.slug),
+    index("articles_updated_at_idx").on(columns.updatedAt),
+    index("articles_created_at_idx").on(columns.createdAt),
+    index("articles__status_idx").on(columns._status),
   ],
 );
 
-export const la_biblia_articles_locales = pgTable(
-  "la_biblia_articles_locales",
+export const articles_locales = pgTable(
+  "articles_locales",
   {
     title: varchar("title"),
     body: jsonb("body"),
@@ -538,34 +518,31 @@ export const la_biblia_articles_locales = pgTable(
     _parentID: integer("_parent_id").notNull(),
   },
   (columns) => [
-    uniqueIndex("la_biblia_articles_locales_locale_parent_id_unique").on(
+    uniqueIndex("articles_locales_locale_parent_id_unique").on(
       columns._locale,
       columns._parentID,
     ),
     foreignKey({
       columns: [columns["_parentID"]],
-      foreignColumns: [la_biblia_articles.id],
-      name: "la_biblia_articles_locales_parent_id_fk",
+      foreignColumns: [articles.id],
+      name: "articles_locales_parent_id_fk",
     }).onDelete("cascade"),
   ],
 );
 
-export const _la_biblia_articles_v = pgTable(
-  "_la_biblia_articles_v",
+export const _articles_v = pgTable(
+  "_articles_v",
   {
     id: serial("id").primaryKey(),
-    parent: integer("parent_id").references(() => la_biblia_articles.id, {
+    parent: integer("parent_id").references(() => articles.id, {
       onDelete: "set null",
     }),
     version_slug: varchar("version_slug"),
-    version_category:
-      enum__la_biblia_articles_v_version_category("version_category").default(
-        "equipo",
-      ),
+    version_category: varchar("version_category"),
     version_difficulty:
-      enum__la_biblia_articles_v_version_difficulty(
-        "version_difficulty",
-      ).default("principiante"),
+      enum__articles_v_version_difficulty("version_difficulty").default(
+        "beginner",
+      ),
     version_reviewedAt: timestamp("version_reviewed_at", {
       mode: "string",
       withTimezone: true,
@@ -588,9 +565,7 @@ export const _la_biblia_articles_v = pgTable(
       precision: 3,
     }),
     version__status:
-      enum__la_biblia_articles_v_version_status("version__status").default(
-        "draft",
-      ),
+      enum__articles_v_version_status("version__status").default("draft"),
     createdAt: timestamp("created_at", {
       mode: "string",
       withTimezone: true,
@@ -606,38 +581,33 @@ export const _la_biblia_articles_v = pgTable(
       .defaultNow()
       .notNull(),
     snapshot: boolean("snapshot"),
-    publishedLocale:
-      enum__la_biblia_articles_v_published_locale("published_locale"),
+    publishedLocale: enum__articles_v_published_locale("published_locale"),
     latest: boolean("latest"),
     autosave: boolean("autosave"),
   },
   (columns) => [
-    index("_la_biblia_articles_v_parent_idx").on(columns.parent),
-    index("_la_biblia_articles_v_version_version_slug_idx").on(
-      columns.version_slug,
-    ),
-    index("_la_biblia_articles_v_version_version_updated_at_idx").on(
+    index("_articles_v_parent_idx").on(columns.parent),
+    index("_articles_v_version_version_slug_idx").on(columns.version_slug),
+    index("_articles_v_version_version_updated_at_idx").on(
       columns.version_updatedAt,
     ),
-    index("_la_biblia_articles_v_version_version_created_at_idx").on(
+    index("_articles_v_version_version_created_at_idx").on(
       columns.version_createdAt,
     ),
-    index("_la_biblia_articles_v_version_version__status_idx").on(
+    index("_articles_v_version_version__status_idx").on(
       columns.version__status,
     ),
-    index("_la_biblia_articles_v_created_at_idx").on(columns.createdAt),
-    index("_la_biblia_articles_v_updated_at_idx").on(columns.updatedAt),
-    index("_la_biblia_articles_v_snapshot_idx").on(columns.snapshot),
-    index("_la_biblia_articles_v_published_locale_idx").on(
-      columns.publishedLocale,
-    ),
-    index("_la_biblia_articles_v_latest_idx").on(columns.latest),
-    index("_la_biblia_articles_v_autosave_idx").on(columns.autosave),
+    index("_articles_v_created_at_idx").on(columns.createdAt),
+    index("_articles_v_updated_at_idx").on(columns.updatedAt),
+    index("_articles_v_snapshot_idx").on(columns.snapshot),
+    index("_articles_v_published_locale_idx").on(columns.publishedLocale),
+    index("_articles_v_latest_idx").on(columns.latest),
+    index("_articles_v_autosave_idx").on(columns.autosave),
   ],
 );
 
-export const _la_biblia_articles_v_locales = pgTable(
-  "_la_biblia_articles_v_locales",
+export const _articles_v_locales = pgTable(
+  "_articles_v_locales",
   {
     version_title: varchar("version_title"),
     version_body: jsonb("version_body"),
@@ -646,14 +616,14 @@ export const _la_biblia_articles_v_locales = pgTable(
     _parentID: integer("_parent_id").notNull(),
   },
   (columns) => [
-    uniqueIndex("_la_biblia_articles_v_locales_locale_parent_id_unique").on(
+    uniqueIndex("_articles_v_locales_locale_parent_id_unique").on(
       columns._locale,
       columns._parentID,
     ),
     foreignKey({
       columns: [columns["_parentID"]],
-      foreignColumns: [_la_biblia_articles_v.id],
-      name: "_la_biblia_articles_v_locales_parent_id_fk",
+      foreignColumns: [_articles_v.id],
+      name: "_articles_v_locales_parent_id_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -860,7 +830,7 @@ export const payload_locked_documents_rels = pgTable(
     mediaID: integer("media_id"),
     membershipsID: integer("memberships_id"),
     canchasID: integer("canchas_id"),
-    "la-biblia-articlesID": integer("la_biblia_articles_id"),
+    articlesID: integer("articles_id"),
     productsID: integer("products_id"),
   },
   (columns) => [
@@ -873,8 +843,8 @@ export const payload_locked_documents_rels = pgTable(
       columns.membershipsID,
     ),
     index("payload_locked_documents_rels_canchas_id_idx").on(columns.canchasID),
-    index("payload_locked_documents_rels_la_biblia_articles_id_idx").on(
-      columns["la-biblia-articlesID"],
+    index("payload_locked_documents_rels_articles_id_idx").on(
+      columns.articlesID,
     ),
     index("payload_locked_documents_rels_products_id_idx").on(
       columns.productsID,
@@ -905,9 +875,9 @@ export const payload_locked_documents_rels = pgTable(
       name: "payload_locked_documents_rels_canchas_fk",
     }).onDelete("cascade"),
     foreignKey({
-      columns: [columns["la-biblia-articlesID"]],
-      foreignColumns: [la_biblia_articles.id],
-      name: "payload_locked_documents_rels_la_biblia_articles_fk",
+      columns: [columns["articlesID"]],
+      foreignColumns: [articles.id],
+      name: "payload_locked_documents_rels_articles_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["productsID"]],
@@ -1009,6 +979,9 @@ export const site_settings = pgTable("site_settings", {
   lang: varchar("lang").default("en"),
   instagramUrl: varchar("instagram_url"),
   whatsappUrl: varchar("whatsapp_url"),
+  memberIdentifierType: enum_site_settings_member_identifier_type(
+    "member_identifier_type",
+  ).default("generic"),
   updatedAt: timestamp("updated_at", {
     mode: "string",
     withTimezone: true,
@@ -1169,43 +1142,40 @@ export const relations__canchas_v = relations(_canchas_v, ({ one, many }) => ({
     relationName: "_locales",
   }),
 }));
-export const relations_la_biblia_articles_locales = relations(
-  la_biblia_articles_locales,
+export const relations_articles_locales = relations(
+  articles_locales,
   ({ one }) => ({
-    _parentID: one(la_biblia_articles, {
-      fields: [la_biblia_articles_locales._parentID],
-      references: [la_biblia_articles.id],
+    _parentID: one(articles, {
+      fields: [articles_locales._parentID],
+      references: [articles.id],
       relationName: "_locales",
     }),
   }),
 );
-export const relations_la_biblia_articles = relations(
-  la_biblia_articles,
-  ({ many }) => ({
-    _locales: many(la_biblia_articles_locales, {
-      relationName: "_locales",
-    }),
+export const relations_articles = relations(articles, ({ many }) => ({
+  _locales: many(articles_locales, {
+    relationName: "_locales",
   }),
-);
-export const relations__la_biblia_articles_v_locales = relations(
-  _la_biblia_articles_v_locales,
+}));
+export const relations__articles_v_locales = relations(
+  _articles_v_locales,
   ({ one }) => ({
-    _parentID: one(_la_biblia_articles_v, {
-      fields: [_la_biblia_articles_v_locales._parentID],
-      references: [_la_biblia_articles_v.id],
+    _parentID: one(_articles_v, {
+      fields: [_articles_v_locales._parentID],
+      references: [_articles_v.id],
       relationName: "_locales",
     }),
   }),
 );
-export const relations__la_biblia_articles_v = relations(
-  _la_biblia_articles_v,
+export const relations__articles_v = relations(
+  _articles_v,
   ({ one, many }) => ({
-    parent: one(la_biblia_articles, {
-      fields: [_la_biblia_articles_v.parent],
-      references: [la_biblia_articles.id],
+    parent: one(articles, {
+      fields: [_articles_v.parent],
+      references: [articles.id],
       relationName: "parent",
     }),
-    _locales: many(_la_biblia_articles_v_locales, {
+    _locales: many(_articles_v_locales, {
       relationName: "_locales",
     }),
   }),
@@ -1277,10 +1247,10 @@ export const relations_payload_locked_documents_rels = relations(
       references: [canchas.id],
       relationName: "canchas",
     }),
-    "la-biblia-articlesID": one(la_biblia_articles, {
-      fields: [payload_locked_documents_rels["la-biblia-articlesID"]],
-      references: [la_biblia_articles.id],
-      relationName: "la-biblia-articles",
+    articlesID: one(articles, {
+      fields: [payload_locked_documents_rels.articlesID],
+      references: [articles.id],
+      relationName: "articles",
     }),
     productsID: one(products, {
       fields: [payload_locked_documents_rels.productsID],
@@ -1348,18 +1318,17 @@ type DatabaseSchema = {
   enum__canchas_v_version_access_type: typeof enum__canchas_v_version_access_type;
   enum__canchas_v_version_status: typeof enum__canchas_v_version_status;
   enum__canchas_v_published_locale: typeof enum__canchas_v_published_locale;
-  enum_la_biblia_articles_category: typeof enum_la_biblia_articles_category;
-  enum_la_biblia_articles_difficulty: typeof enum_la_biblia_articles_difficulty;
-  enum_la_biblia_articles_status: typeof enum_la_biblia_articles_status;
-  enum__la_biblia_articles_v_version_category: typeof enum__la_biblia_articles_v_version_category;
-  enum__la_biblia_articles_v_version_difficulty: typeof enum__la_biblia_articles_v_version_difficulty;
-  enum__la_biblia_articles_v_version_status: typeof enum__la_biblia_articles_v_version_status;
-  enum__la_biblia_articles_v_published_locale: typeof enum__la_biblia_articles_v_published_locale;
+  enum_articles_difficulty: typeof enum_articles_difficulty;
+  enum_articles_status: typeof enum_articles_status;
+  enum__articles_v_version_difficulty: typeof enum__articles_v_version_difficulty;
+  enum__articles_v_version_status: typeof enum__articles_v_version_status;
+  enum__articles_v_published_locale: typeof enum__articles_v_published_locale;
   enum_products_stock_status: typeof enum_products_stock_status;
   enum_products_status: typeof enum_products_status;
   enum__products_v_version_stock_status: typeof enum__products_v_version_stock_status;
   enum__products_v_version_status: typeof enum__products_v_version_status;
   enum__products_v_published_locale: typeof enum__products_v_published_locale;
+  enum_site_settings_member_identifier_type: typeof enum_site_settings_member_identifier_type;
   enum_home_page_status: typeof enum_home_page_status;
   enum__home_page_v_version_status: typeof enum__home_page_v_version_status;
   enum__home_page_v_published_locale: typeof enum__home_page_v_published_locale;
@@ -1372,10 +1341,10 @@ type DatabaseSchema = {
   canchas_locales: typeof canchas_locales;
   _canchas_v: typeof _canchas_v;
   _canchas_v_locales: typeof _canchas_v_locales;
-  la_biblia_articles: typeof la_biblia_articles;
-  la_biblia_articles_locales: typeof la_biblia_articles_locales;
-  _la_biblia_articles_v: typeof _la_biblia_articles_v;
-  _la_biblia_articles_v_locales: typeof _la_biblia_articles_v_locales;
+  articles: typeof articles;
+  articles_locales: typeof articles_locales;
+  _articles_v: typeof _articles_v;
+  _articles_v_locales: typeof _articles_v_locales;
   products: typeof products;
   products_locales: typeof products_locales;
   _products_v: typeof _products_v;
@@ -1398,10 +1367,10 @@ type DatabaseSchema = {
   relations_canchas: typeof relations_canchas;
   relations__canchas_v_locales: typeof relations__canchas_v_locales;
   relations__canchas_v: typeof relations__canchas_v;
-  relations_la_biblia_articles_locales: typeof relations_la_biblia_articles_locales;
-  relations_la_biblia_articles: typeof relations_la_biblia_articles;
-  relations__la_biblia_articles_v_locales: typeof relations__la_biblia_articles_v_locales;
-  relations__la_biblia_articles_v: typeof relations__la_biblia_articles_v;
+  relations_articles_locales: typeof relations_articles_locales;
+  relations_articles: typeof relations_articles;
+  relations__articles_v_locales: typeof relations__articles_v_locales;
+  relations__articles_v: typeof relations__articles_v;
   relations_products_locales: typeof relations_products_locales;
   relations_products: typeof relations_products;
   relations__products_v_locales: typeof relations__products_v_locales;

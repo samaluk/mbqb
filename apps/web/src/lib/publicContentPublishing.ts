@@ -9,7 +9,7 @@ import { isEditorOrAdmin } from '@/access/roles'
 import { env } from '@/env'
 import { buildPreviewUrl, draftVersions } from '@/lib/preview'
 
-export type PublicContentCollection = 'canchas' | 'la-biblia-articles' | 'products'
+export type PublicContentCollection = 'canchas' | 'articles' | 'products'
 
 type PublicContentPublishingTarget = {
   collection: PublicContentCollection
@@ -28,15 +28,15 @@ export type MaybePublicDoc = SlugData & {
 export type RevalidatePath = (path: string) => void
 
 const publicContentTargets = {
+  articles: {
+    collection: 'articles',
+    detailPrefix: '/articles',
+    listingPath: '/articles',
+  },
   canchas: {
     collection: 'canchas',
     detailPrefix: '/canchas',
     listingPath: '/canchas',
-  },
-  'la-biblia-articles': {
-    collection: 'la-biblia-articles',
-    detailPrefix: '/la-biblia',
-    listingPath: '/la-biblia',
   },
   products: {
     collection: 'products',
@@ -45,7 +45,7 @@ const publicContentTargets = {
   },
 } satisfies Record<PublicContentCollection, PublicContentPublishingTarget>
 
-const globalPublicPaths = ['/', '/canchas', '/la-biblia', '/products', '/privacy']
+const globalPublicPaths = ['/', '/canchas', '/articles', '/products', '/privacy']
 
 export function getPublicContentPublishing(collection: PublicContentCollection) {
   return {
