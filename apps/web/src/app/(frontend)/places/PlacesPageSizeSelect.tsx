@@ -8,13 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { CanchasPaginationModel } from '@/lib/canchasBrowsing'
+import type { PlacesPaginationModel } from '@/lib/placesBrowsing'
 
-export type CanchasPageSizeSelectProps = {
-  pagination: CanchasPaginationModel
+export type PlacesPageSizeSelectProps = {
+  pagination: PlacesPaginationModel
 }
 
-export function CanchasPageSizeSelect({ pagination }: CanchasPageSizeSelectProps) {
+export function PlacesPageSizeSelect({ pagination }: PlacesPageSizeSelectProps) {
   const items = pagination.pageSizeOptions.map((option) => ({
     label: `${option.value}`,
     value: `${option.value}`,

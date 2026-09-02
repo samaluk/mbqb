@@ -70,7 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     memberships: Membership;
-    canchas: Cancha;
+    places: Place;
     articles: Article;
     products: Product;
     'payload-kv': PayloadKv;
@@ -83,7 +83,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     memberships: MembershipsSelect<false> | MembershipsSelect<true>;
-    canchas: CanchasSelect<false> | CanchasSelect<true>;
+    places: PlacesSelect<false> | PlacesSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -198,9 +198,9 @@ export interface Membership {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "canchas".
+ * via the `definition` "places".
  */
-export interface Cancha {
+export interface Place {
   id: number;
   title: string;
   slug: string;
@@ -220,11 +220,10 @@ export interface Cancha {
     };
     [k: string]: unknown;
   };
-  accessType: 'pay-and-play' | 'private' | 'restricted' | 'unknown';
+  accessType: 'open' | 'private' | 'restricted' | 'unknown';
   region?: string | null;
   city?: string | null;
-  holes?: number | null;
-  publicBookingUrl?: string | null;
+  externalUrl?: string | null;
   /**
    * @minItems 2
    * @maxItems 2
@@ -337,8 +336,8 @@ export interface PayloadLockedDocument {
         value: number | Membership;
       } | null)
     | ({
-        relationTo: 'canchas';
-        value: number | Cancha;
+        relationTo: 'places';
+        value: number | Place;
       } | null)
     | ({
         relationTo: 'articles';
@@ -446,9 +445,9 @@ export interface MembershipsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "canchas_select".
+ * via the `definition` "places_select".
  */
-export interface CanchasSelect<T extends boolean = true> {
+export interface PlacesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   summary?: T;
@@ -456,8 +455,7 @@ export interface CanchasSelect<T extends boolean = true> {
   accessType?: T;
   region?: T;
   city?: T;
-  holes?: T;
-  publicBookingUrl?: T;
+  externalUrl?: T;
   location?: T;
   sourceUrl?: T;
   sourceUpdatedAt?: T;

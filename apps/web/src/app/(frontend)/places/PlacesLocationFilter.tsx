@@ -7,14 +7,14 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
-import { defaultMaxDistanceKm, maxMaxDistanceKm, minMaxDistanceKm } from '@/lib/canchasGeo'
-import { createStoredUserGeo, type StoredUserGeo } from '@/lib/canchasUserGeo'
+import { defaultMaxDistanceKm, maxMaxDistanceKm, minMaxDistanceKm } from '@/lib/placesGeo'
+import { createStoredUserGeo, type StoredUserGeo } from '@/lib/placesUserGeo'
 
-import { useCanchasGeo } from './CanchasGeoContext'
+import { usePlacesGeo } from './PlacesGeoContext'
 
 function notifyLocationRequired() {
   toast('Comparte tu ubicación para ajustar la distancia máxima.', {
-    id: 'canchas-location-required',
+    id: 'places-location-required',
   })
 }
 
@@ -23,9 +23,9 @@ const firstSliderValue = (value: readonly number[] | number): number =>
   typeof value === 'number' ? value : (value[0] ?? defaultMaxDistanceKm)
 
 type LocateHandlers = {
+  fallbackMaxKm: number
   onFailure: (message: string) => void
   onResolved: (geo: StoredUserGeo | null) => void
-  fallbackMaxKm: number
 }
 
 /** Browser geolocation wrapped so the component only handles outcomes. */
@@ -112,8 +112,8 @@ function useMaxDistanceControls(userGeo: StoredUserGeo | null, setUserGeo: SetUs
   return { commitMaxDistance, persistMaxDistance, schedulePersistMaxDistance, sliderMaxKm }
 }
 
-export function CanchasLocationFilter() {
-  const { isGeoPending, setUserGeo, userGeo } = useCanchasGeo()
+export function PlacesLocationFilter() {
+  const { isGeoPending, setUserGeo, userGeo } = usePlacesGeo()
   const [isLocating, setIsLocating] = React.useState(false)
   const [locationError, setLocationError] = React.useState<string | null>(null)
   const hasLocation = userGeo !== null
@@ -145,7 +145,7 @@ export function CanchasLocationFilter() {
     <div className="flex flex-col gap-3 rounded-lg border bg-card p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <Label className="text-sm font-medium text-foreground" htmlFor="canchas-max-distance">
+          <Label className="text-sm font-medium text-foreground" htmlFor="places-max-distance">
             Cerca de ti
           </Label>
           <p className="max-w-prose text-sm text-muted-foreground">
@@ -166,9 +166,9 @@ export function CanchasLocationFilter() {
       <DistanceControls
         disabled={!hasLocation || isGeoPending}
         maxKm={maxDistance.sliderMaxKm}
-        showSummary={hasLocation}
         onCommit={maxDistance.commitMaxDistance}
         onSchedule={maxDistance.schedulePersistMaxDistance}
+        showSummary={hasLocation}
       />
     </div>
   )
@@ -183,18 +183,18 @@ const locationButtonLabel = (isLocating: boolean, hasLocation: boolean) =>
 
 function LocationButtons({
   hasLocation,
-  requestDisabled,
-  isLocating,
   isGeoPending,
+  isLocating,
   onClear,
   onRequest,
+  requestDisabled,
 }: {
   hasLocation: boolean
-  requestDisabled: boolean
   isGeoPending: boolean
   isLocating: boolean
   onClear: () => void
   onRequest: () => void
+  requestDisabled: boolean
 }) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -229,16 +229,16 @@ function DistanceControls({
     <div className="flex flex-col gap-3">
       {showSummary ? (
         <p className="text-sm text-muted-foreground">
-          Mostrando canchas a hasta <strong className="text-foreground">{maxKm} km</strong> de tu
+          Mostrando lugares a hasta <strong className="text-foreground">{maxKm} km</strong> de tu
           ubicación actual.
         </p>
       ) : (
         <p className="text-sm text-muted-foreground">
-          Usa el botón de arriba para compartir tu ubicación y filtrar canchas por distancia.
+          Usa el botón de arriba para compartir tu ubicación y filtrar lugares por distancia.
         </p>
       )}
       <div className="flex flex-col gap-2">
-        <Label className="text-xs font-normal text-muted-foreground" htmlFor="canchas-max-distance">
+        <Label className="text-xs font-normal text-muted-foreground" htmlFor="places-max-distance">
           Distancia máxima: {maxKm} km
         </Label>
         <SliderBlock
@@ -273,7 +273,7 @@ function SliderBlock({
         aria-disabled={disabled}
         aria-label="Distancia máxima en kilómetros"
         disabled={disabled}
-        id="canchas-max-distance"
+        id="places-max-distance"
         max={maxMaxDistanceKm}
         min={minMaxDistanceKm}
         onValueChange={(value) => onSchedule(firstSliderValue(value))}

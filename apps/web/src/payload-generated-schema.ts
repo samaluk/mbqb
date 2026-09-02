@@ -29,26 +29,26 @@ export const enum_users_role = pgEnum("enum_users_role", [
   "editor",
   "validation-manager",
 ]);
-export const enum_canchas_access_type = pgEnum("enum_canchas_access_type", [
-  "pay-and-play",
+export const enum_places_access_type = pgEnum("enum_places_access_type", [
+  "open",
   "private",
   "restricted",
   "unknown",
 ]);
-export const enum_canchas_status = pgEnum("enum_canchas_status", [
+export const enum_places_status = pgEnum("enum_places_status", [
   "draft",
   "published",
 ]);
-export const enum__canchas_v_version_access_type = pgEnum(
-  "enum__canchas_v_version_access_type",
-  ["pay-and-play", "private", "restricted", "unknown"],
+export const enum__places_v_version_access_type = pgEnum(
+  "enum__places_v_version_access_type",
+  ["open", "private", "restricted", "unknown"],
 );
-export const enum__canchas_v_version_status = pgEnum(
-  "enum__canchas_v_version_status",
+export const enum__places_v_version_status = pgEnum(
+  "enum__places_v_version_status",
   ["draft", "published"],
 );
-export const enum__canchas_v_published_locale = pgEnum(
-  "enum__canchas_v_published_locale",
+export const enum__places_v_published_locale = pgEnum(
+  "enum__places_v_published_locale",
   ["es", "en"],
 );
 export const enum_articles_difficulty = pgEnum("enum_articles_difficulty", [
@@ -307,16 +307,15 @@ export const _memberships_v = pgTable(
   ],
 );
 
-export const canchas = pgTable(
-  "canchas",
+export const places = pgTable(
+  "places",
   {
     id: serial("id").primaryKey(),
     slug: varchar("slug"),
-    accessType: enum_canchas_access_type("access_type").default("unknown"),
+    accessType: enum_places_access_type("access_type").default("unknown"),
     region: varchar("region"),
     city: varchar("city"),
-    holes: numeric("holes", { mode: "number" }),
-    publicBookingUrl: varchar("public_booking_url"),
+    externalUrl: varchar("external_url"),
     location: geometryColumn("location"),
     sourceUrl: varchar("source_url"),
     sourceUpdatedAt: timestamp("source_updated_at", {
@@ -338,18 +337,18 @@ export const canchas = pgTable(
     })
       .defaultNow()
       .notNull(),
-    _status: enum_canchas_status("_status").default("draft"),
+    _status: enum_places_status("_status").default("draft"),
   },
   (columns) => [
-    uniqueIndex("canchas_slug_idx").on(columns.slug),
-    index("canchas_updated_at_idx").on(columns.updatedAt),
-    index("canchas_created_at_idx").on(columns.createdAt),
-    index("canchas__status_idx").on(columns._status),
+    uniqueIndex("places_slug_idx").on(columns.slug),
+    index("places_updated_at_idx").on(columns.updatedAt),
+    index("places_created_at_idx").on(columns.createdAt),
+    index("places__status_idx").on(columns._status),
   ],
 );
 
-export const canchas_locales = pgTable(
-  "canchas_locales",
+export const places_locales = pgTable(
+  "places_locales",
   {
     title: varchar("title"),
     summary: varchar("summary"),
@@ -359,33 +358,32 @@ export const canchas_locales = pgTable(
     _parentID: integer("_parent_id").notNull(),
   },
   (columns) => [
-    uniqueIndex("canchas_locales_locale_parent_id_unique").on(
+    uniqueIndex("places_locales_locale_parent_id_unique").on(
       columns._locale,
       columns._parentID,
     ),
     foreignKey({
       columns: [columns["_parentID"]],
-      foreignColumns: [canchas.id],
-      name: "canchas_locales_parent_id_fk",
+      foreignColumns: [places.id],
+      name: "places_locales_parent_id_fk",
     }).onDelete("cascade"),
   ],
 );
 
-export const _canchas_v = pgTable(
-  "_canchas_v",
+export const _places_v = pgTable(
+  "_places_v",
   {
     id: serial("id").primaryKey(),
-    parent: integer("parent_id").references(() => canchas.id, {
+    parent: integer("parent_id").references(() => places.id, {
       onDelete: "set null",
     }),
     version_slug: varchar("version_slug"),
-    version_accessType: enum__canchas_v_version_access_type(
+    version_accessType: enum__places_v_version_access_type(
       "version_access_type",
     ).default("unknown"),
     version_region: varchar("version_region"),
     version_city: varchar("version_city"),
-    version_holes: numeric("version_holes", { mode: "number" }),
-    version_publicBookingUrl: varchar("version_public_booking_url"),
+    version_externalUrl: varchar("version_external_url"),
     version_location: geometryColumn("version_location"),
     version_sourceUrl: varchar("version_source_url"),
     version_sourceUpdatedAt: timestamp("version_source_updated_at", {
@@ -404,7 +402,7 @@ export const _canchas_v = pgTable(
       precision: 3,
     }),
     version__status:
-      enum__canchas_v_version_status("version__status").default("draft"),
+      enum__places_v_version_status("version__status").default("draft"),
     createdAt: timestamp("created_at", {
       mode: "string",
       withTimezone: true,
@@ -420,31 +418,31 @@ export const _canchas_v = pgTable(
       .defaultNow()
       .notNull(),
     snapshot: boolean("snapshot"),
-    publishedLocale: enum__canchas_v_published_locale("published_locale"),
+    publishedLocale: enum__places_v_published_locale("published_locale"),
     latest: boolean("latest"),
     autosave: boolean("autosave"),
   },
   (columns) => [
-    index("_canchas_v_parent_idx").on(columns.parent),
-    index("_canchas_v_version_version_slug_idx").on(columns.version_slug),
-    index("_canchas_v_version_version_updated_at_idx").on(
+    index("_places_v_parent_idx").on(columns.parent),
+    index("_places_v_version_version_slug_idx").on(columns.version_slug),
+    index("_places_v_version_version_updated_at_idx").on(
       columns.version_updatedAt,
     ),
-    index("_canchas_v_version_version_created_at_idx").on(
+    index("_places_v_version_version_created_at_idx").on(
       columns.version_createdAt,
     ),
-    index("_canchas_v_version_version__status_idx").on(columns.version__status),
-    index("_canchas_v_created_at_idx").on(columns.createdAt),
-    index("_canchas_v_updated_at_idx").on(columns.updatedAt),
-    index("_canchas_v_snapshot_idx").on(columns.snapshot),
-    index("_canchas_v_published_locale_idx").on(columns.publishedLocale),
-    index("_canchas_v_latest_idx").on(columns.latest),
-    index("_canchas_v_autosave_idx").on(columns.autosave),
+    index("_places_v_version_version__status_idx").on(columns.version__status),
+    index("_places_v_created_at_idx").on(columns.createdAt),
+    index("_places_v_updated_at_idx").on(columns.updatedAt),
+    index("_places_v_snapshot_idx").on(columns.snapshot),
+    index("_places_v_published_locale_idx").on(columns.publishedLocale),
+    index("_places_v_latest_idx").on(columns.latest),
+    index("_places_v_autosave_idx").on(columns.autosave),
   ],
 );
 
-export const _canchas_v_locales = pgTable(
-  "_canchas_v_locales",
+export const _places_v_locales = pgTable(
+  "_places_v_locales",
   {
     version_title: varchar("version_title"),
     version_summary: varchar("version_summary"),
@@ -454,14 +452,14 @@ export const _canchas_v_locales = pgTable(
     _parentID: integer("_parent_id").notNull(),
   },
   (columns) => [
-    uniqueIndex("_canchas_v_locales_locale_parent_id_unique").on(
+    uniqueIndex("_places_v_locales_locale_parent_id_unique").on(
       columns._locale,
       columns._parentID,
     ),
     foreignKey({
       columns: [columns["_parentID"]],
-      foreignColumns: [_canchas_v.id],
-      name: "_canchas_v_locales_parent_id_fk",
+      foreignColumns: [_places_v.id],
+      name: "_places_v_locales_parent_id_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -829,7 +827,7 @@ export const payload_locked_documents_rels = pgTable(
     usersID: integer("users_id"),
     mediaID: integer("media_id"),
     membershipsID: integer("memberships_id"),
-    canchasID: integer("canchas_id"),
+    placesID: integer("places_id"),
     articlesID: integer("articles_id"),
     productsID: integer("products_id"),
   },
@@ -842,7 +840,7 @@ export const payload_locked_documents_rels = pgTable(
     index("payload_locked_documents_rels_memberships_id_idx").on(
       columns.membershipsID,
     ),
-    index("payload_locked_documents_rels_canchas_id_idx").on(columns.canchasID),
+    index("payload_locked_documents_rels_places_id_idx").on(columns.placesID),
     index("payload_locked_documents_rels_articles_id_idx").on(
       columns.articlesID,
     ),
@@ -870,9 +868,9 @@ export const payload_locked_documents_rels = pgTable(
       name: "payload_locked_documents_rels_memberships_fk",
     }).onDelete("cascade"),
     foreignKey({
-      columns: [columns["canchasID"]],
-      foreignColumns: [canchas.id],
-      name: "payload_locked_documents_rels_canchas_fk",
+      columns: [columns["placesID"]],
+      foreignColumns: [places.id],
+      name: "payload_locked_documents_rels_places_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["articlesID"]],
@@ -1107,38 +1105,38 @@ export const relations__memberships_v = relations(
     }),
   }),
 );
-export const relations_canchas_locales = relations(
-  canchas_locales,
+export const relations_places_locales = relations(
+  places_locales,
   ({ one }) => ({
-    _parentID: one(canchas, {
-      fields: [canchas_locales._parentID],
-      references: [canchas.id],
+    _parentID: one(places, {
+      fields: [places_locales._parentID],
+      references: [places.id],
       relationName: "_locales",
     }),
   }),
 );
-export const relations_canchas = relations(canchas, ({ many }) => ({
-  _locales: many(canchas_locales, {
+export const relations_places = relations(places, ({ many }) => ({
+  _locales: many(places_locales, {
     relationName: "_locales",
   }),
 }));
-export const relations__canchas_v_locales = relations(
-  _canchas_v_locales,
+export const relations__places_v_locales = relations(
+  _places_v_locales,
   ({ one }) => ({
-    _parentID: one(_canchas_v, {
-      fields: [_canchas_v_locales._parentID],
-      references: [_canchas_v.id],
+    _parentID: one(_places_v, {
+      fields: [_places_v_locales._parentID],
+      references: [_places_v.id],
       relationName: "_locales",
     }),
   }),
 );
-export const relations__canchas_v = relations(_canchas_v, ({ one, many }) => ({
-  parent: one(canchas, {
-    fields: [_canchas_v.parent],
-    references: [canchas.id],
+export const relations__places_v = relations(_places_v, ({ one, many }) => ({
+  parent: one(places, {
+    fields: [_places_v.parent],
+    references: [places.id],
     relationName: "parent",
   }),
-  _locales: many(_canchas_v_locales, {
+  _locales: many(_places_v_locales, {
     relationName: "_locales",
   }),
 }));
@@ -1242,10 +1240,10 @@ export const relations_payload_locked_documents_rels = relations(
       references: [memberships.id],
       relationName: "memberships",
     }),
-    canchasID: one(canchas, {
-      fields: [payload_locked_documents_rels.canchasID],
-      references: [canchas.id],
-      relationName: "canchas",
+    placesID: one(places, {
+      fields: [payload_locked_documents_rels.placesID],
+      references: [places.id],
+      relationName: "places",
     }),
     articlesID: one(articles, {
       fields: [payload_locked_documents_rels.articlesID],
@@ -1313,11 +1311,11 @@ export const relations__home_page_v = relations(_home_page_v, ({ one }) => ({
 type DatabaseSchema = {
   enum__locales: typeof enum__locales;
   enum_users_role: typeof enum_users_role;
-  enum_canchas_access_type: typeof enum_canchas_access_type;
-  enum_canchas_status: typeof enum_canchas_status;
-  enum__canchas_v_version_access_type: typeof enum__canchas_v_version_access_type;
-  enum__canchas_v_version_status: typeof enum__canchas_v_version_status;
-  enum__canchas_v_published_locale: typeof enum__canchas_v_published_locale;
+  enum_places_access_type: typeof enum_places_access_type;
+  enum_places_status: typeof enum_places_status;
+  enum__places_v_version_access_type: typeof enum__places_v_version_access_type;
+  enum__places_v_version_status: typeof enum__places_v_version_status;
+  enum__places_v_published_locale: typeof enum__places_v_published_locale;
   enum_articles_difficulty: typeof enum_articles_difficulty;
   enum_articles_status: typeof enum_articles_status;
   enum__articles_v_version_difficulty: typeof enum__articles_v_version_difficulty;
@@ -1337,10 +1335,10 @@ type DatabaseSchema = {
   media: typeof media;
   memberships: typeof memberships;
   _memberships_v: typeof _memberships_v;
-  canchas: typeof canchas;
-  canchas_locales: typeof canchas_locales;
-  _canchas_v: typeof _canchas_v;
-  _canchas_v_locales: typeof _canchas_v_locales;
+  places: typeof places;
+  places_locales: typeof places_locales;
+  _places_v: typeof _places_v;
+  _places_v_locales: typeof _places_v_locales;
   articles: typeof articles;
   articles_locales: typeof articles_locales;
   _articles_v: typeof _articles_v;
@@ -1363,10 +1361,10 @@ type DatabaseSchema = {
   relations_media: typeof relations_media;
   relations_memberships: typeof relations_memberships;
   relations__memberships_v: typeof relations__memberships_v;
-  relations_canchas_locales: typeof relations_canchas_locales;
-  relations_canchas: typeof relations_canchas;
-  relations__canchas_v_locales: typeof relations__canchas_v_locales;
-  relations__canchas_v: typeof relations__canchas_v;
+  relations_places_locales: typeof relations_places_locales;
+  relations_places: typeof relations_places;
+  relations__places_v_locales: typeof relations__places_v_locales;
+  relations__places_v: typeof relations__places_v;
   relations_articles_locales: typeof relations_articles_locales;
   relations_articles: typeof relations_articles;
   relations__articles_v_locales: typeof relations__articles_v_locales;

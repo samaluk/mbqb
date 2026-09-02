@@ -4,11 +4,11 @@ import { cookies } from 'next/headers'
 
 import { env } from '@/env'
 
-import { parseStoredUserGeo, type StoredUserGeo } from '@/lib/canchasUserGeo'
+import { parseStoredUserGeo, type StoredUserGeo } from '@/lib/placesUserGeo'
 
-const canchasUserGeoCookieName = 'mbqb.canchas.userGeo'
+const placesUserGeoCookieName = 'community.places.userGeo'
 
-const cookiePath = '/canchas'
+const cookiePath = '/places'
 const maxAgeSeconds = 8 * 60 * 60
 
 const cookieOptions = {
@@ -18,9 +18,9 @@ const cookieOptions = {
   secure: env.NODE_ENV === 'production',
 }
 
-export async function readCanchasUserGeoCookie(): Promise<StoredUserGeo | null> {
+export async function readPlacesUserGeoCookie(): Promise<StoredUserGeo | null> {
   const cookieStore = await cookies()
-  const raw = cookieStore.get(canchasUserGeoCookieName)?.value
+  const raw = cookieStore.get(placesUserGeoCookieName)?.value
 
   if (!raw) return null
 
@@ -31,7 +31,7 @@ export async function readCanchasUserGeoCookie(): Promise<StoredUserGeo | null> 
   }
 }
 
-export async function setCanchasUserGeoCookie(geo: StoredUserGeo) {
+export async function setPlacesUserGeoCookie(geo: StoredUserGeo) {
   const parsed = parseStoredUserGeo(geo)
 
   if (!parsed) {
@@ -39,16 +39,16 @@ export async function setCanchasUserGeoCookie(geo: StoredUserGeo) {
   }
 
   const cookieStore = await cookies()
-  cookieStore.set(canchasUserGeoCookieName, JSON.stringify(parsed), {
+  cookieStore.set(placesUserGeoCookieName, JSON.stringify(parsed), {
     ...cookieOptions,
     maxAge: maxAgeSeconds,
   })
 }
 
-export async function clearCanchasUserGeoCookie() {
+export async function clearPlacesUserGeoCookie() {
   const cookieStore = await cookies()
   cookieStore.delete({
-    name: canchasUserGeoCookieName,
+    name: placesUserGeoCookieName,
     path: cookiePath,
   })
 }

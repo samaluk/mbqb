@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  annotateCanchasWithDistance,
-  filterCanchasWithinRadius,
+  annotatePlacesWithDistance,
+  filterPlacesWithinRadius,
   formatDistanceKm,
   getDistanceKm,
-  sortCanchasByDistance,
-} from '../../src/lib/canchasGeo'
-import type { CanchaMapItem } from '../../src/lib/canchas'
+  sortPlacesByDistance,
+} from '../../src/lib/placesGeo'
+import type { PlaceMapItem } from '../../src/lib/places'
 
 const santiagoOrigin = { latitude: -33.4489, longitude: -70.6693 }
 
-const sampleCancha = (overrides: Partial<CanchaMapItem> = {}): CanchaMapItem => ({
-  accessType: 'pay-and-play',
+const samplePlace = (overrides: Partial<PlaceMapItem> = {}): PlaceMapItem => ({
+  accessType: 'open',
   id: 1,
   location: [-70.6, -33.4],
   slug: 'sample',
@@ -44,21 +44,21 @@ describe('formatDistanceKm', () => {
 })
 
 describe('geo filtering helpers', () => {
-  it('annotates, filters, and sorts canchas by distance', () => {
-    const canchas = [
-      sampleCancha({ id: 1, location: [-70.6, -33.4] }),
-      sampleCancha({ id: 2, location: [-70.75, -33.5] }),
-      sampleCancha({ id: 3, location: [-71.1, -34.2] }),
-      sampleCancha({ id: 4, title: 'Sin coordenadas', location: null }),
+  it('annotates, filters, and sorts places by distance', () => {
+    const places = [
+      samplePlace({ id: 1, location: [-70.6, -33.4] }),
+      samplePlace({ id: 2, location: [-70.75, -33.5] }),
+      samplePlace({ id: 3, location: [-71.1, -34.2] }),
+      samplePlace({ id: 4, location: null, title: 'Sin coordenadas' }),
     ]
 
-    const annotated = annotateCanchasWithDistance(canchas, santiagoOrigin)
-    const filtered = filterCanchasWithinRadius(annotated, 30)
-    const sorted = sortCanchasByDistance(filtered)
+    const annotated = annotatePlacesWithDistance(places, santiagoOrigin)
+    const filtered = filterPlacesWithinRadius(annotated, 30)
+    const sorted = sortPlacesByDistance(filtered)
 
     expect(annotated).toHaveLength(3)
     expect(filtered).toHaveLength(2)
-    expect(filtered.every((cancha) => cancha.distanceKm <= 30)).toBe(true)
+    expect(filtered.every((place) => place.distanceKm <= 30)).toBe(true)
     expect(sorted[0]?.distanceKm).toBeLessThanOrEqual(sorted[1]?.distanceKm ?? 0)
   })
 })

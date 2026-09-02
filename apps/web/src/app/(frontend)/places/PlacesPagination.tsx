@@ -9,23 +9,23 @@ import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { buttonVariants } from '@/components/ui/button-variants'
-import type { CanchasPaginationLink, CanchasPaginationModel } from '@/lib/canchasBrowsing'
+import type { PlacesPaginationLink, PlacesPaginationModel } from '@/lib/placesBrowsing'
 import { cn } from '@/lib/utils'
 
-import { CanchasPageSizeSelect } from './CanchasPageSizeSelect'
+import { PlacesPageSizeSelect } from './PlacesPageSizeSelect'
 
-export type CanchasPaginationProps = {
-  pagination: CanchasPaginationModel
+export type PlacesPaginationProps = {
+  pagination: PlacesPaginationModel
 }
 
-export function CanchasPagination({ pagination }: CanchasPaginationProps) {
+export function PlacesPagination({ pagination }: PlacesPaginationProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="text-sm text-muted-foreground">{pagination.label}</div>
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">Filas</span>
-          <CanchasPageSizeSelect pagination={pagination} />
+          <PlacesPageSizeSelect pagination={pagination} />
         </div>
         <div className="flex items-center gap-3">
           <div className="text-sm font-medium">{pagination.pageLabel}</div>
@@ -53,13 +53,7 @@ export function CanchasPagination({ pagination }: CanchasPaginationProps) {
   )
 }
 
-function PaginationButton({
-  children,
-  link,
-}: {
-  children: ReactNode
-  link: CanchasPaginationLink
-}) {
+function PaginationButton({ children, link }: { children: ReactNode; link: PlacesPaginationLink }) {
   if (link.disabled) {
     return (
       <Button disabled size="icon-sm" type="button" variant="outline">

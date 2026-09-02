@@ -1,6 +1,6 @@
 /**
  * Seeds the fixture content the instant-navigation e2e suite runs against:
- * published canchas, articles, and products with fixed slugs.
+ * published places, articles, and products with fixed slugs.
  *
  * Idempotent: upserts by slug. Runs against POSTGRES_URL (the same database
  * the served build reads). Invoked from the Playwright globalSetup and can
@@ -36,13 +36,13 @@ const richTextBody = {
   },
 }
 
-const fixtureCollections = ['canchas', 'articles', 'products'] as const
+const fixtureCollections = ['places', 'articles', 'products'] as const
 
 type FixtureCollection = (typeof fixtureCollections)[number]
 
 /**
  * Per-collection fixture shape: each collection's docs are checked against
- * its own Payload data type via the `satisfies` map below, so a cancha shape
+ * its own Payload data type via the `satisfies` map below, so a place shape
  * cannot silently drift into a product shape. `body` is exempted because
  * Payload's generated rich-text type is lossier than the lexical editor
  * state fixtures carry (its root demands an indent/alignment `format` the
@@ -72,22 +72,22 @@ const fixtures = {
       title: 'Articulo Fixture Dos',
     },
   ],
-  canchas: [
+  places: [
     {
-      accessType: 'pay-and-play',
+      accessType: 'open',
       body: richTextBody,
-      slug: 'cancha-fixture-1',
-      sourceUrl: 'https://mbqb.cl/fixture/cancha-1',
-      summary: 'Cancha de fixture con greens rapidos.',
-      title: 'Cancha Fixture Uno',
+      slug: 'place-fixture-1',
+      sourceUrl: 'https://community.example/fixture/place-1',
+      summary: 'Lugar de fixture para pruebas.',
+      title: 'Lugar Fixture Uno',
     },
     {
       accessType: 'private',
       body: richTextBody,
-      slug: 'cancha-fixture-2',
-      sourceUrl: 'https://mbqb.cl/fixture/cancha-2',
-      summary: 'Cancha de fixture privada.',
-      title: 'Cancha Fixture Dos',
+      slug: 'place-fixture-2',
+      sourceUrl: 'https://community.example/fixture/place-2',
+      summary: 'Lugar de fixture privado.',
+      title: 'Lugar Fixture Dos',
     },
   ],
   products: [

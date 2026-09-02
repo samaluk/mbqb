@@ -9,7 +9,7 @@ import { isEditorOrAdmin } from '@/access/roles'
 import { env } from '@/env'
 import { buildPreviewUrl, draftVersions } from '@/lib/preview'
 
-export type PublicContentCollection = 'canchas' | 'articles' | 'products'
+export type PublicContentCollection = 'places' | 'articles' | 'products'
 
 type PublicContentPublishingTarget = {
   collection: PublicContentCollection
@@ -33,10 +33,10 @@ const publicContentTargets = {
     detailPrefix: '/articles',
     listingPath: '/articles',
   },
-  canchas: {
-    collection: 'canchas',
-    detailPrefix: '/canchas',
-    listingPath: '/canchas',
+  places: {
+    collection: 'places',
+    detailPrefix: '/places',
+    listingPath: '/places',
   },
   products: {
     collection: 'products',
@@ -45,7 +45,7 @@ const publicContentTargets = {
   },
 } satisfies Record<PublicContentCollection, PublicContentPublishingTarget>
 
-const globalPublicPaths = ['/', '/canchas', '/articles', '/products', '/privacy']
+const globalPublicPaths = ['/', '/places', '/articles', '/products', '/privacy']
 
 export function getPublicContentPublishing(collection: PublicContentCollection) {
   return {

@@ -84,11 +84,11 @@
   grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
 }
 
-@utility grid-cols-canchas-filters {
+@utility grid-cols-places-filters {
   grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(160px, 1fr));
 }
 
-@utility grid-cols-canchas-cards {
+@utility grid-cols-places-cards {
   grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
 }
 
@@ -308,15 +308,15 @@
     @apply text-label font-display text-green uppercase;
   }
 
-  .canchas-map {
+  .places-map {
     @apply sticky top-6 z-0 min-h-170 overflow-hidden rounded-lg border border-line bg-white-soft max-[760px]:relative max-[760px]:top-auto max-[760px]:min-h-55;
   }
 
-  .canchas-map .leaflet-container {
+  .places-map .leaflet-container {
     font: inherit;
   }
 
-  .canchas-map .leaflet-control-attribution {
+  .places-map .leaflet-control-attribution {
     @apply text-meta;
   }
 
@@ -328,7 +328,7 @@
     @apply grid place-items-center rounded-full border-2 border-white-soft text-label font-black text-white-soft shadow-map-pin [&_span]:block [&_span]:leading-none bg-red;
   }
 
-  .map-marker-pay-and-play {
+  .map-marker-open {
     @apply grid place-items-center rounded-full border-2 border-white-soft text-label font-black text-white-soft shadow-map-pin [&_span]:block [&_span]:leading-none bg-green;
   }
 

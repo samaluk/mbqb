@@ -10,7 +10,7 @@ import { env } from '@/env'
 
 import { Memberships } from './collections/Memberships'
 import { Articles } from './collections/Articles'
-import { Canchas } from './collections/Canchas'
+import { Places } from './collections/Places'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Products } from './collections/Products'
@@ -37,7 +37,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Memberships, Canchas, Articles, Products],
+  collections: [Users, Media, Memberships, Places, Articles, Products],
   globals: [SiteSettings, HomePage],
   localization: {
     defaultLocale: 'es',

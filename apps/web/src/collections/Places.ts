@@ -4,13 +4,13 @@ import { getPublicContentPublishing } from '@/lib/publicContentPublishing'
 
 import { localizedRichBodyField, localizedTitleField, uniqueSlugField } from './fields'
 
-const publishing = getPublicContentPublishing('canchas')
+const publishing = getPublicContentPublishing('places')
 
-export const Canchas: CollectionConfig = {
-  slug: 'canchas',
+export const Places: CollectionConfig = {
+  slug: 'places',
   labels: {
-    singular: 'Cancha',
-    plural: 'Canchas',
+    singular: 'Place',
+    plural: 'Places',
   },
   admin: {
     ...publishing.admin,
@@ -35,8 +35,8 @@ export const Canchas: CollectionConfig = {
       defaultValue: 'unknown',
       options: [
         {
-          label: 'Pay and Play',
-          value: 'pay-and-play',
+          label: 'Open',
+          value: 'open',
         },
         {
           label: 'Private',
@@ -60,20 +60,12 @@ export const Canchas: CollectionConfig = {
     {
       name: 'city',
       type: 'text',
-      label: 'City / comuna',
+      label: 'City / locality',
     },
     {
-      name: 'holes',
-      type: 'number',
-      admin: {
-        step: 1,
-      },
-      label: 'Holes',
-    },
-    {
-      name: 'publicBookingUrl',
+      name: 'externalUrl',
       type: 'text',
-      label: 'Public booking URL',
+      label: 'External URL',
     },
     {
       name: 'location',
