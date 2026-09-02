@@ -8,7 +8,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
-import { formatIdentifierInput } from '@/lib/rut'
+import { getMemberIdentifierConfig, type MemberIdentifierType } from '@/lib/memberIdentifiers'
 
 type CheckStatus = 'active' | 'invalid_identifier' | 'not_found' | 'rate_limited'
 
@@ -67,7 +67,23 @@ async function verifyMembership(identifier: string): Promise<CheckResponse> {
   return parseCheckResponse(data)
 }
 
-export function VerifyForm() {
+function VerifyResultBadge({ result }: { result: CheckResponse }) {
+  return (
+    <Badge
+      className="h-auto justify-start px-3 py-2.5 text-sm font-bold whitespace-normal"
+      variant={result.status === 'active' ? 'secondary' : 'destructive'}
+    >
+      {result.message}
+    </Badge>
+  )
+}
+
+export type VerifyFormProps = {
+  identifierType?: MemberIdentifierType | null
+}
+
+export function VerifyForm({ identifierType }: VerifyFormProps) {
+  const config = getMemberIdentifierConfig(identifierType)
   const [identifier, setIdentifier] = useState('')
   const [result, setResult] = useState<CheckResponse | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -97,7 +113,7 @@ export function VerifyForm() {
           <FieldGroup>
             <Field>
               <FieldLabel className="font-bold" htmlFor="identifier">
-                Member identifier
+                {config.label}
               </FieldLabel>
               <Input
                 className="min-h-10 bg-paper px-3"
@@ -106,8 +122,11 @@ export function VerifyForm() {
                 id="identifier"
                 inputMode="text"
                 name="identifier"
-                onChange={(event) => setIdentifier(formatIdentifierInput(event.target.value))}
-                placeholder="e.g. MEMBER-1234"
+                onChange={(event) => {
+                  const raw = event.target.value
+                  setIdentifier(config.formatInput ? config.formatInput(raw) : raw)
+                }}
+                placeholder={config.placeholder}
                 required
                 value={identifier}
               />
@@ -125,14 +144,7 @@ export function VerifyForm() {
               'Verify membership'
             )}
           </Button>
-          {result ? (
-            <Badge
-              className="h-auto justify-start px-3 py-2.5 text-sm font-bold whitespace-normal"
-              variant={result.status === 'active' ? 'secondary' : 'destructive'}
-            >
-              {result.message}
-            </Badge>
-          ) : null}
+          {result ? <VerifyResultBadge result={result} /> : null}
         </CardFooter>
       </Card>
     </form>

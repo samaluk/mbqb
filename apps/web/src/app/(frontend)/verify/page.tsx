@@ -1,10 +1,13 @@
 import { PageKicker, PageLede, PageShell, PageTitle } from '@/components/page'
+import { getSiteSettings } from '@/lib/siteSettings'
 
 import { VerifyForm } from './VerifyForm'
 
 export const metadata = { title: 'Verify Membership' }
 
-export default function VerifyPage() {
+export default async function VerifyPage() {
+  const siteSettings = await getSiteSettings()
+
   return (
     <PageShell className="grid grid-cols-verify items-start gap-8 max-[760px]:grid-cols-1 max-[760px]:gap-4">
       <div>
@@ -15,7 +18,7 @@ export default function VerifyPage() {
           never exposes member names or internal details.
         </PageLede>
       </div>
-      <VerifyForm />
+      <VerifyForm identifierType={siteSettings.memberIdentifierType} />
     </PageShell>
   )
 }

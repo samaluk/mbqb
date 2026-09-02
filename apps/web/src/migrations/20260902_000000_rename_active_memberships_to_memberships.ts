@@ -45,6 +45,8 @@ const upRenameStatements = [
   sql`ALTER TABLE ONLY public.payload_locked_documents_rels
     ADD CONSTRAINT payload_locked_documents_rels_memberships_fk
     FOREIGN KEY (memberships_id) REFERENCES public.memberships(id) ON DELETE CASCADE`,
+  sql`ALTER TABLE public.site_settings
+    ADD COLUMN IF NOT EXISTS member_identifier_type character varying DEFAULT 'generic'`,
 ]
 
 const downRenameStatements = [
@@ -90,6 +92,8 @@ const downRenameStatements = [
   sql`ALTER TABLE ONLY public.payload_locked_documents_rels
     ADD CONSTRAINT payload_locked_documents_rels_active_memberships_fk
     FOREIGN KEY (active_memberships_id) REFERENCES public.active_memberships(id) ON DELETE CASCADE`,
+  sql`ALTER TABLE public.site_settings
+    DROP COLUMN IF EXISTS member_identifier_type`,
 ]
 
 type MembershipRow = {

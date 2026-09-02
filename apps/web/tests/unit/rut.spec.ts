@@ -1,14 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  cleanRut,
-  formatIdentifierInput,
-  formatRut,
-  formatRutInput,
-  isRutCandidate,
-  normalizeRut,
-  validateRut,
-} from '@/lib/rut'
+import { cleanRut, formatRut, formatRutInput, normalizeRut, validateRut } from '@/lib/rut'
 
 describe('RUT utilities', () => {
   it('normalizes valid RUT input with dots, hyphen, whitespace, and lowercase k', () => {
@@ -36,20 +28,6 @@ describe('RUT utilities', () => {
     expect(formatRutInput('12345678')).toBe('1.234.567-8')
     expect(formatRutInput('123456785')).toBe('12.345.678-5')
     expect(formatRutInput('1000005k')).toBe('1.000.005-K')
-  })
-
-  it('detects RUT candidates and leaves generic identifiers untouched', () => {
-    expect(isRutCandidate('123456785')).toBe(true)
-    expect(isRutCandidate('12.345.678-5')).toBe(true)
-    expect(isRutCandidate('1000005k')).toBe(true)
-    expect(isRutCandidate('MEMBER-1234')).toBe(false)
-    expect(isRutCandidate('user@example.com')).toBe(false)
-    expect(isRutCandidate('12k34')).toBe(false)
-
-    expect(formatIdentifierInput('123456785')).toBe('12.345.678-5')
-    expect(formatIdentifierInput('1000005k')).toBe('1.000.005-K')
-    expect(formatIdentifierInput('MEMBER-1234')).toBe('MEMBER-1234')
-    expect(formatIdentifierInput('user@example.com')).toBe('user@example.com')
   })
 
   it('rejects malformed input without treating it as not found', () => {

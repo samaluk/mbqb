@@ -558,6 +558,7 @@ export interface SiteSetting {
   lang?: string | null;
   instagramUrl?: string | null;
   whatsappUrl?: string | null;
+  memberIdentifierType?: ('generic' | 'cl_rut') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -584,6 +585,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   lang?: T;
   instagramUrl?: T;
   whatsappUrl?: T;
+  memberIdentifierType?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
