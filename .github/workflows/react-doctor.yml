@@ -32,10 +32,7 @@ concurrency:
 jobs:
   react-doctor:
     name: React Doctor
-    # Preserve the repo's safe fork / self-hosted runner routing (same shape as
-    # the other quality jobs): forks always run on GitHub-hosted runners, and
-    # the USE_SELF_HOSTED_RUNNERS repo variable opts in to self-hosted runners.
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     # Least-privilege at the workflow scope; the elevated write permissions the
     # Action needs for PR feedback are scoped to this job only.
@@ -52,7 +49,6 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-          clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
 
       # Resolve the react-doctor version the workspace pins so the scan below
       # runs the exact CLI the local hk gates run — not the Action default

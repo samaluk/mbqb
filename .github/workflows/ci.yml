@@ -21,15 +21,13 @@ jobs:
   # one must pass for a merge. Coverage and Fallow jobs live in fallow.yml.
   static:
     name: Lint, typecheck & format
-    # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
+    runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-          clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
 
       - uses: ./.github/actions/setup-toolchain
 
@@ -40,11 +38,8 @@ jobs:
         run: pnpm format:check
 
       # `tsc --noEmit` compiles against Next.js's generated route types in
-      # `.next/types`. On self-hosted runners the checkout is NOT clean
-      # (`clean: false`), so a `.next` left over from a previous run can
-      # reference routes that no longer exist after a rename/remove and make
-      # typecheck fail spuriously. This job never builds, so discard any
-      # stale generated types and typecheck the real source instead.
+      # `.next/types`. Discard any stale generated types so typecheck always
+      # runs against real source, not leftover build artefacts.
       - name: Clean stale generated types
         run: rm -rf apps/web/.next/types apps/web/.next/dev
         working-directory: .
@@ -54,8 +49,7 @@ jobs:
 
   build-and-integration:
     name: Build, integration, and E2E tests
-    # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
+    runs-on: ubuntu-latest
 
     env:
       POSTGRES_URL: postgres://postgres:postgres@localhost:5433/mbqb
@@ -64,8 +58,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
 
       - uses: ./.github/actions/setup-toolchain
 

@@ -31,15 +31,13 @@ concurrency:
 jobs:
   test:
     name: Test with coverage
-    # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
+    runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-          clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
 
       - uses: ./.github/actions/setup-toolchain
 
@@ -57,8 +55,7 @@ jobs:
   gate:
     name: Fallow gate
     needs: test
-    # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
+    runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
@@ -66,13 +63,12 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-          clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
 
       - uses: ./.github/actions/setup-toolchain
 
-      # Download the one coverage result produced by the test job. Homerun gives
-      # each job a fresh work directory and Istanbul keys contain the producing
-      # checkout's absolute path, so re-anchor before Fallow consumes it.
+      # Download the one coverage result produced by the test job. Istanbul
+      # keys contain the producing checkout's absolute path, so re-anchor
+      # before Fallow consumes it.
       - name: Download coverage
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -93,8 +89,7 @@ jobs:
     # quality consumers, while a gate failure does not suppress review feedback.
     if: ${{ needs.test.result == 'success' && !cancelled() && github.event_name == 'pull_request' }}
     needs: test
-    # USE_SELF_HOSTED_RUNNERS repo variable (Settings → Actions → Variables)
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || (vars.USE_SELF_HOSTED_RUNNERS == 'true' && fromJSON('["self-hosted","macOS","ARM64"]') || 'ubuntu-latest') }}
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     # Least-privilege at the workflow scope; the elevated write permissions the
     # Action needs for PR feedback are scoped to this job only.
@@ -108,60 +103,12 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-          clean: ${{ vars.USE_SELF_HOSTED_RUNNERS != 'true' }}
-
-      - uses: ./.github/actions/setup-toolchain
-
-      # Resolve the exact workspace-pinned Fallow version after setup. Keeping
-      # this value derived from installed package metadata prevents the global
-      # workaround from becoming unsynchronized with package.json/pnpm-lock.yaml.
-      - id: fver
-        name: Resolve Fallow version
-        run: |
-          fallow_version="$(node -p "require('./node_modules/fallow/package.json').version")"
-          if [ -z "$fallow_version" ]; then
-            echo "::error::Fallow version not found in installed workspace dependencies"
-            exit 1
-          fi
-          echo "version=$fallow_version" >> "$GITHUB_OUTPUT"
-
-      # The Fallow Action installs its CLI globally with npm and locates the
-      # install by parsing `npm root -g` output. Two quirks of these homerun
-      # runners break that: npm 11 redacts UUID-shaped segments in every
-      # command's stdout (@npmcli/redact rewrites them to a literal '***'),
-      # and the runner directories embed a UUID (.../runners/<uuid>/...), so
-      # any prefix under the runner home makes the Action verify against a
-      # mangled path and fail with platform-package-missing even though the
-      # install succeeded. Newer npm also refuses `npm config get prefix`
-      # outright ("The prefix option is protected"), so a plain bin-dir expose
-      # is a silent no-op. Provision a prefix free of UUID-shaped segments
-      # instead: prefer the shared tool cache, falling back to mktemp while
-      # RUNNER_TOOL_CACHE itself still lives under a runner directory.
-      - name: Provision isolated Fallow npm prefix
-        run: |
-          fallow_prefix="${RUNNER_TOOL_CACHE:-${RUNNER_TEMP}}/fallow-global-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
-          if printf '%s' "$fallow_prefix" | grep -qE '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}'; then
-            fallow_prefix="$(mktemp -d)/fallow-global-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}"
-          fi
-          mkdir -p "$fallow_prefix"
-          echo "NPM_CONFIG_PREFIX=$fallow_prefix" >> "$GITHUB_ENV"
-          echo "$fallow_prefix/bin" >> "$GITHUB_PATH"
-          case "${RUNNER_OS}:${RUNNER_ARCH}" in
-            macOS:ARM64) fallow_platform="@fallow-cli/darwin-arm64" ;;
-            Linux:X64) fallow_platform="@fallow-cli/linux-x64-gnu" ;;
-            *)
-              echo "Unsupported Fallow runner: ${RUNNER_OS}:${RUNNER_ARCH}" >&2
-              exit 1
-              ;;
-          esac
-          NPM_CONFIG_PREFIX="$fallow_prefix" npm install --global --ignore-scripts \
-            "fallow@${{ steps.fver.outputs.version }}" "${fallow_platform}@${{ steps.fver.outputs.version }}"
 
       # Same coverage evidence the test job produced, so audit CRAP scoring
       # matches — downloaded rather than regenerated to avoid a second
-      # install + test run. Homerun gives each job a fresh work directory and
-      # Istanbul coverage keys embed the producing checkout's absolute path,
-      # so re-anchor every key to this checkout before the audit consumes it.
+      # install + test run. Istanbul keys embed the producing checkout's
+      # absolute path, so re-anchor every key to this checkout before the
+      # audit consumes it. node is pre-installed on ubuntu-latest.
       - name: Download coverage
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -171,14 +118,22 @@ jobs:
       - name: Re-anchor coverage paths to this checkout
         run: node scripts/reanchor-coverage.mjs coverage/coverage-final.json
 
+      # The Action self-installs the fallow CLI. The `version` input reads the
+      # pinned version from the root package.json `fallow` dependency automatically
+      # when omitted — no manual install step needed.
+      #
+      # This is the PR feedback surface (sticky comment + inline review comments).
+      # The hard gate is the separate `gate` job that runs `pnpm fallow:ci`.
+      # Use `gate: new-only` so pre-existing findings on incidentally-touched
+      # files don't block the PR, and `type-aware-require: best-effort` so an
+      # unavailable type-aware sidecar degrades gracefully instead of failing.
       - name: Fallow changed-code audit
         uses: fallow-rs/fallow@85d490ce31ada36388dd59f7860716b261b48694 # v3.20.0
         with:
           command: audit
-          # Fully blocking: every finding in changed files counts (there is no
-          # backlog), matching audit.gate: all in .fallowrc.json.
-          gate: all
+          gate: new-only
           type-aware: true
+          type-aware-require: best-effort
           coverage: coverage/coverage-final.json
           coverage-root: ${{ github.workspace }}
           comment: true
