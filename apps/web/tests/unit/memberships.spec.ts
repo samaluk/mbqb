@@ -1,28 +1,28 @@
 import { describe, expect, it } from 'vitest'
 
-import { checkActiveMembership } from '@/lib/bogeyficador'
+import { checkMembership } from '@/lib/memberships'
 
-describe('Bogeyficador membership lookup', () => {
-  it('rejects invalid RUTs before looking up membership records', async () => {
-    const result = await checkActiveMembership('12.345.678-9', {
+describe('Membership lookup and verification', () => {
+  it('rejects invalid or empty identifiers before looking up membership records', async () => {
+    const result = await checkMembership('   ', {
       findByLookupHash: async () => {
-        throw new Error('lookup should not run for invalid RUTs')
+        throw new Error('lookup should not run for invalid identifiers')
       },
       hashSecret: 'test-secret',
     })
 
-    expect(result).toEqual({ status: 'invalid_rut' })
+    expect(result).toEqual({ status: 'invalid_identifier' })
   })
 
   it('returns active for an active membership without exposing member details', async () => {
-    const result = await checkActiveMembership('12.345.678-5', {
+    const result = await checkMembership('MEMBER-123', {
       findByLookupHash: async () => ({
         id: 1,
+        identifier: 'MEMBER-123',
         isActive: true,
-        normalizedRut: '12345678-5',
+        lookupHash: 'hash',
+        normalizedIdentifier: 'member-123',
         notes: 'internal note',
-        rut: '12.345.678-5',
-        rutLookupHash: 'hash',
       }),
       hashSecret: 'test-secret',
     })
@@ -31,18 +31,18 @@ describe('Bogeyficador membership lookup', () => {
   })
 
   it('returns not found for inactive or missing memberships', async () => {
-    const inactive = await checkActiveMembership('12.345.678-5', {
+    const inactive = await checkMembership('MEMBER-123', {
       findByLookupHash: async () => ({
         id: 1,
+        identifier: 'MEMBER-123',
         isActive: false,
-        normalizedRut: '12345678-5',
-        rut: '12.345.678-5',
-        rutLookupHash: 'hash',
+        lookupHash: 'hash',
+        normalizedIdentifier: 'member-123',
       }),
       hashSecret: 'test-secret',
     })
 
-    const missing = await checkActiveMembership('12.345.678-5', {
+    const missing = await checkMembership('MEMBER-123', {
       findByLookupHash: async () => null,
       hashSecret: 'test-secret',
     })
@@ -51,10 +51,10 @@ describe('Bogeyficador membership lookup', () => {
     expect(missing).toEqual({ status: 'not_found' })
   })
 
-  it('looks up memberships by hash instead of raw RUT', async () => {
+  it('looks up memberships by HMAC hash instead of raw identifier', async () => {
     let lookupHash = ''
 
-    await checkActiveMembership('12.345.678-5', {
+    await checkMembership('MEMBER-123', {
       findByLookupHash: async (hash) => {
         lookupHash = hash
         return null
@@ -63,6 +63,7 @@ describe('Bogeyficador membership lookup', () => {
     })
 
     expect(lookupHash).toMatch(/^[a-f0-9]{64}$/)
-    expect(lookupHash).not.toContain('12345678')
+    expect(lookupHash).not.toContain('MEMBER-123')
+    expect(lookupHash).not.toContain('member-123')
   })
 })

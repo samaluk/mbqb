@@ -18,12 +18,43 @@ const migrationPath = path.join(migrationsDir, `${migrationName}.ts`)
 const localPostgresUrl =
   process.env.POSTGRES_URL || 'postgres://postgres:postgres@127.0.0.1:5433/mbqb'
 
+function getProcessStdout(result: { status: number | null; stdout: string }): string | null {
+  return result.status === 0 && result.stdout ? result.stdout : null
+}
+
 function dumpSchema(): string {
+  const fromExec = getProcessStdout(dumpViaDockerExec())
+  if (fromExec) return fromExec
+
   const docker = dumpViaDocker()
+  const fromDocker = getProcessStdout(docker)
+  if (fromDocker) return fromDocker
 
-  if (docker.status === 0 && docker.stdout) return docker.stdout
+  return dumpViaLocalPgDump(docker.stderr || '')
+}
 
-  return dumpViaLocalPgDump(docker.stderr ?? '')
+function dumpViaDockerExec() {
+  const url = new URL(localPostgresUrl)
+  const dbName = url.pathname.slice(1) || 'mbqb'
+  const user = url.username || 'postgres'
+
+  return spawnSync(
+    'docker',
+    [
+      'exec',
+      'postgres',
+      'pg_dump',
+      '-U',
+      user,
+      '-d',
+      dbName,
+      '--schema-only',
+      '--no-owner',
+      '--no-privileges',
+      '--schema=public',
+    ],
+    { encoding: 'utf8' },
+  )
 }
 
 function dumpViaDocker() {

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { handleBogeyficadorCheck } from '@/lib/bogeyficadorRoute'
+import { handleVerifyCheck } from '@/lib/verifyRoute'
 
-describe('Bogeyficador check route handler', () => {
+describe('Verify check route handler', () => {
   it('returns a generic active response for active memberships', async () => {
-    const response = await handleBogeyficadorCheck(
-      new Request('http://localhost/api/bogeyficador/check', {
-        body: JSON.stringify({ rut: '12.345.678-5' }),
+    const response = await handleVerifyCheck(
+      new Request('http://localhost/api/verify', {
+        body: JSON.stringify({ identifier: 'MEMBER-123' }),
         method: 'POST',
       }),
       {
@@ -16,35 +16,35 @@ describe('Bogeyficador check route handler', () => {
     )
 
     await expect(response.json()).resolves.toEqual({
-      message: 'Membresia MBQB activa.',
+      message: 'Active membership verified.',
       status: 'active',
     })
     expect(response.status).toBe(200)
   })
 
-  it('returns invalid RUT without treating bad input as a membership miss', async () => {
-    const response = await handleBogeyficadorCheck(
-      new Request('http://localhost/api/bogeyficador/check', {
-        body: JSON.stringify({ rut: '12.345.678-9' }),
+  it('returns invalid identifier without treating bad input as a membership miss', async () => {
+    const response = await handleVerifyCheck(
+      new Request('http://localhost/api/verify', {
+        body: JSON.stringify({ identifier: '   ' }),
         method: 'POST',
       }),
       {
-        checkMembership: async () => ({ status: 'invalid_rut' }),
+        checkMembership: async () => ({ status: 'invalid_identifier' }),
         clientKey: '127.0.0.1',
       },
     )
 
     await expect(response.json()).resolves.toEqual({
-      message: 'Revisa el RUT ingresado.',
-      status: 'invalid_rut',
+      message: 'Please provide a valid member identifier.',
+      status: 'invalid_identifier',
     })
     expect(response.status).toBe(400)
   })
 
   it('returns a generic not-found response for inactive or missing memberships', async () => {
-    const response = await handleBogeyficadorCheck(
-      new Request('http://localhost/api/bogeyficador/check', {
-        body: JSON.stringify({ rut: '12.345.678-5' }),
+    const response = await handleVerifyCheck(
+      new Request('http://localhost/api/verify', {
+        body: JSON.stringify({ identifier: 'UNKNOWN-ID' }),
         method: 'POST',
       }),
       {
@@ -54,16 +54,16 @@ describe('Bogeyficador check route handler', () => {
     )
 
     await expect(response.json()).resolves.toEqual({
-      message: 'No encontramos una membresia MBQB activa para este RUT.',
+      message: 'No active membership found for this identifier.',
       status: 'not_found',
     })
     expect(response.status).toBe(404)
   })
 
-  it('rate-limits excessive public checks', async () => {
-    const response = await handleBogeyficadorCheck(
-      new Request('http://localhost/api/bogeyficador/check', {
-        body: JSON.stringify({ rut: '12.345.678-5' }),
+  it('rate-limits excessive public verification checks', async () => {
+    const response = await handleVerifyCheck(
+      new Request('http://localhost/api/verify', {
+        body: JSON.stringify({ identifier: 'MEMBER-123' }),
         method: 'POST',
       }),
       {
@@ -76,7 +76,7 @@ describe('Bogeyficador check route handler', () => {
     )
 
     await expect(response.json()).resolves.toEqual({
-      message: 'Demasiados intentos. Prueba de nuevo en unos minutos.',
+      message: 'Too many attempts. Please try again in a few minutes.',
       status: 'rate_limited',
     })
     expect(response.status).toBe(429)

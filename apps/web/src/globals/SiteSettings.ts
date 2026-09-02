@@ -48,5 +48,21 @@ export const SiteSettings: GlobalConfig = {
       type: 'text',
       label: 'WhatsApp URL',
     },
+    {
+      name: 'memberIdentifierType',
+      type: 'select',
+      label: 'Member identifier format',
+      defaultValue: 'generic',
+      options: [
+        {
+          label: 'Generic identifier',
+          value: 'generic',
+        },
+        {
+          label: 'Chilean RUT',
+          value: 'cl_rut',
+        },
+      ],
+    },
   ],
 }

@@ -12,12 +12,12 @@ _Avoid_: Traditional golf club, country club
 MBQB's positioning as a golf community for people who want the belonging and guidance of a club without the traditional barriers of golf clubs.
 _Avoid_: Country club, formal golf club
 
-**Active MBQB Membership**:
-A staff-managed status indicating that MBQB considers a person an active member of the MBQB community. In version 1, this status is manual and indefinite until MBQB deactivates or removes it.
+**Membership**:
+A staff-managed status indicating that the community considers a person an active member. This status is manual and indefinite until staff deactivates or removes it.
 _Avoid_: Validation, verified identity, paid subscription, handicap verification
 
-**Bogeyficador**:
-The public MBQB tool that checks whether a RUT has an active MBQB membership status.
+**Membership Verification**:
+The public tool that checks whether a member identifier has an active community membership status.
 _Avoid_: Identity verifier, payment checker, public member directory
 
 **Cancha**:

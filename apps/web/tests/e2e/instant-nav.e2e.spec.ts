@@ -86,14 +86,14 @@ test('home → Ver canchas CTA commits the canchas shell instantly', async ({ pa
   await expect(page).toHaveURL(/\/canchas$/)
 })
 
-test('home → Bogeyficador CTA commits instantly', async ({ page }) => {
-  // Smoke guard: /bogeyficador is fully static (no dynamic reads, no
+test('home → Verify CTA commits instantly', async ({ page }) => {
+  // Smoke guard: /verify is fully static (no dynamic reads, no
   // Suspense), so this lock asserts the prerendered page commits rather than
   // exercising the shell mechanism. It regression-guards the AC but can
   // never fail on this code path on its own.
   await page.goto('/')
 
-  const trigger = page.getByTestId('home-bogeyficador-cta')
+  const trigger = page.getByTestId('home-verify-cta')
   await expect(trigger).toBeVisible({ timeout: 20_000 })
 
   await instant(page, async () => {
@@ -101,7 +101,7 @@ test('home → Bogeyficador CTA commits instantly', async ({ page }) => {
     await expect(
       page.getByRole('heading', {
         level: 1,
-        name: 'Revisa tu membresia activa.',
+        name: 'Verify active membership.',
       }),
     ).toBeVisible()
   })

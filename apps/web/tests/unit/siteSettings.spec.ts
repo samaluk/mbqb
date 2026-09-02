@@ -20,6 +20,7 @@ it('provides generic community fallback defaults when CMS data is empty or unava
   expect(DEFAULT_SITE_SETTINGS.siteDescription).toBe(
     'A platform for community connection and shared knowledge.',
   )
+  expect(DEFAULT_SITE_SETTINGS.memberIdentifierType).toBe('generic')
 })
 
 it('fetches published site settings when draft mode is disabled', async () => {

@@ -13,6 +13,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSetting = {
   siteDescription: 'A platform for community connection and shared knowledge.',
   defaultLocale: 'en',
   lang: 'en',
+  memberIdentifierType: 'generic',
   createdAt: '',
   updatedAt: '',
 }

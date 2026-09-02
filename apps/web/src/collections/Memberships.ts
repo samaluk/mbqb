@@ -2,17 +2,18 @@ import type { CollectionConfig } from 'payload'
 
 import { isAdmin, isValidationManagerOrAdmin } from '@/access/roles'
 import { env } from '@/env'
-import { getActiveMembershipPrivacyFields } from '@/lib/activeMembershipPrivacy'
+import { getMembershipPrivacyFields } from '@/lib/membershipPrivacy'
+import { validateRut } from '@/lib/rut'
 
-export const ActiveMemberships: CollectionConfig = {
-  slug: 'active-memberships',
+export const Memberships: CollectionConfig = {
+  slug: 'memberships',
   labels: {
-    singular: 'Active MBQB Membership',
-    plural: 'Active MBQB Memberships',
+    singular: 'Membership',
+    plural: 'Memberships',
   },
   admin: {
-    useAsTitle: 'normalizedRut',
-    defaultColumns: ['normalizedRut', 'isActive', 'updatedAt'],
+    useAsTitle: 'normalizedIdentifier',
+    defaultColumns: ['normalizedIdentifier', 'isActive', 'updatedAt'],
   },
   access: {
     read: isValidationManagerOrAdmin,
@@ -23,10 +24,14 @@ export const ActiveMemberships: CollectionConfig = {
   hooks: {
     beforeValidate: [
       ({ data }) => {
-        if (!data?.rut) return data
+        if (!data?.identifier || typeof data.identifier !== 'string') return data
 
-        // oxlint-disable-next-line typescript/no-unsafe-argument
-        const privacyFields = getActiveMembershipPrivacyFields(data.rut, env.PAYLOAD_SECRET)
+        const rutResult = validateRut(data.identifier)
+        const identifier = rutResult.ok
+          ? `${rutResult.rut.body}${rutResult.rut.checkDigit}`
+          : data.identifier
+
+        const privacyFields = getMembershipPrivacyFields(identifier, env.PAYLOAD_SECRET)
 
         if (!privacyFields) {
           return data
@@ -34,6 +39,7 @@ export const ActiveMemberships: CollectionConfig = {
 
         return {
           ...data,
+          identifier,
           ...privacyFields,
         }
       },
@@ -41,17 +47,17 @@ export const ActiveMemberships: CollectionConfig = {
   },
   fields: [
     {
-      name: 'rut',
+      name: 'identifier',
       type: 'text',
-      label: 'RUT',
+      label: 'Member Identifier',
       required: true,
       admin: {
         description:
-          'Staff entry field. Payload stores a normalized RUT and lookup hash for checks.',
+          'Staff entry field. Payload stores a normalized identifier and lookup hash for checks.',
       },
     },
     {
-      name: 'normalizedRut',
+      name: 'normalizedIdentifier',
       type: 'text',
       required: true,
       unique: true,
@@ -60,7 +66,7 @@ export const ActiveMemberships: CollectionConfig = {
       },
     },
     {
-      name: 'rutLookupHash',
+      name: 'lookupHash',
       type: 'text',
       required: true,
       unique: true,
@@ -82,7 +88,7 @@ export const ActiveMemberships: CollectionConfig = {
       name: 'notes',
       type: 'textarea',
       admin: {
-        description: 'Internal staff notes. Never exposed in the public Bogeyficador result.',
+        description: 'Internal staff notes. Never exposed in the public verification result.',
       },
     },
   ],

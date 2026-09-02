@@ -80,7 +80,7 @@
   --blur-header: 10px;
 }
 
-@utility grid-cols-bogeyficador {
+@utility grid-cols-verify {
   grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
 }
 

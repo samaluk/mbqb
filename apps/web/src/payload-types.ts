@@ -69,7 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    'active-memberships': ActiveMembership;
+    memberships: Membership;
     canchas: Cancha;
     'la-biblia-articles': LaBibliaArticle;
     products: Product;
@@ -82,7 +82,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    'active-memberships': ActiveMembershipsSelect<false> | ActiveMembershipsSelect<true>;
+    memberships: MembershipsSelect<false> | MembershipsSelect<true>;
     canchas: CanchasSelect<false> | CanchasSelect<true>;
     'la-biblia-articles': LaBibliaArticlesSelect<false> | LaBibliaArticlesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
@@ -178,19 +178,19 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "active-memberships".
+ * via the `definition` "memberships".
  */
-export interface ActiveMembership {
+export interface Membership {
   id: number;
   /**
-   * Staff entry field. Payload stores a normalized RUT and lookup hash for checks.
+   * Staff entry field. Payload stores a normalized identifier and lookup hash for checks.
    */
-  rut: string;
-  normalizedRut: string;
-  rutLookupHash: string;
+  identifier: string;
+  normalizedIdentifier: string;
+  lookupHash: string;
   isActive: boolean;
   /**
-   * Internal staff notes. Never exposed in the public Bogeyficador result.
+   * Internal staff notes. Never exposed in the public verification result.
    */
   notes?: string | null;
   updatedAt: string;
@@ -340,8 +340,8 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'active-memberships';
-        value: number | ActiveMembership;
+        relationTo: 'memberships';
+        value: number | Membership;
       } | null)
     | ({
         relationTo: 'canchas';
@@ -440,12 +440,12 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "active-memberships_select".
+ * via the `definition` "memberships_select".
  */
-export interface ActiveMembershipsSelect<T extends boolean = true> {
-  rut?: T;
-  normalizedRut?: T;
-  rutLookupHash?: T;
+export interface MembershipsSelect<T extends boolean = true> {
+  identifier?: T;
+  normalizedIdentifier?: T;
+  lookupHash?: T;
   isActive?: T;
   notes?: T;
   updatedAt?: T;
@@ -558,6 +558,7 @@ export interface SiteSetting {
   lang?: string | null;
   instagramUrl?: string | null;
   whatsappUrl?: string | null;
+  memberIdentifierType?: ('generic' | 'cl_rut') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -584,6 +585,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   lang?: T;
   instagramUrl?: T;
   whatsappUrl?: T;
+  memberIdentifierType?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

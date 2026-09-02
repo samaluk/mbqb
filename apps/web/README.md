@@ -81,7 +81,7 @@ Use `CMS_USER_UPDATE_EXISTING=true` to reset an existing user password. `create:
 
 The app uses Payload with Postgres, Vercel Blob-backed media when `BLOB_READ_WRITE_TOKEN` is present, and built-in admin auth with `admin`, `editor`, and `validation-manager` staff roles.
 
-Current CMS foundation includes `users`, `media`, `active-memberships`, and `site-settings`.
+Current CMS foundation includes `users`, `media`, `memberships`, and `site-settings`.
 
 ## Live preview (server-rendered)
 
