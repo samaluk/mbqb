@@ -1,37 +1,209 @@
-# MBQB
+# Community Platform
 
-Monorepo for the MBQB public site and CMS.
+An open-source, extensible digital home and content management system for community organizations, clubs, and interest groups. Built with Next.js 16 (App Router), Payload CMS 3.0, and PostgreSQL with PostGIS.
 
-## Toolchain
+## Features
 
-Node and pnpm versions are defined only in the root [`package.json`](package.json):
+- **Places Directory (`/places`)**: Discover and filter community venues, locations, and facilities by distance, region, and access type (`open`, `private`, `restricted`) using PostGIS spatial queries with interactive map and table views.
+- **Educational Articles (`/articles`)**: Publishing hub for guides, tutorials, and knowledge base resources with category filtering and difficulty levels (`beginner`, `intermediate`, `advanced`).
+- **Product Catalog (`/products`)**: Showcase community merchandise and offerings with pricing and availability status.
+- **Privacy-Preserving Membership Verification (`/verify`)**: Staff-managed membership verification using keyed HMAC-SHA256 hashes of normalized identifiers (such as email addresses, membership numbers, or national IDs), preventing member enumeration or PII exposure.
+- **Configurable Site Settings**: CMS global configuration (`site-settings`) for brand name, site description, default locale, HTML `lang` code, social links, and member identifier format (`generic` or custom formats like `cl_rut`).
+- **Live Preview & Draft Workflows**: Side-by-side real-time preview and versioned drafts in Payload CMS with on-demand Next.js cache revalidation upon publishing.
 
-- **Node** — `engines.node` (use [Corepack](https://nodejs.org/api/corepack.html) or install that exact version locally)
-- **pnpm** — `packageManager` (Corepack activates this version automatically)
+## Architecture
 
-CI reads both fields via [`.github/actions/setup-toolchain`](.github/actions/setup-toolchain). Docker images must stay aligned with `engines.node` (see comments in `apps/web/Dockerfile`).
+The project is structured as a lightweight `pnpm` monorepo:
 
-CI runs on GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (lint, format, typecheck, production build with migrations, integration tests, and Playwright E2E against PostGIS) plus [`.github/workflows/fallow.yml`](.github/workflows/fallow.yml) (unit tests with coverage, the fully-blocking Fallow quality gate, and PR review). Generic validation runs on pull requests.
+```
+community-platform/
+├── apps/
+│   └── web/            # Next.js 16 App Router + Payload CMS 3.0 application
+├── docs/
+│   ├── adr/            # Architectural Decision Records
+│   └── agents/         # AI agent conventions and domain principles
+├── CONTEXT.md          # Ubiquitous domain language and architectural boundaries
+├── LICENSE             # MIT License
+└── NOTICE              # Third-party notices and attribution
+```
 
-## Development
+The application runs as a single deployable unit combining the public web experience and the administrative CMS, backed by PostgreSQL (with PostGIS) and optional Vercel Blob storage for media uploads.
+
+## Prerequisites & Toolchain
+
+Node.js and pnpm versions are pinned in the root [`package.json`](package.json):
+
+- **Node.js**: `^24.19.0` (managed via [Corepack](https://nodejs.org/api/corepack.html) or your version manager)
+- **pnpm**: `11.24.0` (activated automatically via Corepack)
+- **Docker & Docker Compose**: for running local PostgreSQL with PostGIS
+
+## Quick Start
+
+### 1. Install dependencies
 
 ```sh
 pnpm install
 ```
 
-Environment variables and local setup: [apps/web/README.md](apps/web/README.md).
+### 2. Start local PostgreSQL with PostGIS
+
+Use Docker Compose to start a local PostgreSQL 17 instance with PostGIS on port **5433** (configured to avoid clashing with standard Postgres on port 5432):
+
+```sh
+cd apps/web
+docker compose up -d postgres
+cd ../..
+```
+
+The container automatically creates the primary development database (`mbqb`) and test database (`mbqb_test`).
+
+### 3. Configure environment variables
+
+Create `apps/web/.env.local` with the required local development configuration:
+
+```env
+NODE_ENV=development
+POSTGRES_URL=postgres://postgres:postgres@127.0.0.1:5433/mbqb
+TEST_POSTGRES_URL=postgres://postgres:postgres@127.0.0.1:5433/mbqb_test
+NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+PAYLOAD_SECRET=development-secret-must-be-at-least-32-chars-long
+PREVIEW_SECRET=development-preview-secret-value
+```
+
+If you use Vercel for hosting, you can pull remote environment variables directly:
+
+```sh
+cd apps/web
+pnpm env:pull
+cd ../..
+```
+
+### 4. Run database migrations
+
+Apply Payload database migrations to initialize the schema:
+
+```sh
+pnpm migrate
+```
+
+For a completely fresh local database:
+
+```sh
+pnpm --filter @community/web migrate:fresh
+```
+
+### 5. Start the development server
 
 ```sh
 pnpm dev
 ```
 
-### Git hooks
+The application will be available at:
+- **Public Site**: [http://localhost:3000](http://localhost:3000)
+- **Payload Admin**: [http://localhost:3000/admin](http://localhost:3000/admin)
 
-Local checks are managed by [hk](https://hk.jdx.dev/). Install hk once (`brew install hk` or `cargo install hk`), then run `bash scripts/setup-hk.sh` in this repo (or `hk install --global` once on your machine — hk is a silent no-op in repos without an `hk.pkl`).
+## Environment Variables Reference
 
-> If you previously ran `scripts/setup-githooks.sh` (pre-hk), run `bash scripts/setup-hk.sh` once: it removes the stale `include.path` pointing at the deleted `.githooks/mbqb.config`. If you use `hk install --global` instead, clear it manually with `git config --local --fixed-value --unset-all include.path '../.githooks/mbqb.config'`.
+All environment variables are validated at build and runtime via [`apps/web/src/env.ts`](apps/web/src/env.ts) using `@t3-oss/env-nextjs` and Zod:
 
-- `pre-commit` — oxlint and oxfmt on **staged files only** (auto-fixes and re-stages them), then typecheck, fallow gates, and unit tests on the whole repo
-- `pre-push` — checks the environment, typechecks, fetches `origin/master`, runs the changed-scope React Doctor gate, builds, generates fresh coverage, and runs the full Fallow scan (requires `apps/web/.env.local`; run `cd apps/web && pnpm env:pull`)
+| Variable | Required | Description |
+|---|---|---|
+| `POSTGRES_URL` | Yes | PostgreSQL connection URI (must support PostGIS). |
+| `TEST_POSTGRES_URL` | Optional | Dedicated database URI for isolated integration tests (`pnpm test:int`). |
+| `PAYLOAD_SECRET` | Yes | Secret key used by Payload CMS for auth encryption and HMAC member hashing. |
+| `PREVIEW_SECRET` | Yes | Secret token for Next.js draft mode and CMS live preview. |
+| `NEXT_PUBLIC_SERVER_URL` | Yes | Public canonical base URL (e.g. `http://localhost:3000`). |
+| `BLOB_READ_WRITE_TOKEN` | Optional | Vercel Blob access token for cloud media asset storage. |
 
-The full fast suite is also available on demand: `hk check` (defaults to staged files; `--all` for every tracked file, `--unstaged` for working-tree changes) and `hk fix` to auto-fix.
+## CMS Workflows & Setup
+
+### Creating the First Admin User
+
+1. Navigate to [http://localhost:3000/admin](http://localhost:3000/admin) in your browser.
+2. Complete the initial registration form to create the primary administrator account for your local environment.
+
+For production deployments, administrative users can also be provisioned via CLI script with production credentials:
+
+```sh
+cd apps/web
+CMS_USER_EMAIL=admin@example.com CMS_USER_PASSWORD=your-secure-password pnpm create:prod-user
+cd ../..
+```
+*(Requires `.env.production.local` configured with production database credentials).*
+
+### Configuring Site Identity (Site Settings)
+
+In Payload Admin, navigate to **Globals > Site Settings** to configure your organization's identity:
+- **Brand Name**: Displayed in navigation, metadata, and page titles.
+- **Site Description**: Default SEO and social sharing meta description.
+- **Default Locale & HTML Lang**: Set default content language code (e.g., `en`, `es`).
+- **Social Links**: URLs for Instagram and WhatsApp channels.
+- **Member Identifier Format**: Choose `generic` (default) or regional formats like `cl_rut`.
+
+### Managing Content
+
+- **Places (`/admin/collections/places`)**: Create community locations with coordinates (`location` point field), locality (`region`, `city`), `accessType` (`open`, `private`, `restricted`), and rich-text details.
+- **Articles (`/admin/collections/articles`)**: Publish guides and educational resources with categories, `difficulty` (`beginner`, `intermediate`, `advanced`), and Lexical rich text.
+- **Products (`/admin/collections/products`)**: Showcase community merchandise and offerings with pricing, stock status (`available`, `unavailable`), and imagery.
+- **Memberships (`/admin/collections/memberships`)**: Staff-managed membership roster. Enter raw identifiers (`identifier`); the system automatically computes a normalized identifier and a secure HMAC `lookupHash`.
+- **Home Page (`/admin/globals/home-page`)**: Configure hero video and featured media for the landing page.
+
+### Drafts, Live Preview, and Publishing
+
+- **Drafts**: Collections support draft versions, allowing content to be saved and reviewed before publication.
+- **Live Preview**: The admin panel embeds a live iframe of the frontend that updates instantly as editors type.
+- **On-Demand Cache Revalidation**: When content is published or updated, Payload lifecycle hooks automatically revalidate the relevant Next.js routes and tag caches.
+
+## Development & Quality Assurance
+
+### Testing
+
+```sh
+pnpm test:unit        # Vitest unit test suite
+pnpm test:int         # Vitest integration test suite (requires TEST_POSTGRES_URL)
+pnpm test:e2e         # Playwright end-to-end test suite
+pnpm test:coverage    # Unit test suite with v8 coverage report
+```
+
+Follow [`docs/agents/testing-principles.md`](docs/agents/testing-principles.md) when writing and updating tests.
+
+### Linting & Formatting
+
+```sh
+pnpm typecheck        # TypeScript compilation check (tsc --noEmit)
+pnpm oxlint           # Oxlint static code linter
+pnpm format:check     # oxfmt formatting validation
+pnpm format           # Auto-format files with oxfmt
+```
+
+### Fallow Quality Gate
+
+The repository enforces a zero-debt steady state with [Fallow](docs/fallow.md):
+
+```sh
+pnpm fallow:ci        # Strict audit across dead code, duplication, and code health
+```
+
+### Git Hooks
+
+Local verification hooks are managed by [hk](https://hk.jdx.dev/):
+
+```sh
+# Setup hooks once
+bash scripts/setup-hk.sh
+```
+
+- **Pre-commit**: Checks staged files with oxlint and oxfmt, then runs repo-wide typechecking, unit tests, and Fallow checks.
+- **Pre-push**: Verifies environment, typechecks, builds, generates test coverage, and executes the full Fallow CI gate.
+
+## Core Platform vs. Operator Separation
+
+To preserve reusability across diverse communities:
+- The core application contains **zero** organization-specific logic, hardcoded branding, or bespoke editorial routes.
+- Organization branding, locales, and member verification formats are configured through **Site Settings** and CMS collections.
+- For architectural background, see [CONTEXT.md](CONTEXT.md) and [ADR 0005: Separate generic platform source from operator configuration and content](docs/adr/0005-generic-platform-and-operator-separation.md).
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+Third-party notices and licensing disclosures are documented in [NOTICE](NOTICE).

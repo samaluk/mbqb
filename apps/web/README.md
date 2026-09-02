@@ -1,6 +1,6 @@
-# MBQB Web
+# Community Platform Web
 
-Next.js and Payload app for MBQB.
+Next.js and Payload application for the community platform.
 
 ## Quick Start
 
@@ -81,7 +81,7 @@ Use `CMS_USER_UPDATE_EXISTING=true` to reset an existing user password. `create:
 
 The app uses Payload with Postgres, Vercel Blob-backed media when `BLOB_READ_WRITE_TOKEN` is present, and built-in admin auth with `admin`, `editor`, and `validation-manager` staff roles.
 
-Current CMS foundation includes `users`, `media`, `memberships`, and `site-settings`.
+Current CMS foundation includes collections `users`, `media`, `memberships`, `places`, `articles`, `products`, and globals `site-settings`, `home-page`.
 
 ## Live preview (server-rendered)
 
