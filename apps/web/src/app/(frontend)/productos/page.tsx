@@ -3,14 +3,14 @@ import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { DocCard, PayloadCollectionListing } from '@/components/page'
 
-export const metadata = { title: 'Productos · MBQB' }
+export const metadata = { title: 'Productos' }
 
 export default function ProductosPage() {
   return (
     <PayloadCollectionListing
       collection="products"
       kicker="Productos"
-      lede="Catalogo simple de productos MBQB con detalles y contacto directo por WhatsApp para consultas."
+      lede="Catalogo simple de productos con detalles y contacto directo por WhatsApp para consultas."
       renderItem={(product) => (
         <DocCard
           badges={
@@ -43,7 +43,7 @@ export default function ProductosPage() {
           title={product.title}
         />
       )}
-      title="Merch MBQB."
+      title="Productos."
     />
   )
 }

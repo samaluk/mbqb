@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge'
 import { DocCard, PayloadCollectionListing } from '@/components/page'
 import { laBibliaCategoryLabels } from '@/lib/laBiblia'
 
-export const metadata = { title: 'La Biblia · MBQB' }
+export const metadata = { title: 'La Biblia' }
 
 export default function LaBibliaPage() {
   return (

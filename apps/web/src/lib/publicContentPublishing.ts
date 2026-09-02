@@ -45,15 +45,7 @@ const publicContentTargets = {
   },
 } satisfies Record<PublicContentCollection, PublicContentPublishingTarget>
 
-const globalPublicPaths = [
-  '/',
-  '/canchas',
-  '/la-biblia',
-  '/productos',
-  '/el-canal',
-  '/convenios',
-  '/sobre-nosotros',
-]
+const globalPublicPaths = ['/', '/canchas', '/la-biblia', '/productos', '/privacy']
 
 export function getPublicContentPublishing(collection: PublicContentCollection) {
   return {

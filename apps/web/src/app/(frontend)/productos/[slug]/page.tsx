@@ -4,7 +4,7 @@ import { MetaPills, PayloadDocDetail, RichContent, type SlugPageProps } from '@/
 import { payloadDocMetadata } from '@/lib/payloadBySlug'
 import type { Product } from '@/payload-types'
 
-export const generateMetadata = payloadDocMetadata('products', 'Productos · MBQB')
+export const generateMetadata = payloadDocMetadata('products', 'Productos')
 
 export default function ProductDetailPage({ params }: SlugPageProps) {
   return (

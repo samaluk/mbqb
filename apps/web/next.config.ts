@@ -28,45 +28,6 @@ const nextConfig: NextConfig = {
     // in real production. See instant-nav.rig.md.
     exposeTestingApiInProductionBuild: process.env.EXPOSE_TESTING_API === '1',
   },
-  async redirects() {
-    return [
-      {
-        destination: '/canchas',
-        permanent: true,
-        source: '/pages/canchas-pay-and-play',
-      },
-      {
-        destination: '/canchas',
-        permanent: true,
-        source: '/pages/canchas-privadas',
-      },
-      {
-        destination: '/bogeyficador',
-        permanent: true,
-        source: '/pages/el-bogeyficador',
-      },
-      {
-        destination: '/el-canal',
-        permanent: true,
-        source: '/pages/el-canal',
-      },
-      {
-        destination: '/la-biblia',
-        permanent: true,
-        source: '/pages/la-biblia',
-      },
-      {
-        destination: '/convenios',
-        permanent: true,
-        source: '/pages/nuestos-convenios',
-      },
-      {
-        destination: '/sobre-nosotros',
-        permanent: true,
-        source: '/pages/sobre-nosotros',
-      },
-    ]
-  },
   images: {
     localPatterns: [
       {

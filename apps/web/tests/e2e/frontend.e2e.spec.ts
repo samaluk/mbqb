@@ -11,11 +11,11 @@ test.describe('Frontend', () => {
   test('can go on homepage', async () => {
     await page.goto('/')
 
-    await expect(page).toHaveTitle(/MBQB/)
+    await expect(page).toHaveTitle(/Community/)
 
     const heading = page.locator('h1').first()
 
-    await expect(heading).toHaveText('Mas Bogeys Que Birdies')
+    await expect(heading).toHaveText('Community')
   })
 
   test('can check invalid Bogeyficador input', async () => {
@@ -28,15 +28,7 @@ test.describe('Frontend', () => {
   })
 
   test('public launch routes render', async () => {
-    for (const path of [
-      '/canchas',
-      '/la-biblia',
-      '/productos',
-      '/sobre-nosotros',
-      '/el-canal',
-      '/convenios',
-      '/privacidad',
-    ]) {
+    for (const path of ['/canchas', '/la-biblia', '/productos', '/privacy']) {
       const response = await page.goto(path)
 
       expect(response?.status()).toBe(200)

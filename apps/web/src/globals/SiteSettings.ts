@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload'
 
 import { isEditorOrAdmin } from '@/access/roles'
+import { revalidateGlobalPublicContent } from '@/lib/publicContentPublishing'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
@@ -9,12 +10,33 @@ export const SiteSettings: GlobalConfig = {
     read: () => true,
     update: isEditorOrAdmin,
   },
+  hooks: {
+    afterChange: [() => revalidateGlobalPublicContent()],
+  },
   fields: [
     {
       name: 'brandName',
       type: 'text',
       required: true,
-      defaultValue: 'Mas Bogeys Que Birdies',
+      defaultValue: 'Community',
+    },
+    {
+      name: 'siteDescription',
+      type: 'textarea',
+      label: 'Site description',
+      defaultValue: 'A platform for community connection and shared knowledge.',
+    },
+    {
+      name: 'defaultLocale',
+      type: 'text',
+      label: 'Default locale',
+      defaultValue: 'en',
+    },
+    {
+      name: 'lang',
+      type: 'text',
+      label: 'Language (HTML lang attribute)',
+      defaultValue: 'en',
     },
     {
       name: 'instagramUrl',

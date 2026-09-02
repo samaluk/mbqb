@@ -223,10 +223,6 @@
     }
   }
 
-  .editorial-body {
-    @apply grid max-w-190 gap-3 text-body leading-body max-[760px]:text-body-sm max-[760px]:leading-body-sm [&_p]:max-w-none;
-  }
-
   .rich-content {
     @apply mt-1 grid max-w-195 gap-3 text-ink max-[760px]:gap-2.5;
   }
