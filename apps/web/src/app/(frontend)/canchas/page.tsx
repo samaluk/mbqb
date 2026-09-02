@@ -4,6 +4,8 @@ import { PageKicker, PageLede, PageShell, PageTitle } from '@/components/page'
 
 import { CanchasPageContent } from './CanchasPageContent'
 
+export const metadata = { title: 'Canchas' }
+
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }

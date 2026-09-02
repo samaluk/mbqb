@@ -9,7 +9,7 @@ import { canchaAccessLabels, getGoogleMapsUrl, type CanchaMapItem } from '@/lib/
 import { payloadDocMetadata } from '@/lib/payloadBySlug'
 import type { Cancha } from '@/payload-types'
 
-export const generateMetadata = payloadDocMetadata('canchas', 'Canchas · MBQB')
+export const generateMetadata = payloadDocMetadata('canchas', 'Canchas')
 
 export default function CanchaDetailPage({ params }: SlugPageProps) {
   return (

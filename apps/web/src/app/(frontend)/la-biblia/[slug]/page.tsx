@@ -2,7 +2,7 @@ import { MetaPills, PayloadDocDetail, RichContent, type SlugPageProps } from '@/
 import { laBibliaCategoryLabels } from '@/lib/laBiblia'
 import { payloadDocMetadata } from '@/lib/payloadBySlug'
 
-export const generateMetadata = payloadDocMetadata('la-biblia-articles', 'La Biblia · MBQB')
+export const generateMetadata = payloadDocMetadata('la-biblia-articles', 'La Biblia')
 
 export default function ArticleDetailPage({ params }: SlugPageProps) {
   return (

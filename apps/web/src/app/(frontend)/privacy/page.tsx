@@ -1,5 +1,7 @@
 import { PageKicker, PageLede, PageShell, PageTitle } from '@/components/page'
 
+export const metadata = { title: 'Privacy' }
+
 export default function PrivacyPage() {
   return (
     <PageShell>

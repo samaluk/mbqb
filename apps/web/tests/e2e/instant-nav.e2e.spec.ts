@@ -101,7 +101,7 @@ test('home → Bogeyficador CTA commits instantly', async ({ page }) => {
     await expect(
       page.getByRole('heading', {
         level: 1,
-        name: /membresia/i,
+        name: 'Revisa tu membresia activa.',
       }),
     ).toBeVisible()
   })
