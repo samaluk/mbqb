@@ -45,6 +45,27 @@ function parseResponseStatus(data: object): CheckStatus {
   return isCheckStatus(status) ? status : 'not_found'
 }
 
+async function verifyMembership(identifier: string): Promise<CheckResponse> {
+  const response = await fetch('/api/verify', {
+    body: JSON.stringify({ identifier }),
+    headers: {
+      'content-type': 'application/json',
+    },
+    method: 'POST',
+  })
+
+  if (!response.ok) {
+    // The check API reports outcomes through a `{ message, status }` JSON
+    // body even on HTTP errors (400 invalid identifier, 404 not found, 429 rate
+    // limited), so error responses are parsed and shown like successes.
+    const errorData: unknown = await response.json()
+    return parseCheckResponse(errorData)
+  }
+
+  const data: unknown = await response.json()
+  return parseCheckResponse(data)
+}
+
 export function VerifyForm() {
   const [identifier, setIdentifier] = useState('')
   const [result, setResult] = useState<CheckResponse | null>(null)
@@ -56,22 +77,7 @@ export function VerifyForm() {
     setResult(null)
 
     try {
-      const response = await fetch('/api/verify', {
-        body: JSON.stringify({ identifier }),
-        headers: {
-          'content-type': 'application/json',
-        },
-        method: 'POST',
-      })
-
-      if (!response.ok) {
-        const errorData: unknown = await response.json().catch(() => null)
-        setResult(parseCheckResponse(errorData))
-        return
-      }
-
-      const data: unknown = await response.json().catch(() => null)
-      setResult(parseCheckResponse(data))
+      setResult(await verifyMembership(identifier))
     } catch (error) {
       console.error('Failed to verify membership', error)
     }
