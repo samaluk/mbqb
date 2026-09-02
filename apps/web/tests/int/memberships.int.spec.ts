@@ -4,20 +4,10 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { env } from '@/env'
 import config from '@/payload.config'
 import { checkMembership, findMembershipByLookupHash } from '@/lib/memberships'
-import { getMembershipPrivacyFields } from '@/lib/membershipPrivacy'
 
 let payload: Payload
 
 const testIdentifier = 'MEMBER-42'
-const getTestMembershipPrivacyFields = () => {
-  const fields = getMembershipPrivacyFields(testIdentifier, env.PAYLOAD_SECRET)
-
-  if (!fields) {
-    throw new Error('Invalid test identifier')
-  }
-
-  return fields
-}
 
 describe('Memberships integration', () => {
   beforeAll(async () => {
@@ -38,16 +28,20 @@ describe('Memberships integration', () => {
   })
 
   it('finds active memberships through the hashed lookup field', async () => {
-    await payload.create({
+    const created = await payload.create({
       collection: 'memberships',
       data: {
-        ...getTestMembershipPrivacyFields(),
         identifier: testIdentifier,
         isActive: true,
+        lookupHash: '',
+        normalizedIdentifier: '',
       },
       draft: false,
       overrideAccess: true,
     })
+
+    expect(created.normalizedIdentifier).toBe('member-42')
+    expect(created.lookupHash).toMatch(/^[a-f0-9]{64}$/)
 
     const result = await checkMembership(testIdentifier, {
       findByLookupHash: (lookupHash) => findMembershipByLookupHash(payload, lookupHash),
@@ -61,9 +55,10 @@ describe('Memberships integration', () => {
     await payload.create({
       collection: 'memberships',
       data: {
-        ...getTestMembershipPrivacyFields(),
         identifier: testIdentifier,
         isActive: false,
+        lookupHash: '',
+        normalizedIdentifier: '',
       },
       draft: false,
       overrideAccess: true,

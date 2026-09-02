@@ -31,10 +31,6 @@ async function readIdentifierFromRequest(request: Request): Promise<string> {
     return raw.identifier
   }
 
-  if ('memberId' in raw && typeof raw.memberId === 'string') {
-    return raw.memberId
-  }
-
   return ''
 }
 

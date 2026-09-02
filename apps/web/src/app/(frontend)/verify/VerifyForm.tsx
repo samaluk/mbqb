@@ -65,12 +65,12 @@ export function VerifyForm() {
       })
 
       if (!response.ok) {
-        const data: unknown = await response.json()
-        setResult(parseCheckResponse(data))
+        const errorData: unknown = await response.json().catch(() => null)
+        setResult(parseCheckResponse(errorData))
         return
       }
 
-      const data: unknown = await response.json()
+      const data: unknown = await response.json().catch(() => null)
       setResult(parseCheckResponse(data))
     } catch (error) {
       console.error('Failed to verify membership', error)

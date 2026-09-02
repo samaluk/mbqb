@@ -22,26 +22,6 @@ describe('Verify check route handler', () => {
     expect(response.status).toBe(200)
   })
 
-  it('supports memberId field in JSON payload', async () => {
-    const response = await handleVerifyCheck(
-      new Request('http://localhost/api/verify', {
-        body: JSON.stringify({ memberId: 'MEMBER-123' }),
-        method: 'POST',
-      }),
-      {
-        checkMembership: async (id) =>
-          id === 'MEMBER-123' ? { status: 'active' } : { status: 'not_found' },
-        clientKey: '127.0.0.1',
-      },
-    )
-
-    await expect(response.json()).resolves.toEqual({
-      message: 'Active membership verified.',
-      status: 'active',
-    })
-    expect(response.status).toBe(200)
-  })
-
   it('returns invalid identifier without treating bad input as a membership miss', async () => {
     const response = await handleVerifyCheck(
       new Request('http://localhost/api/verify', {
