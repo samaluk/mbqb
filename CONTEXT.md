@@ -1,50 +1,64 @@
-# MBQB
+# Community Platform
 
-MBQB is the public digital home for Mas Bogeys Que Birdies, a Chilean golf community and brand for making golf more accessible, entertaining, and beginner-friendly.
+The public digital home and content management system for community organizations to share places, publish educational guides, showcase products, and verify memberships with privacy preservation.
 
 ## Language
 
-**MBQB**:
-Mas Bogeys Que Birdies, a Chilean golf community and brand focused on accessible, beginner-friendly golf culture.
-_Avoid_: Traditional golf club, country club
+**Community Platform**:
+The generic open-source web application and CMS enabling community organizations to share places, publish educational articles, catalog products, and verify memberships.
+_Avoid_: MBQB, portal, bespoke website
 
-**Neo Golf Club**:
-MBQB's positioning as a golf community for people who want the belonging and guidance of a club without the traditional barriers of golf clubs.
-_Avoid_: Country club, formal golf club
+**Operator**:
+An organization, club, or community running an instance of the community platform with their own branding, configuration, and content.
+_Avoid_: Tenant, client, account holder
 
 **Membership**:
-A staff-managed status indicating that the community considers a person an active member. This status is manual and indefinite until staff deactivates or removes it.
-_Avoid_: Validation, verified identity, paid subscription, handicap verification
+A staff-managed status indicating that the community considers an individual an active member, maintained indefinitely until staff updates or deactivates it.
+_Avoid_: Account, user profile, subscription, validation
+
+**Member Identifier**:
+A normalized identifier (such as an email address, national ID, or member number) used by staff to record membership and by members to check active status.
+_Avoid_: Username, credential, password
 
 **Membership Verification**:
-The public tool that checks whether a member identifier has an active community membership status.
-_Avoid_: Identity verifier, payment checker, public member directory
+The public privacy-preserving tool that checks whether a member identifier has an active community membership status without exposing identity or roster data.
+_Avoid_: Bogeyficador, identity verifier, payment checker, public member directory, auth check
 
-**Cancha**:
-A playable golf course or on-course golf experience that MBQB presents to help people understand where they can play.
-_Avoid_: Simulator, academy, practice range
+**Place**:
+A physical location, facility, venue, or point of interest curated by the community for members and visitors.
+_Avoid_: Cancha, golf course, simulator, establishment
 
-**Cancha Browsing**:
-The public experience for finding Canchas by text, access type, location, distance, and list/map/table view so golfers can decide where to play.
-_Avoid_: Course database admin, generic search page
+**Place Browsing**:
+The public experience for finding Places through location, proximity, access type, text search, and map/table/list views.
+_Avoid_: Cancha browsing, course database admin, directory admin, generic search page
 
-**Pay and Play**:
-An access type for a Cancha where users can generally play without belonging to that club, subject to the course's booking conditions.
-_Avoid_: Public course, unrestricted access
-
-**Beginner Friendliness**:
-An MBQB editorial assessment of how suitable a Cancha is for newer golfers, based on practical beginner experience rather than an official course metric.
-_Avoid_: Official difficulty rating, user review score
+**Access Type**:
+The admission policy of a Place (`open`, `private`, `restricted`) describing who can access the venue.
+_Avoid_: Pay and play, membership tier, permission
 
 **Articles**:
 The community platform's educational content hub and knowledge base for guides, tutorials, and community resources.
-_Avoid_: News, blog, opinion feed
+_Avoid_: La Biblia, news, blog, opinion feed
 
 **Product**:
-An MBQB merchandise item promoted through the site for inquiry or purchase through an external contact flow.
-_Avoid_: Cart item, checkout item
+A community merchandise item or offering showcased for visitor inquiry or external purchase through a contact flow.
+_Avoid_: Cart item, checkout item, SKU
 
 **Public Content Publishing**:
-The shared CMS publishing behavior for public Cancha, Articles, and Product content: draft previews, staff-only editing, published public reads, and public route revalidation.
+The shared CMS publishing behavior for public Place, Article, and Product content: draft previews, staff-only editing, published public reads, and public route revalidation.
 _Avoid_: Generic CMS plumbing, private membership validation
 
+**Site Settings**:
+The global CMS configuration controlling community brand identity, description, default locale, HTML language code, and identifier format across the application.
+_Avoid_: Hardcoded config, theme file, environment branding
+
+## Architectural Boundaries
+
+**Core Platform vs. Operator Boundary**:
+The core platform codebase contains generic data models, routes, UI components, and workflows. Operator-specific identity (brand name, description, locale, social links, member identifier format) is supplied via the Site Settings global and database content, never hardcoded in core source files.
+
+**Privacy & Verification Boundary**:
+The public verification endpoint checks membership status solely via a keyed HMAC-SHA256 hash of the normalized member identifier using the server's secret. Raw identifiers and member details are restricted to staff roles (`admin`, `validation-manager`) and are never exposed over public APIs or client bundles.
+
+**Public Content vs. Administrative Boundary**:
+Public visitors interact with cached read-only routes (`/`, `/places`, `/articles`, `/products`, `/verify`, `/privacy`). Administrative workflows and draft previews are isolated under `/admin` and protected by role-based access control (`admin`, `editor`, `validation-manager`).

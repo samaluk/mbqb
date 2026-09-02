@@ -1,4 +1,4 @@
-# instant-nav rig: MBQB web
+# instant-nav rig: Community web
 
 - BUILD: seed fixtures before building any cached public lists, then run
   `EXPOSE_TESTING_API=1 pnpm build:next` (`apps/web`), served by `pnpm start`.
@@ -21,16 +21,16 @@
   in CI). Playwright `globalSetup` seeds fixture content (see SEED above).
 - TEST USER: anonymous public visitor — the frontend routes under test are
   public. Data is fixture-seeded by `tests/e2e/global-setup.ts`
-  (`scripts/seed-e2e-fixtures.ts`) into `POSTGRES_URL` before tests: 2 canchas,
-  2 La Biblia articles, 2 products, all `_status: 'published'`, fixed slugs
-  (`cancha-fixture-1`, `articulo-fixture-1`, `producto-fixture-1`, ...).
+  (`scripts/seed-e2e-fixtures.ts`) into `POSTGRES_URL` before tests: 2 places,
+  2 articles, 2 products, all `_status: 'published'`, fixed slugs
+  (`place-fixture-1`, `articulo-fixture-1`, `producto-fixture-1`, ...).
 - DRIFT:
   - Empty vs seeded DB: CI and fresh local DBs have NO content; the seed script
     is the only source of content, so content-dependent flows are deterministic.
   - Draft mode: fixtures are published only; draft-mode reads must not change
     what the test user sees.
   - Locale: fixtures are seeded in `es` (the site's only locale).
-  - Geo cookie: canchas list reads a user-geo cookie; seeded canchas have no
+  - Geo cookie: places list reads a user-geo cookie; seeded places have no
     region, so geo must not filter them out.
 - LOOP: local seed → `EXPOSE_TESTING_API=1 pnpm build:next` → `pnpm start`
   (port 3000) → `E2E_SEED_FIXTURES=1 pnpm test:e2e`; fully agent-drivable on
@@ -38,7 +38,7 @@
   `pnpm test:e2e` (sets `E2E_SEED_FIXTURES=1`); the same suite runs in the
   `build-and-integration` job. No deploy approvals or secrets needed.
 - VERIFICATION: acceptance criteria map as follows.
-  - AC 1-4 (instant UI on canchas / La Biblia / products / home CTAs): the
+  - AC 1-4 (instant UI on places / articles / products / home CTAs): the
     self-validating `@next/playwright` `instant()` locks in
     `tests/e2e/instant-nav.e2e.spec.ts`. Each locks dynamic data while
     navigating and asserts the static shell commits under the lock, then
