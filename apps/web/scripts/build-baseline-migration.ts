@@ -16,7 +16,7 @@ const migrationName = '20260604_000000_baseline'
 const migrationPath = path.join(migrationsDir, `${migrationName}.ts`)
 
 const localPostgresUrl =
-  process.env.POSTGRES_URL || 'postgres://postgres:postgres@127.0.0.1:5433/mbqb'
+  process.env.POSTGRES_URL || 'postgres://postgres:postgres@127.0.0.1:5433/community'
 
 function getProcessStdout(result: { status: number | null; stdout: string }): string | null {
   return result.status === 0 && result.stdout ? result.stdout : null
@@ -35,7 +35,7 @@ function dumpSchema(): string {
 
 function dumpViaDockerExec() {
   const url = new URL(localPostgresUrl)
-  const dbName = url.pathname.slice(1) || 'mbqb'
+  const dbName = url.pathname.slice(1) || 'community'
   const user = url.username || 'postgres'
 
   return spawnSync(
