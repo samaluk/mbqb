@@ -16,6 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     description: siteSettings.siteDescription ?? undefined,
+    openGraph: {
+      locale: siteSettings.defaultLocale ?? 'en',
+    },
     title: {
       default: siteSettings.brandName,
       template: `%s · ${siteSettings.brandName}`,
