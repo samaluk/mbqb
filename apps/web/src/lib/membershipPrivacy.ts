@@ -1,5 +1,7 @@
 import { createHmac } from 'node:crypto'
 
+import { validateRut } from '@/lib/rut'
+
 export type MembershipPrivacyFields = {
   lookupHash: string
   normalizedIdentifier: string
@@ -17,6 +19,12 @@ export type MembershipLookup =
 export function normalizeIdentifier(input: string): string | null {
   const trimmed = input.trim()
   if (!trimmed) return null
+
+  const rutResult = validateRut(trimmed)
+  if (rutResult.ok) {
+    return `${rutResult.rut.body}${rutResult.rut.checkDigit}`.toLowerCase()
+  }
+
   return trimmed.toLowerCase()
 }
 

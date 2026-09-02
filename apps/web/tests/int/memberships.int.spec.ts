@@ -8,6 +8,8 @@ import { checkMembership, findMembershipByLookupHash } from '@/lib/memberships'
 let payload: Payload
 
 const testIdentifier = 'MEMBER-42'
+const testRut = '12.345.678-5'
+const cleanedRut = '123456785'
 
 describe('Memberships integration', () => {
   beforeAll(async () => {
@@ -20,9 +22,18 @@ describe('Memberships integration', () => {
       collection: 'memberships',
       overrideAccess: true,
       where: {
-        identifier: {
-          equals: testIdentifier,
-        },
+        or: [
+          {
+            identifier: {
+              equals: testIdentifier,
+            },
+          },
+          {
+            identifier: {
+              equals: cleanedRut,
+            },
+          },
+        ],
       },
     })
   })
@@ -70,5 +81,33 @@ describe('Memberships integration', () => {
     })
 
     expect(result).toEqual({ status: 'not_found' })
+  })
+
+  it('stores RUTs without dots or dash and verifies them across input formats', async () => {
+    const created = await payload.create({
+      collection: 'memberships',
+      data: {
+        identifier: testRut,
+        isActive: true,
+        lookupHash: '',
+        normalizedIdentifier: '',
+      },
+      draft: false,
+      overrideAccess: true,
+    })
+
+    expect(created.identifier).toBe(cleanedRut)
+    expect(created.normalizedIdentifier).toBe(cleanedRut)
+    expect(created.lookupHash).toMatch(/^[a-f0-9]{64}$/)
+
+    // Can be verified using formatted RUT, hyphen-only RUT, or raw digits
+    for (const input of [testRut, '12345678-5', cleanedRut]) {
+      const result = await checkMembership(input, {
+        findByLookupHash: (lookupHash) => findMembershipByLookupHash(payload, lookupHash),
+        hashSecret: env.PAYLOAD_SECRET,
+      })
+
+      expect(result).toEqual({ status: 'active' })
+    }
   })
 })

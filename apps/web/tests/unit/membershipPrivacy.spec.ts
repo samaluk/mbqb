@@ -15,6 +15,28 @@ describe('Membership privacy and normalization', () => {
     expect(normalizeIdentifier('user@EXAMPLE.com')).toBe('user@example.com')
   })
 
+  it('normalizes Chilean RUTs to unpunctuated lowercase without dots or dash', () => {
+    expect(normalizeIdentifier(' 12.345.678-5 ')).toBe('123456785')
+    expect(normalizeIdentifier('12345678-5')).toBe('123456785')
+    expect(normalizeIdentifier('123456785')).toBe('123456785')
+    expect(normalizeIdentifier('1.000.005-k')).toBe('1000005k')
+    expect(normalizeIdentifier('1.000.005-K')).toBe('1000005k')
+    expect(normalizeIdentifier('1000005k')).toBe('1000005k')
+  })
+
+  it('matches lookup hashes between dotted and unpunctuated RUT inputs', () => {
+    const dottedLookup = getMembershipLookup('12.345.678-5', 'test-secret')
+    const plainLookup = getMembershipLookup('12345678-5', 'test-secret')
+    const rawLookup = getMembershipLookup('123456785', 'test-secret')
+
+    if (!dottedLookup.ok || !plainLookup.ok || !rawLookup.ok) {
+      throw new Error('Expected valid RUTs to produce lookup hashes')
+    }
+
+    expect(dottedLookup.lookupHash).toBe(plainLookup.lookupHash)
+    expect(dottedLookup.lookupHash).toBe(rawLookup.lookupHash)
+  })
+
   it('rejects empty or whitespace-only identifiers', () => {
     expect(normalizeIdentifier('')).toBeNull()
     expect(normalizeIdentifier('   ')).toBeNull()

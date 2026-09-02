@@ -17,11 +17,52 @@ export type RutValidationResult =
       reason: RutValidationError
     }
 
-const cleanRut = (input: string) => input.replace(/[.\-\s]/g, '').toUpperCase()
+export const cleanRut = (input: string) => input.replace(/[.\-\s]/g, '').toUpperCase()
 
 // Module scope: constructing an Intl formatter loads locale data, so build
 // the es-CL formatter once instead of per call.
 const rutBodyFormatter = new Intl.NumberFormat('es-CL')
+
+const formatCheckSuffix = (check: string) => (check ? `-${check}` : '')
+
+const splitRut = (value: string) => {
+  const cleaned = cleanRut(value)
+
+  return {
+    body: cleaned.slice(0, -1).replace(/\D/g, ''),
+    check: cleaned.slice(-1).replace(/[^0-9K]/g, ''),
+  }
+}
+
+export const formatRutInput = (value: string): string => {
+  const { body, check } = splitRut(value)
+
+  if (!body && !check) return ''
+
+  return body ? `${rutBodyFormatter.format(Number(body))}${formatCheckSuffix(check)}` : check
+}
+
+export const isRutCandidate = (value: string): boolean => {
+  const cleaned = value.replace(/[.\-\s]/g, '')
+  if (!cleaned) return false
+  if (/[^0-9Kk]/.test(cleaned)) return false
+  if (cleaned.slice(0, -1).toLowerCase().includes('k')) return false
+  if (cleaned.length > 9) return false
+  return true
+}
+
+export const formatIdentifierInput = (value: string): string => {
+  if (isRutCandidate(value)) {
+    return formatRutInput(value)
+  }
+
+  const cleaned = value.replace(/[.\-\s]/g, '')
+  if (/^\d{10,}$/.test(cleaned)) {
+    return cleaned
+  }
+
+  return value
+}
 
 const calculateCheckDigit = (body: string) => {
   let multiplier = 2

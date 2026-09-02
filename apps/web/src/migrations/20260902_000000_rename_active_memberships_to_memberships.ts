@@ -1,4 +1,4 @@
-import { createHmac } from 'node:crypto'
+import { createHash, createHmac } from 'node:crypto'
 
 import { MigrateDownArgs, MigrateUpArgs, sql } from '@payloadcms/db-postgres'
 
@@ -111,6 +111,39 @@ function getPayloadSecret() {
   return secret
 }
 
+function cleanRut(input: string): string {
+  return input.replace(/[.\-\s]/g, '').toUpperCase()
+}
+
+const CHECK_DIGITS = '0K987654321'
+const RUT_PATTERN = /^(\d{1,8})([0-9K])$/
+
+function calculateCheckDigit(body: string): string {
+  let multiplier = 2
+  let sum = 0
+
+  for (let index = body.length - 1; index >= 0; index -= 1) {
+    sum += Number(body[index]) * multiplier
+    multiplier = multiplier === 7 ? 2 : multiplier + 1
+  }
+
+  return CHECK_DIGITS[sum % 11] ?? '0'
+}
+
+function parseRutParts(input: string): { body: string; checkDigit: string } | null {
+  const match = RUT_PATTERN.exec(cleanRut(input))
+  if (!match) return null
+
+  const [, body, checkDigit] = match
+  return checkDigit === calculateCheckDigit(body) ? { body, checkDigit } : null
+}
+
+function normalizeRutLegacy(input: string): string | null {
+  const parts = parseRutParts(input)
+  if (!parts) return null
+  return `${parts.body}-${parts.checkDigit}`
+}
+
 function normalizeIdentifier(input: string): string | null {
   const trimmed = input.trim()
   if (!trimmed) return null
@@ -125,14 +158,25 @@ async function rehashMembershipRows(db: MigrateUpArgs['db'], secret: string) {
   const result = await db.execute<MembershipRow>(sql`SELECT id, identifier FROM public.memberships`)
 
   for (const row of result.rows) {
-    const normalizedIdentifier = normalizeIdentifier(row.identifier)
+    const rutParts = parseRutParts(row.identifier)
+    let identifier = row.identifier
+    let normalizedIdentifier: string | null = null
+
+    if (rutParts) {
+      identifier = `${rutParts.body}${rutParts.checkDigit}`
+      normalizedIdentifier = identifier.toLowerCase()
+    } else {
+      normalizedIdentifier = normalizeIdentifier(row.identifier)
+    }
+
     if (!normalizedIdentifier) continue
 
     const lookupHash = createLookupHash(normalizedIdentifier, secret)
 
     await db.execute(sql`
       UPDATE public.memberships
-      SET normalized_identifier = ${normalizedIdentifier},
+      SET identifier = ${identifier},
+          normalized_identifier = ${normalizedIdentifier},
           lookup_hash = ${lookupHash}
       WHERE id = ${row.id}
     `)
@@ -145,14 +189,25 @@ async function rehashMembershipVersionRows(db: MigrateUpArgs['db'], secret: stri
   )
 
   for (const row of result.rows) {
-    const normalizedIdentifier = normalizeIdentifier(row.version_identifier)
-    if (!normalizedIdentifier) continue
+    const rutParts = parseRutParts(row.version_identifier)
+    let versionIdentifier = row.version_identifier
+    let versionNormalizedIdentifier: string | null = null
 
-    const lookupHash = createLookupHash(normalizedIdentifier, secret)
+    if (rutParts) {
+      versionIdentifier = `${rutParts.body}${rutParts.checkDigit}`
+      versionNormalizedIdentifier = versionIdentifier.toLowerCase()
+    } else {
+      versionNormalizedIdentifier = normalizeIdentifier(row.version_identifier)
+    }
+
+    if (!versionNormalizedIdentifier) continue
+
+    const lookupHash = createLookupHash(versionNormalizedIdentifier, secret)
 
     await db.execute(sql`
       UPDATE public._memberships_v
-      SET version_normalized_identifier = ${normalizedIdentifier},
+      SET version_identifier = ${versionIdentifier},
+          version_normalized_identifier = ${versionNormalizedIdentifier},
           version_lookup_hash = ${lookupHash}
       WHERE id = ${row.id}
     `)
@@ -169,8 +224,66 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   await rehashMembershipVersionRows(db, secret)
 }
 
+type ActiveMembershipRow = {
+  id: number
+  rut: string
+}
+
+type ActiveMembershipVersionRow = {
+  id: number
+  version_rut: string
+}
+
+function createLegacyRutLookupHash(normalizedRut: string, secret: string) {
+  return createHash('sha256').update(`${secret}:${normalizedRut}`).digest('hex')
+}
+
+async function rollbackMembershipRows(db: MigrateDownArgs['db'], secret: string) {
+  const result = await db.execute<ActiveMembershipRow>(
+    sql`SELECT id, rut FROM public.active_memberships`,
+  )
+
+  for (const row of result.rows) {
+    const normalizedRut = normalizeRutLegacy(row.rut) ?? row.rut.trim().toLowerCase()
+    if (!normalizedRut) continue
+
+    const rutLookupHash = createLegacyRutLookupHash(normalizedRut, secret)
+
+    await db.execute(sql`
+      UPDATE public.active_memberships
+      SET normalized_rut = ${normalizedRut},
+          rut_lookup_hash = ${rutLookupHash}
+      WHERE id = ${row.id}
+    `)
+  }
+}
+
+async function rollbackMembershipVersionRows(db: MigrateDownArgs['db'], secret: string) {
+  const result = await db.execute<ActiveMembershipVersionRow>(
+    sql`SELECT id, version_rut FROM public._active_memberships_v`,
+  )
+
+  for (const row of result.rows) {
+    const normalizedRut = normalizeRutLegacy(row.version_rut) ?? row.version_rut.trim().toLowerCase()
+    if (!normalizedRut) continue
+
+    const rutLookupHash = createLegacyRutLookupHash(normalizedRut, secret)
+
+    await db.execute(sql`
+      UPDATE public._active_memberships_v
+      SET version_normalized_rut = ${normalizedRut},
+          version_rut_lookup_hash = ${rutLookupHash}
+      WHERE id = ${row.id}
+    `)
+  }
+}
+
 export async function down({ db }: MigrateDownArgs): Promise<void> {
   for (const statement of downRenameStatements) {
     await db.execute(statement)
   }
+
+  const secret = getPayloadSecret()
+  await rollbackMembershipRows(db, secret)
+  await rollbackMembershipVersionRows(db, secret)
 }

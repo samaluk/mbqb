@@ -8,6 +8,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
+import { formatIdentifierInput } from '@/lib/rut'
 
 type CheckStatus = 'active' | 'invalid_identifier' | 'not_found' | 'rate_limited'
 
@@ -105,7 +106,7 @@ export function VerifyForm() {
                 id="identifier"
                 inputMode="text"
                 name="identifier"
-                onChange={(event) => setIdentifier(event.target.value)}
+                onChange={(event) => setIdentifier(formatIdentifierInput(event.target.value))}
                 placeholder="e.g. MEMBER-1234"
                 required
                 value={identifier}

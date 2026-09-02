@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { isAdmin, isValidationManagerOrAdmin } from '@/access/roles'
 import { env } from '@/env'
 import { getMembershipPrivacyFields } from '@/lib/membershipPrivacy'
+import { validateRut } from '@/lib/rut'
 
 export const Memberships: CollectionConfig = {
   slug: 'memberships',
@@ -23,10 +24,14 @@ export const Memberships: CollectionConfig = {
   hooks: {
     beforeValidate: [
       ({ data }) => {
-        if (!data?.identifier) return data
+        if (!data?.identifier || typeof data.identifier !== 'string') return data
 
-        // oxlint-disable-next-line typescript/no-unsafe-argument
-        const privacyFields = getMembershipPrivacyFields(data.identifier, env.PAYLOAD_SECRET)
+        const rutResult = validateRut(data.identifier)
+        const identifier = rutResult.ok
+          ? `${rutResult.rut.body}${rutResult.rut.checkDigit}`
+          : data.identifier
+
+        const privacyFields = getMembershipPrivacyFields(identifier, env.PAYLOAD_SECRET)
 
         if (!privacyFields) {
           return data
@@ -34,6 +39,7 @@ export const Memberships: CollectionConfig = {
 
         return {
           ...data,
+          identifier,
           ...privacyFields,
         }
       },
