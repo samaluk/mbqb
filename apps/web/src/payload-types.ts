@@ -553,6 +553,9 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface SiteSetting {
   id: number;
   brandName: string;
+  siteDescription?: string | null;
+  defaultLocale?: string | null;
+  lang?: string | null;
   instagramUrl?: string | null;
   whatsappUrl?: string | null;
   updatedAt?: string | null;
@@ -576,6 +579,9 @@ export interface HomePage {
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
   brandName?: T;
+  siteDescription?: T;
+  defaultLocale?: T;
+  lang?: T;
   instagramUrl?: T;
   whatsappUrl?: T;
   updatedAt?: T;

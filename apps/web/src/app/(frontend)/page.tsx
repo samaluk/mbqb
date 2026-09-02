@@ -15,9 +15,10 @@ import {
 } from '@/components/page'
 import { buttonVariants } from '@/components/ui/button-variants'
 import { getCmsQueryOptions } from '@/lib/cmsQuery'
+import { getSiteSettings } from '@/lib/siteSettings'
 import { cn } from '@/lib/utils'
 import { isPayloadUnavailableError } from '@/lib/payloadUnavailableError'
-import type { HomePage as HomePageGlobal, Media } from '@/payload-types'
+import type { HomePage as HomePageGlobal, Media, SiteSetting } from '@/payload-types'
 
 function getMediaUrl(media: number | Media | null | undefined) {
   if (!media || typeof media === 'number') {
@@ -78,39 +79,55 @@ export default function HomePage() {
 
 async function HomePageContent() {
   const { isEnabled: draft } = await draftMode()
-  const homePage = draft ? await getDraftHomePageContent() : await getPublishedHomePageContent()
+  const [homePage, siteSettings] = await Promise.all([
+    draft ? getDraftHomePageContent() : getPublishedHomePageContent(),
+    getSiteSettings(),
+  ])
 
-  return <HomePageView homePage={homePage} />
+  return <HomePageView heroVideo={homePage?.heroVideo} siteSettings={siteSettings} />
 }
 
-function HomePageView({ homePage }: { homePage: HomePageGlobal | null }) {
-  const heroVideoUrl = getMediaUrl(homePage?.heroVideo)
+function HomeHeroCtas() {
+  return (
+    <div className="mt-5 flex flex-wrap gap-2">
+      <Link
+        className={cn(buttonVariants(), 'min-h-10 px-4 font-bold')}
+        data-testid="home-bogeyficador-cta"
+        href="/bogeyficador"
+      >
+        Bogeyficador
+      </Link>
+      <Link
+        className={cn(buttonVariants({ variant: 'outline' }), 'min-h-10 px-4 font-bold')}
+        href="/canchas"
+      >
+        Ver canchas
+      </Link>
+    </div>
+  )
+}
 
+function HomeHeroVideoBg({ heroVideo }: { heroVideo: number | Media | null | undefined }) {
+  const heroVideoUrl = getMediaUrl(heroVideo)
+  if (!heroVideoUrl) return null
+  return <HomeHeroVideo src={heroVideoUrl} />
+}
+
+function HomePageView({
+  heroVideo,
+  siteSettings,
+}: {
+  heroVideo: number | Media | null | undefined
+  siteSettings: SiteSetting
+}) {
   return (
     <PageShell variant="hero">
-      {heroVideoUrl ? <HomeHeroVideo src={heroVideoUrl} /> : null}
+      <HomeHeroVideoBg heroVideo={heroVideo} />
       <HomeHeroContent>
-        <PageKicker tone="hero">Neo Golf Club</PageKicker>
-        <PageTitle size="hero">Mas Bogeys Que Birdies</PageTitle>
-        <PageLede>
-          Comunidad chilena para jugar mas golf, encontrar canchas accesibles y aprender sin
-          vueltas.
-        </PageLede>
-        <div className="mt-5 flex flex-wrap gap-2">
-          <Link
-            className={cn(buttonVariants(), 'min-h-10 px-4 font-bold')}
-            data-testid="home-bogeyficador-cta"
-            href="/bogeyficador"
-          >
-            Bogeyficador
-          </Link>
-          <Link
-            className={cn(buttonVariants({ variant: 'outline' }), 'min-h-10 px-4 font-bold')}
-            href="/canchas"
-          >
-            Ver canchas
-          </Link>
-        </div>
+        <PageKicker tone="hero">Community</PageKicker>
+        <PageTitle size="hero">{siteSettings.brandName}</PageTitle>
+        <PageLede>{siteSettings.siteDescription}</PageLede>
+        <HomeHeroCtas />
       </HomeHeroContent>
     </PageShell>
   )

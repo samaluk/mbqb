@@ -46,7 +46,7 @@ export const HomePage: GlobalConfig = {
       name: 'heroVideoAlt',
       type: 'text',
       label: 'Hero video alt text',
-      defaultValue: 'Video destacado de Mas Bogeys Que Birdies',
+      defaultValue: 'Featured community video',
       required: true,
     },
   ],

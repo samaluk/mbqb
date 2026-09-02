@@ -64,7 +64,7 @@ local repo_checks = new Mapping<String, Step> {
     check = "pnpm fallow:staged"
   }
   ["test"] {
-    check = "pnpm --filter @mbqb/web test"
+    check = "pnpm --filter @community/web test"
   }
 }
 

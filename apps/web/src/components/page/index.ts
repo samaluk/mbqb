@@ -1,4 +1,3 @@
-export { EditorialBody } from './editorial-body'
 export { HomeHeroContent, PageShell } from './page-shell'
 export { HomeHeroVideo } from './home-hero-video'
 export { MetaPills } from './meta-pills'

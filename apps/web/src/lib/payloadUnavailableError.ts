@@ -4,7 +4,7 @@ type MaybePayloadError = {
   payloadInitError?: unknown
 }
 
-const unavailableCodes = new Set(['42P01', 'ECONNREFUSED'])
+const unavailableCodes = new Set(['42P01', '42703', 'ECONNREFUSED'])
 
 function asMaybePayloadError(error: unknown): MaybePayloadError | null {
   if (!error || typeof error !== 'object') return null
