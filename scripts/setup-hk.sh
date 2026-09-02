@@ -14,10 +14,10 @@ if ! command -v hk >/dev/null 2>&1; then
 fi
 
 # Drop the include.path the old scripts/setup-githooks.sh wrote. It points at
-# .githooks/mbqb.config, which is deleted by the hk migration; the dead entry
+# .githooks/community.config, which is deleted by the hk migration; the dead entry
 # is fatal on older gits (and stale cruft on newer ones). --fixed-value matches
 # only that exact value, leaving any other include.path entries untouched.
-git config --local --fixed-value --unset-all include.path '../.githooks/mbqb.config' 2>/dev/null || true
+git config --local --fixed-value --unset-all include.path '../.githooks/community.config' 2>/dev/null || true
 
 # One-time per-repo hook install (Git 2.54+ writes config-based hooks).
 # Prefer the one-time global alternative: hk install --global (silent no-op in

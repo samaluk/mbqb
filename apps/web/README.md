@@ -35,7 +35,7 @@ pnpm env:pull:production   # → .env.production.local
 vercel env ls              # inspect remote values
 ```
 
-Configure the Vercel **Development** environment with a local Docker `POSTGRES_URL` (`postgres://postgres:postgres@127.0.0.1:5433/mbqb`), `TEST_POSTGRES_URL` for integration tests (`postgres://postgres:postgres@127.0.0.1:5433/mbqb_test`), `NEXT_PUBLIC_SERVER_URL=http://localhost:3000`, `PAYLOAD_SECRET`, `PREVIEW_SECRET`, and `BLOB_READ_WRITE_TOKEN` (optional). Do not point Development `POSTGRES_URL` or `TEST_POSTGRES_URL` at production. Production uses Neon’s `POSTGRES_URL` from the Vercel integration — use that name only; do not add a separate `DATABASE_URL`.
+Configure the Vercel **Development** environment with a local Docker `POSTGRES_URL` (`postgres://postgres:postgres@127.0.0.1:5433/community`), `TEST_POSTGRES_URL` for integration tests (`postgres://postgres:postgres@127.0.0.1:5433/community_test`), `NEXT_PUBLIC_SERVER_URL=http://localhost:3000`, `PAYLOAD_SECRET`, `PREVIEW_SECRET`, and `BLOB_READ_WRITE_TOKEN` (optional). Do not point Development `POSTGRES_URL` or `TEST_POSTGRES_URL` at production. Production uses Neon’s `POSTGRES_URL` from the Vercel integration — use that name only; do not add a separate `DATABASE_URL`.
 
 If you run `pnpm seed:dev-from-prod`, set Development `PAYLOAD_SECRET` to the **same value as Production** in the Vercel dashboard so membership lookup hashes match the copied data.
 
@@ -55,7 +55,9 @@ cd apps/web
 docker compose up -d postgres
 ```
 
-Postgres 17 + PostGIS on port **5433** (avoids clashing with a local Postgres on 5432). Compose creates `mbqb` and `mbqb_test` when the `pgdata` volume is initialized. If you already have a local `pgdata` volume, create the test database once with `docker compose exec postgres createdb -U postgres mbqb_test`. Set `POSTGRES_URL` and `TEST_POSTGRES_URL` in Vercel Development, then `pnpm env:pull`.
+Postgres 17 + PostGIS on port **5433** (avoids clashing with a local Postgres on 5432). Compose creates `community` and `community_test` when the `pgdata` volume is initialized. If you already have a local `pgdata` volume, create the test database once with `docker compose exec postgres createdb -U postgres community_test`. Set `POSTGRES_URL` and `TEST_POSTGRES_URL` in Vercel Development, then `pnpm env:pull`.
+
+Volumes initialized before the Community rename retain their original database names. Recreate a disposable local volume or rename the existing databases to `community` and `community_test` before starting the app.
 
 ### Seed local data from production
 
@@ -65,7 +67,7 @@ pnpm env:pull:production
 pnpm seed:dev-from-prod
 ```
 
-This replaces your local `mbqb` database with a copy of production (schema and content), then applies any pending Payload migrations.
+This replaces your local `community` database with a copy of production (schema and content), then applies any pending Payload migrations.
 
 ### Production admin user
 
@@ -138,7 +140,7 @@ Schema history starts from `20260604_000000_baseline` (includes drafts/version t
 
 ```sh
 cd apps/web
-POSTGRES_URL=postgres://postgres:postgres@127.0.0.1:5433/mbqb pnpm migrate:fresh
+POSTGRES_URL=postgres://postgres:postgres@127.0.0.1:5433/community pnpm migrate:fresh
 ```
 
 `pnpm test:int` refuses to run unless `TEST_POSTGRES_URL` is set. Payload may push schema during integration setup, so this database must be isolated from local development content and production-like data.

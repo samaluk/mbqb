@@ -52,8 +52,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      POSTGRES_URL: postgres://postgres:postgres@localhost:5433/mbqb
-      TEST_POSTGRES_URL: postgres://postgres:postgres@localhost:5433/mbqb_test
+      POSTGRES_URL: postgres://postgres:postgres@localhost:5433/community
+      TEST_POSTGRES_URL: postgres://postgres:postgres@localhost:5433/community_test
       CI: true
 
     steps:
@@ -78,14 +78,14 @@ jobs:
             --name postgres \
             -e POSTGRES_USER=postgres \
             -e POSTGRES_PASSWORD=postgres \
-            -e POSTGRES_DB=mbqb \
+            -e POSTGRES_DB=community \
             -p 5433:5432 \
             imresamu/postgis:17-3.5
 
       - name: Wait for PostgreSQL
         run: |
           for _ in $(seq 1 30); do
-            docker exec postgres pg_isready -U postgres -d mbqb >/dev/null 2>&1 || { sleep 1; continue; }
+            docker exec postgres pg_isready -U postgres -d community >/dev/null 2>&1 || { sleep 1; continue; }
             # pg_isready succeeds against the entrypoint's temporary postmaster
             # (used for first-boot initdb.d setup); only proceed once init is
             # truly complete or CREATE DATABASE gets killed by its fast shutdown.
@@ -94,7 +94,7 @@ jobs:
           done
 
       - name: Create integration test database
-        run: docker exec postgres psql -U postgres -d mbqb -c "CREATE DATABASE mbqb_test;"
+        run: docker exec postgres psql -U postgres -d community -c "CREATE DATABASE community_test;"
 
       - name: Migrate and seed E2E fixtures
         working-directory: apps/web

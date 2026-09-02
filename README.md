@@ -55,7 +55,9 @@ docker compose up -d postgres
 cd ../..
 ```
 
-The container automatically creates the primary development database (`mbqb`) and test database (`mbqb_test`).
+The container automatically creates the primary development database (`community`) and test database (`community_test`).
+
+If you already have a `pgdata` volume from before the rename, it retains the old database names. Recreate that disposable local volume or rename its databases to `community` and `community_test` before pulling the updated environment.
 
 ### 3. Configure environment variables
 
@@ -63,8 +65,8 @@ Create `apps/web/.env.local` with the required local development configuration:
 
 ```env
 NODE_ENV=development
-POSTGRES_URL=postgres://postgres:postgres@127.0.0.1:5433/mbqb
-TEST_POSTGRES_URL=postgres://postgres:postgres@127.0.0.1:5433/mbqb_test
+POSTGRES_URL=postgres://postgres:postgres@127.0.0.1:5433/community
+TEST_POSTGRES_URL=postgres://postgres:postgres@127.0.0.1:5433/community_test
 NEXT_PUBLIC_SERVER_URL=http://localhost:3000
 PAYLOAD_SECRET=development-secret-must-be-at-least-32-chars-long
 PREVIEW_SECRET=development-preview-secret-value

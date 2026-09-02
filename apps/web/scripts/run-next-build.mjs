@@ -34,7 +34,7 @@ if (!isProductionTarget) {
     const file = path.join(appDir, name)
     if (!existsSync(file)) continue
 
-    const masked = `${file}.mbqb-local-build`
+    const masked = `${file}.community-local-build`
     renameSync(file, masked)
     maskedProductionFiles.push([file, masked])
   }

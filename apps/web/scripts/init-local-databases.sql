@@ -1,1 +1,1 @@
-CREATE DATABASE mbqb_test;
+CREATE DATABASE community_test;

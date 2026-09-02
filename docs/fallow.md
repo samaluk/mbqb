@@ -1,7 +1,7 @@
 # Fallow
 
-MBQB is in the Fallow ZERO-DEBT steady state (see
-[issue #264](https://github.com/samaluk/mbqb/issues/264), with
+Community Platform is in the Fallow ZERO-DEBT steady state (see
+[issue #264](https://github.com/samaluk/community/issues/264), with
 [fintual-api #405](https://github.com/samaluk/fintual-api/pull/405) as the
 reference). The full repository scan reports zero findings, and every surface
 — pre-commit, pre-push, `hk check`, and CI — blocks on any of them.

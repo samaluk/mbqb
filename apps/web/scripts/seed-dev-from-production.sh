@@ -4,7 +4,7 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 app_dir="$(cd "${script_dir}/.." && pwd)"
 production_env="${DOTENV_CONFIG_PATH:-${app_dir}/.env.production.local}"
-dump_file="$(mktemp -t mbqb-prod-seed.XXXXXX.sql)"
+dump_file="$(mktemp -t community-prod-seed.XXXXXX.sql)"
 
 cleanup() {
   rm -f "${dump_file}"
