@@ -16,14 +16,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { canchaAccessLabels, isCanchaAccessType } from '@/lib/canchas'
-import type { CanchasControlsModel } from '@/lib/canchasBrowsing'
+import { placeAccessLabels, isPlaceAccessType } from '@/lib/places'
+import type { PlacesControlsModel } from '@/lib/placesBrowsing'
 
-import { useCanchasGeo } from './CanchasGeoContext'
-import { CanchasLocationFilter } from './CanchasLocationFilter'
+import { usePlacesGeo } from './PlacesGeoContext'
+import { PlacesLocationFilter } from './PlacesLocationFilter'
 
-export type CanchasViewControlsProps = {
-  controls: CanchasControlsModel
+export type PlacesViewControlsProps = {
+  controls: PlacesControlsModel
 }
 
 const allValue = '__all__'
@@ -110,9 +110,9 @@ function hasActiveFilters(
   )
 }
 
-export function CanchasViewControls({ controls }: CanchasViewControlsProps) {
+export function PlacesViewControls({ controls }: PlacesViewControlsProps) {
   const { filterOptions, view } = controls
-  const { hasGeoFilter, setUserGeo } = useCanchasGeo()
+  const { hasGeoFilter, setUserGeo } = usePlacesGeo()
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -149,7 +149,7 @@ export function CanchasViewControls({ controls }: CanchasViewControlsProps) {
     <div className="mt-6 flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <ToggleGroup
-          aria-label="Vista de canchas"
+          aria-label="Vista de lugares"
           onValueChange={(value) => updateView(updateParams, value)}
           value={[view]}
           variant="outline"
@@ -163,11 +163,11 @@ export function CanchasViewControls({ controls }: CanchasViewControlsProps) {
           </Button>
         ) : null}
       </div>
-      <CanchasLocationFilter />
-      <div className="grid grid-cols-canchas-filters gap-2 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1">
+      <PlacesLocationFilter />
+      <div className="grid grid-cols-places-filters gap-2 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1">
         <div className="flex flex-col gap-1.5">
-          <Label className="text-xs font-normal text-muted-foreground" htmlFor="canchas-search">
-            Buscar cancha
+          <Label className="text-xs font-normal text-muted-foreground" htmlFor="places-search">
+            Buscar lugar
           </Label>
           <div className="relative">
             <SearchIcon
@@ -178,7 +178,7 @@ export function CanchasViewControls({ controls }: CanchasViewControlsProps) {
             <Input
               className="ps-8"
               defaultValue={query}
-              id="canchas-search"
+              id="places-search"
               key={query}
               onChange={(event) => updateSearch(event.target.value)}
               placeholder="Nombre o dirección"
@@ -186,24 +186,24 @@ export function CanchasViewControls({ controls }: CanchasViewControlsProps) {
           </div>
         </div>
         <FilterSelect
-          id="canchas-filter-access-type"
+          id="places-filter-access-type"
           label="Tipo de acceso"
           onValueChange={(value) => updateFilter('accessType', value)}
           options={filterOptions.accessTypes.map((accessType) => ({
-            label: isCanchaAccessType(accessType) ? canchaAccessLabels[accessType] : accessType,
+            label: isPlaceAccessType(accessType) ? placeAccessLabels[accessType] : accessType,
             value: accessType,
           }))}
           value={filterValue(searchParams, 'accessType')}
         />
         <FilterSelect
-          id="canchas-filter-region"
+          id="places-filter-region"
           label="Región"
           onValueChange={(value) => updateFilter('region', value)}
           options={filterOptions.regions.map((region) => ({ label: region, value: region }))}
           value={filterValue(searchParams, 'region')}
         />
         <FilterSelect
-          id="canchas-filter-city"
+          id="places-filter-city"
           label="Ciudad"
           onValueChange={(value) => updateFilter('city', value)}
           options={filterOptions.cities.map((city) => ({ label: city, value: city }))}

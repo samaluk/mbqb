@@ -8,25 +8,24 @@ import { useEffect } from 'react'
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
 
 import {
-  canchaAccessLabels,
-  getCanchaLocation,
+  getPlaceLocation,
   getGoogleMapsUrl,
-  type CanchaMapItem,
-} from '@/lib/canchas'
-import { formatDistanceKm, type GeoPoint } from '@/lib/canchasGeo'
+  placeAccessLabels,
+  type PlaceMapItem,
+} from '@/lib/places'
+import { formatDistanceKm, type GeoPoint } from '@/lib/placesGeo'
 
-const clubMarkerClassByAccess: Record<CanchaMapItem['accessType'], string> = {
+const placeMarkerClassByAccess: Record<PlaceMapItem['accessType'], string> = {
+  open: 'map-marker-open',
   private: 'map-marker-private',
-  'pay-and-play': 'map-marker-pay-and-play',
   restricted: 'map-marker-restricted',
-  unknown: 'map-marker-unknown',
 }
 
 const userLocationMarkerClass = 'map-marker-user'
 
-const createClubIcon = (index: number, accessType: CanchaMapItem['accessType']) =>
+const createPlaceIcon = (index: number, accessType: PlaceMapItem['accessType']) =>
   L.divIcon({
-    className: clubMarkerClassByAccess[accessType],
+    className: placeMarkerClassByAccess[accessType],
     html: `<span>${index + 1}</span>`,
     iconAnchor: [16, 16],
     iconSize: [32, 32],
@@ -40,17 +39,17 @@ const userLocationIcon = L.divIcon({
   iconSize: [20, 20],
 })
 
-function FitClubBounds({
-  locatedCanchas,
+function FitPlaceBounds({
+  locatedPlaces,
   userLocation,
 }: {
-  locatedCanchas: { location: { latitude: number; longitude: number } }[]
+  locatedPlaces: { location: { latitude: number; longitude: number } }[]
   userLocation: GeoPoint | null
 }) {
   const map = useMap()
 
   useEffect(() => {
-    const points: [number, number][] = locatedCanchas.map(({ location }) => [
+    const points: [number, number][] = locatedPlaces.map(({ location }) => [
       location.latitude,
       location.longitude,
     ])
@@ -63,38 +62,38 @@ function FitClubBounds({
 
     const bounds = L.latLngBounds(points)
     map.fitBounds(bounds, { padding: [28, 28] })
-  }, [locatedCanchas, map, userLocation])
+  }, [locatedPlaces, map, userLocation])
 
   return null
 }
 
-export default function CanchasMap({
-  canchas,
+export default function PlacesMap({
+  places,
   userLocation,
 }: {
-  canchas: CanchaMapItem[]
+  places: PlaceMapItem[]
   userLocation: GeoPoint | null
 }) {
-  const locatedCanchas = canchas
-    .map((cancha, index) => ({
-      cancha,
+  const locatedPlaces = places
+    .map((place, index) => ({
       index,
-      location: getCanchaLocation(cancha),
+      location: getPlaceLocation(place),
+      place,
     }))
     .filter(
       (
         item,
       ): item is {
-        cancha: CanchaMapItem
         index: number
         location: { latitude: number; longitude: number }
+        place: PlaceMapItem
       } => Boolean(item.location),
     )
 
   return (
     <MapContainer
       center={[-33.45, -70.66]}
-      className="canchas-map"
+      className="places-map"
       scrollWheelZoom={false}
       zoom={8}
       zoomControl
@@ -103,7 +102,7 @@ export default function CanchasMap({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <FitClubBounds locatedCanchas={locatedCanchas} userLocation={userLocation} />
+      <FitPlaceBounds locatedPlaces={locatedPlaces} userLocation={userLocation} />
       {userLocation ? (
         <Marker icon={userLocationIcon} position={[userLocation.latitude, userLocation.longitude]}>
           <Popup>
@@ -114,14 +113,14 @@ export default function CanchasMap({
           </Popup>
         </Marker>
       ) : null}
-      {locatedCanchas.map(({ cancha, index, location }) => (
+      {locatedPlaces.map(({ index, location, place }) => (
         <Marker
-          icon={createClubIcon(index, cancha.accessType)}
-          key={cancha.id}
+          icon={createPlaceIcon(index, place.accessType)}
+          key={place.id}
           position={[location.latitude, location.longitude]}
         >
           <Popup>
-            <CanchaMarkerPopup cancha={cancha} />
+            <PlaceMarkerPopup place={place} />
           </Popup>
         </Marker>
       ))}
@@ -129,22 +128,22 @@ export default function CanchasMap({
   )
 }
 
-function CanchaMarkerPopup({ cancha }: { cancha: CanchaMapItem }) {
-  const location = [cancha.city, cancha.region].filter(Boolean).join(', ')
+function PlaceMarkerPopup({ place }: { place: PlaceMapItem }) {
+  const location = [place.city, place.region].filter(Boolean).join(', ')
 
   return (
     <div className="grid min-w-40 gap-1 text-ink">
-      <strong className="leading-snug">{cancha.title}</strong>
-      <span className="text-label text-muted">{canchaAccessLabels[cancha.accessType]}</span>
-      <CanchaPopupLocationLine cancha={cancha} location={location} />
-      <DistanceLine cancha={cancha} />
+      <strong className="leading-snug">{place.title}</strong>
+      <span className="text-label text-muted">{placeAccessLabels[place.accessType]}</span>
+      <PlacePopupLocationLine location={location} place={place} />
+      <DistanceLine place={place} />
       <div className="flex flex-wrap gap-3">
-        <Link className="font-extrabold text-green" href={`/canchas/${cancha.slug}`}>
+        <Link className="font-extrabold text-green" href={`/places/${place.slug}`}>
           Ver ficha
         </Link>
         <a
           className="font-extrabold text-green"
-          href={getGoogleMapsUrl(cancha)}
+          href={getGoogleMapsUrl(place)}
           rel="noreferrer"
           target="_blank"
         >
@@ -155,24 +154,18 @@ function CanchaMarkerPopup({ cancha }: { cancha: CanchaMapItem }) {
   )
 }
 
-function CanchaPopupLocationLine({
-  cancha,
-  location,
-}: {
-  cancha: CanchaMapItem
-  location: string
-}) {
-  if (!cancha.city && !cancha.region) return null
+function PlacePopupLocationLine({ location, place }: { location: string; place: PlaceMapItem }) {
+  if (!place.city && !place.region) return null
 
   return <span className="text-label text-muted">{location}</span>
 }
 
-function DistanceLine({ cancha }: { cancha: CanchaMapItem }) {
-  if (!('distanceKm' in cancha) || typeof cancha.distanceKm !== 'number') return null
+function DistanceLine({ place }: { place: PlaceMapItem }) {
+  if (!('distanceKm' in place) || typeof place.distanceKm !== 'number') return null
 
   return (
     <span className="text-label font-semibold text-green">
-      {formatDistanceKm(cancha.distanceKm)}
+      {formatDistanceKm(place.distanceKm)}
     </span>
   )
 }

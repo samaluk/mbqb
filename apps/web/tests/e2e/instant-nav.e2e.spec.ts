@@ -15,21 +15,21 @@ import { expect, test } from '@playwright/test'
  */
 
 const SHELL = {
-  canchaDetail: '[data-testid="cancha-detail-back-link"]',
+  placeDetail: '[data-testid="place-detail-back-link"]',
   articleDetail: '[data-testid="article-detail-back-link"]',
   productDetail: '[data-testid="product-detail-back-link"]',
-  canchasList: '[data-testid="canchas-list-title"]',
+  placesList: '[data-testid="places-list-title"]',
 } as const
 
 const listToDetailFlows = [
   {
-    name: 'canchas',
-    listPath: '/canchas',
-    fixtureCard: 'Cancha Fixture Uno',
+    name: 'places',
+    listPath: '/places',
+    fixtureCard: 'Lugar Fixture Uno',
     triggerLink: 'Ver ficha',
-    shell: SHELL.canchaDetail,
-    deferredTitle: 'cancha-detail-title',
-    urlPattern: /\/canchas\/cancha-fixture-1/,
+    shell: SHELL.placeDetail,
+    deferredTitle: 'place-detail-title',
+    urlPattern: /\/places\/place-fixture-1/,
   },
   {
     name: 'articles',
@@ -70,20 +70,20 @@ for (const flow of listToDetailFlows) {
   })
 }
 
-test('home → Ver canchas CTA commits the canchas shell instantly', async ({ page }) => {
+test('home → Ver lugares CTA commits the places shell instantly', async ({ page }) => {
   await page.goto('/')
 
-  const trigger = page.getByRole('link', { name: 'Ver canchas', exact: true })
+  const trigger = page.getByRole('link', { name: 'Ver lugares', exact: true })
   await expect(trigger).toBeVisible({ timeout: 20_000 })
 
   await instant(page, async () => {
     await trigger.click()
-    await expect(page.locator(SHELL.canchasList)).toBeVisible()
+    await expect(page.locator(SHELL.placesList)).toBeVisible()
     await expect(page.getByRole('link', { name: 'Ver ficha' })).toHaveCount(0)
   })
 
   await expect(page.getByRole('link', { name: 'Ver ficha' }).first()).toBeVisible()
-  await expect(page).toHaveURL(/\/canchas$/)
+  await expect(page).toHaveURL(/\/places$/)
 })
 
 test('home → Verify CTA commits instantly', async ({ page }) => {

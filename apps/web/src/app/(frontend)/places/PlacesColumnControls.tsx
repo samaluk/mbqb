@@ -11,14 +11,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-export type CanchasColumnControlsProps = {
+export type PlacesColumnControlsProps = {
   columns: {
     id: string
     label: string
   }[]
 }
 
-export function CanchasColumnControls({ columns }: CanchasColumnControlsProps) {
+export function PlacesColumnControls({ columns }: PlacesColumnControlsProps) {
   const [hiddenColumns, setHiddenColumns] = React.useState<Set<string>>(() => new Set())
 
   React.useEffect(() => {

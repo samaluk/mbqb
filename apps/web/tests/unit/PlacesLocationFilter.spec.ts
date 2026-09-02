@@ -2,8 +2,8 @@ import { act, cleanup, render } from '@testing-library/react'
 import * as React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { CanchasLocationFilter } from '@/app/(frontend)/canchas/CanchasLocationFilter'
-import type { StoredUserGeo } from '@/lib/canchasUserGeo'
+import { PlacesLocationFilter } from '@/app/(frontend)/places/PlacesLocationFilter'
+import type { StoredUserGeo } from '@/lib/placesUserGeo'
 
 /**
  * Handles captured from the vendored Slider primitive: the stable contract the
@@ -29,8 +29,8 @@ const stubs = vi.hoisted(() => {
   return { geo, sliderProps }
 })
 
-vi.mock('@/app/(frontend)/canchas/CanchasGeoContext', () => ({
-  useCanchasGeo: () => stubs.geo.current,
+vi.mock('@/app/(frontend)/places/PlacesGeoContext', () => ({
+  usePlacesGeo: () => stubs.geo.current,
 }))
 
 vi.mock('@/components/ui/slider', async () => {
@@ -70,7 +70,7 @@ function renderLocationFilter(userGeo: StoredUserGeo | null) {
     userGeo,
   }
 
-  render(React.createElement(CanchasLocationFilter))
+  render(React.createElement(PlacesLocationFilter))
 
   const slider = stubs.sliderProps.current
   if (!slider) throw new Error('Slider stub did not render')
@@ -82,7 +82,7 @@ function renderLocationFilter(userGeo: StoredUserGeo | null) {
   }
 }
 
-describe('CanchasLocationFilter max-distance persistence', () => {
+describe('PlacesLocationFilter max-distance persistence', () => {
   afterEach(() => {
     cleanup()
     vi.useRealTimers()

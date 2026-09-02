@@ -16,6 +16,12 @@
         // mechanisms the graph cannot resolve.
         "files": ["src/migrations/**", "src/payload-generated-schema.ts"],
         "rules": ["deslop/unused-file"]
+      },
+      {
+        // React Compiler automatically memoizes context values; manual
+        // memoization triggers react-compiler-no-manual-memoization in full/changed scans.
+        "files": ["**/PlacesGeoContext.tsx"],
+        "rules": ["react-doctor/context-provider-value-from-unmemoized-local-literal"]
       }
     ]
   }

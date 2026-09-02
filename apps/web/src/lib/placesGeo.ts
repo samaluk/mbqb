@@ -1,5 +1,5 @@
-import { getCanchaLocation, type CanchaMapItem } from '@/lib/canchas'
-import type { GeoCoordinates } from '@/lib/canchasLocation'
+import { getPlaceLocation, type PlaceMapItem } from '@/lib/places'
+import type { GeoCoordinates } from '@/lib/placesLocation'
 
 const earthRadiusKm = 6371
 
@@ -9,7 +9,7 @@ export const maxMaxDistanceKm = 250
 
 export type GeoPoint = GeoCoordinates
 
-export type CanchaWithDistance = CanchaMapItem & {
+export type PlaceWithDistance = PlaceMapItem & {
   distanceKm: number
 }
 
@@ -40,40 +40,40 @@ export function formatDistanceKm(distanceKm: number): string {
   return `${Math.round(distanceKm)} km`
 }
 
-export function annotateCanchasWithDistance(
-  canchas: CanchaMapItem[],
+export function annotatePlacesWithDistance(
+  places: PlaceMapItem[],
   origin: GeoPoint,
-): CanchaWithDistance[] {
-  return canchas.flatMap((cancha) => {
-    const location = getCanchaLocation(cancha)
+): PlaceWithDistance[] {
+  return places.flatMap((place) => {
+    const location = getPlaceLocation(place)
 
     if (!location) return []
 
     return [
       {
-        ...cancha,
+        ...place,
         distanceKm: getDistanceKm(origin, location),
       },
     ]
   })
 }
 
-export function filterCanchasWithinRadius(canchas: CanchaWithDistance[], maxKm: number) {
-  return canchas.filter((cancha) => cancha.distanceKm <= maxKm)
+export function filterPlacesWithinRadius(places: PlaceWithDistance[], maxKm: number) {
+  return places.filter((place) => place.distanceKm <= maxKm)
 }
 
-export function sortCanchasByDistance(canchas: CanchaWithDistance[]) {
-  return canchas.toSorted((left, right) => left.distanceKm - right.distanceKm)
+export function sortPlacesByDistance(places: PlaceWithDistance[]) {
+  return places.toSorted((left, right) => left.distanceKm - right.distanceKm)
 }
 
-export function paginateCanchas<T>(canchas: T[], page: number, pageSize: number) {
-  const totalDocs = canchas.length
+export function paginatePlaces<T>(places: T[], page: number, pageSize: number) {
+  const totalDocs = places.length
   const totalPages = Math.max(1, Math.ceil(totalDocs / pageSize))
   const safePage = Math.min(Math.max(page, 1), totalPages)
   const start = (safePage - 1) * pageSize
 
   return {
-    docs: canchas.slice(start, start + pageSize),
+    docs: places.slice(start, start + pageSize),
     page: safePage,
     totalDocs,
     totalPages,

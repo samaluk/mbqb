@@ -3,20 +3,20 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import * as React from 'react'
 
-import type { StoredUserGeo } from '@/lib/canchasUserGeo'
+import type { StoredUserGeo } from '@/lib/placesUserGeo'
 
-import { clearCanchasUserGeo, setCanchasUserGeo } from './actions'
+import { clearPlacesUserGeo, setPlacesUserGeo } from './actions'
 
-type CanchasGeoContextValue = {
+type PlacesGeoContextValue = {
   hasGeoFilter: boolean
   isGeoPending: boolean
   setUserGeo: (geo: StoredUserGeo | null) => void
   userGeo: StoredUserGeo | null
 }
 
-const CanchasGeoContext = React.createContext<CanchasGeoContextValue | null>(null)
+const PlacesGeoContext = React.createContext<PlacesGeoContextValue | null>(null)
 
-export function CanchasGeoProvider({
+export function PlacesGeoProvider({
   children,
   initialUserGeo,
 }: {
@@ -48,9 +48,9 @@ export function CanchasGeoProvider({
 
     startTransition(async () => {
       if (geo) {
-        await setCanchasUserGeo(geo)
+        await setPlacesUserGeo(geo)
       } else {
-        await clearCanchasUserGeo()
+        await clearPlacesUserGeo()
       }
 
       resetPageAndRefresh()
@@ -65,14 +65,14 @@ export function CanchasGeoProvider({
     userGeo,
   }
 
-  return <CanchasGeoContext value={value}>{children}</CanchasGeoContext>
+  return <PlacesGeoContext value={value}>{children}</PlacesGeoContext>
 }
 
-export function useCanchasGeo() {
-  const context = React.use(CanchasGeoContext)
+export function usePlacesGeo() {
+  const context = React.use(PlacesGeoContext)
 
   if (!context) {
-    throw new Error('useCanchasGeo must be used within CanchasGeoProvider')
+    throw new Error('usePlacesGeo must be used within PlacesGeoProvider')
   }
 
   return context

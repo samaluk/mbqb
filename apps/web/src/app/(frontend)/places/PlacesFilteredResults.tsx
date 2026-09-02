@@ -5,32 +5,32 @@ import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button-variants'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { canchaAccessLabels, getGoogleMapsUrl } from '@/lib/canchas'
-import type { CanchaMapItem } from '@/lib/canchas'
-import type { CanchasResultsModel } from '@/lib/canchasBrowsing'
-import { formatDistanceKm } from '@/lib/canchasGeo'
+import { getGoogleMapsUrl, placeAccessLabels } from '@/lib/places'
+import type { PlaceMapItem } from '@/lib/places'
+import type { PlacesResultsModel } from '@/lib/placesBrowsing'
+import { formatDistanceKm } from '@/lib/placesGeo'
 import { cn } from '@/lib/utils'
 
-import { CanchasDataTable } from './CanchasDataTable'
-import { CanchasMapLoader } from './CanchasMapLoader'
-import { CanchasPagination } from './CanchasPagination'
+import { PlacesDataTable } from './PlacesDataTable'
+import { PlacesMapLoader } from './PlacesMapLoader'
+import { PlacesPagination } from './PlacesPagination'
 
-export type CanchasFilteredResultsProps = {
-  results: CanchasResultsModel
+export type PlacesFilteredResultsProps = {
+  results: PlacesResultsModel
 }
 
-export function CanchasFilteredResults({ results }: CanchasFilteredResultsProps) {
-  const { mapCanchas, navigation, pagination, showDistance, sort, userGeo, view } = results
-  const canchaDocs = pagination.canchas
-  const mapCanchaDocs = mapCanchas ?? canchaDocs
+export function PlacesFilteredResults({ results }: PlacesFilteredResultsProps) {
+  const { mapPlaces, navigation, pagination, showDistance, sort, userGeo, view } = results
+  const placeDocs = pagination.places
+  const mapPlaceDocs = mapPlaces ?? placeDocs
   const userLocation = toUserLocation(userGeo)
 
   if (view === 'table') {
     return (
-      <CanchasDataTable
-        canchas={canchaDocs}
+      <PlacesDataTable
         geoSortActive={showDistance}
         pagination={pagination}
+        places={placeDocs}
         showDistance={showDistance}
         sort={sort}
         sortLinks={navigation.sortLinks}
@@ -40,18 +40,18 @@ export function CanchasFilteredResults({ results }: CanchasFilteredResultsProps)
 
   return (
     <div className="mt-6 flex flex-col gap-3">
-      <div className="grid grid-cols-canchas-cards items-start gap-4 max-[760px]:grid-cols-1 max-[760px]:gap-3">
-        <CanchasMapLoader canchas={mapCanchaDocs} userLocation={userLocation} />
+      <div className="grid grid-cols-places-cards items-start gap-4 max-[760px]:grid-cols-1 max-[760px]:gap-3">
+        <PlacesMapLoader places={mapPlaceDocs} userLocation={userLocation} />
         <div
+          aria-label="Listado de lugares"
           className="grid max-h-170 gap-2 overflow-auto pe-1 max-[760px]:max-h-none max-[760px]:overflow-visible max-[760px]:pe-0"
-          aria-label="Listado de canchas"
         >
-          {canchaDocs.length ? (
-            canchaDocs.map((cancha, index) => (
-              <CanchaResultCard
-                cancha={cancha}
+          {placeDocs.length ? (
+            placeDocs.map((place, index) => (
+              <PlaceResultCard
                 index={(pagination.page - 1) * pagination.pageSize + index + 1}
-                key={cancha.id}
+                key={place.id}
+                place={place}
               />
             ))
           ) : (
@@ -59,12 +59,12 @@ export function CanchasFilteredResults({ results }: CanchasFilteredResultsProps)
           )}
         </div>
       </div>
-      <CanchasPagination pagination={pagination} />
+      <PlacesPagination pagination={pagination} />
     </div>
   )
 }
 
-function toUserLocation(userGeo: CanchasResultsModel['userGeo']) {
+function toUserLocation(userGeo: PlacesResultsModel['userGeo']) {
   return userGeo ? { latitude: userGeo.latitude, longitude: userGeo.longitude } : null
 }
 
@@ -73,14 +73,14 @@ function EmptyResultsCard({ showDistance }: { showDistance: boolean }) {
     <Card className="min-w-0" size="sm">
       <CardContent className="py-6 text-sm text-muted-foreground">
         {showDistance
-          ? 'No hay canchas con coordenadas dentro del radio elegido. Prueba aumentar la distancia máxima.'
-          : 'No hay canchas para los filtros seleccionados.'}
+          ? 'No hay lugares con coordenadas dentro del radio elegido. Prueba aumentar la distancia máxima.'
+          : 'No hay lugares para los filtros seleccionados.'}
       </CardContent>
     </Card>
   )
 }
 
-function CanchaResultCard({ cancha, index }: { cancha: CanchaMapItem; index: number }) {
+function PlaceResultCard({ index, place }: { index: number; place: PlaceMapItem }) {
   return (
     <Card className="min-w-0" size="sm">
       <CardHeader>
@@ -88,26 +88,26 @@ function CanchaResultCard({ cancha, index }: { cancha: CanchaMapItem; index: num
           <span className="grid size-7 shrink-0 place-items-center rounded-full bg-green text-label font-black text-white-soft max-[760px]:size-6 max-[760px]:text-xs">
             {index}
           </span>
-          <CanchaCardBadges cancha={cancha} />
+          <PlaceCardBadges place={place} />
         </div>
-        <CardTitle>{cancha.title}</CardTitle>
+        <CardTitle>{place.title}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
-        {cancha.summary ? (
+        {place.summary ? (
           <p className="max-w-none text-base text-muted max-[760px]:text-sm max-[760px]:leading-snippet-sm">
-            {cancha.summary}
+            {place.summary}
           </p>
         ) : null}
         <div className="flex flex-wrap gap-x-3 gap-y-1">
           <Link
             className={cn(buttonVariants({ variant: 'link' }), 'font-extrabold')}
-            href={`/canchas/${cancha.slug}`}
+            href={`/places/${place.slug}`}
           >
             Ver ficha
           </Link>
           <a
             className={cn(buttonVariants({ variant: 'link' }), 'font-extrabold')}
-            href={getGoogleMapsUrl(cancha)}
+            href={getGoogleMapsUrl(place)}
             rel="noreferrer"
             target="_blank"
           >
@@ -119,19 +119,19 @@ function CanchaResultCard({ cancha, index }: { cancha: CanchaMapItem; index: num
   )
 }
 
-function CanchaCardBadges({ cancha }: { cancha: CanchaMapItem }) {
+function PlaceCardBadges({ place }: { place: PlaceMapItem }) {
   return (
     <div className="flex flex-wrap gap-2">
-      <Badge variant="outline">{canchaAccessLabels[cancha.accessType]}</Badge>
-      {cancha.region ? <Badge variant="outline">{cancha.region}</Badge> : null}
-      {cancha.city ? <Badge variant="outline">{cancha.city}</Badge> : null}
-      <DistanceBadge cancha={cancha} />
+      <Badge variant="outline">{placeAccessLabels[place.accessType]}</Badge>
+      {place.region ? <Badge variant="outline">{place.region}</Badge> : null}
+      {place.city ? <Badge variant="outline">{place.city}</Badge> : null}
+      <DistanceBadge place={place} />
     </div>
   )
 }
 
-function DistanceBadge({ cancha }: { cancha: CanchaMapItem }) {
-  if (!('distanceKm' in cancha) || typeof cancha.distanceKm !== 'number') return null
+function DistanceBadge({ place }: { place: PlaceMapItem }) {
+  if (!('distanceKm' in place) || typeof place.distanceKm !== 'number') return null
 
-  return <Badge variant="secondary">{formatDistanceKm(cancha.distanceKm)}</Badge>
+  return <Badge variant="secondary">{formatDistanceKm(place.distanceKm)}</Badge>
 }

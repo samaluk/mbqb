@@ -1,92 +1,92 @@
 import type { Payload, Where } from 'payload'
 
-import type { CanchaMapItem } from '@/lib/canchas'
-import { annotateCanchasWithDistance, paginateCanchas } from '@/lib/canchasGeo'
-import { getCanchasNearWhere } from '@/lib/canchasLocation'
-import type { StoredUserGeo } from '@/lib/canchasUserGeo'
+import type { PlaceMapItem } from '@/lib/places'
+import { annotatePlacesWithDistance, paginatePlaces } from '@/lib/placesGeo'
+import { getPlacesNearWhere } from '@/lib/placesLocation'
+import type { StoredUserGeo } from '@/lib/placesUserGeo'
 
-export type CanchasSort = {
+export type PlacesSort = {
   direction: 'asc' | 'desc'
   field: 'accessType' | 'city' | 'region' | 'title'
 }
 
-export type CanchasView = 'cards' | 'table'
+export type PlacesView = 'cards' | 'table'
 
-type CanchasFilters = {
+type PlacesFilters = {
   accessType: string
   city: string
   page: number
   pageSize: number
   q: string
   region: string
-  sort: CanchasSort
+  sort: PlacesSort
   view: string
 }
 
-export type CanchasPaginationModel = {
-  canchas: CanchaMapItem[]
+export type PlacesPaginationModel = {
   firstRow: number
   label: string
+  links: {
+    first: PlacesPaginationLink
+    last: PlacesPaginationLink
+    next: PlacesPaginationLink
+    previous: PlacesPaginationLink
+  }
   page: number
   pageLabel: string
   pageSize: number
-  pageSizeOptions: CanchasPageSizeOption[]
-  links: {
-    first: CanchasPaginationLink
-    last: CanchasPaginationLink
-    next: CanchasPaginationLink
-    previous: CanchasPaginationLink
-  }
+  pageSizeOptions: PlacesPageSizeOption[]
+  places: PlaceMapItem[]
   totalDocs: number
   totalPages: number
 }
 
-export type CanchasPaginationLink = {
+export type PlacesPaginationLink = {
   disabled: boolean
   href: string
 }
 
-export type CanchasPageSizeOption = {
+export type PlacesPageSizeOption = {
   href: string
   value: number
 }
 
-export type CanchasSortLink = {
+export type PlacesSortLink = {
   active: boolean
-  direction: CanchasSort['direction']
+  direction: PlacesSort['direction']
   disabled: boolean
   href: string
 }
 
-export type CanchasNavigationModel = {
-  sortLinks: Record<CanchasSort['field'], CanchasSortLink>
+export type PlacesNavigationModel = {
+  sortLinks: Record<PlacesSort['field'], PlacesSortLink>
 }
 
-export type CanchasControlsModel = {
+export type PlacesControlsModel = {
   filterOptions: {
     accessTypes: string[]
     cities: string[]
     regions: string[]
   }
-  view: CanchasView
+  view: PlacesView
 }
 
-export type CanchasResultsModel = {
-  mapCanchas?: CanchaMapItem[]
-  navigation: CanchasNavigationModel
-  pagination: CanchasPaginationModel
+export type PlacesResultsModel = {
+  mapPlaces?: PlaceMapItem[]
+  navigation: PlacesNavigationModel
+  pagination: PlacesPaginationModel
   showDistance: boolean
-  sort: CanchasSort
+  sort: PlacesSort
   userGeo: StoredUserGeo | null
-  view: CanchasView
+  view: PlacesView
 }
 
-export type CanchasBrowsingModel = {
-  controls: CanchasControlsModel
-  results: CanchasResultsModel
+export type PlacesBrowsingModel = {
+  controls: PlacesControlsModel
+  results: PlacesResultsModel
 }
 
-export type FindCanchasArgs = {
+export type FindPlacesArgs = {
   depth: 0
   limit: number
   locale: 'es'
@@ -96,26 +96,26 @@ export type FindCanchasArgs = {
   where?: Where
 }
 
-export type FindCanchasResult = {
-  docs: CanchaMapItem[]
+export type FindPlacesResult = {
+  docs: PlaceMapItem[]
   page?: number
   totalDocs: number
   totalPages: number
 }
 
-export type CanchasFinder = (args: FindCanchasArgs) => Promise<FindCanchasResult>
+export type PlacesFinder = (args: FindPlacesArgs) => Promise<FindPlacesResult>
 
-export type CanchasAdapter = {
-  find: CanchasFinder
+export type PlacesAdapter = {
+  find: PlacesFinder
 }
 
-export type CanchasCmsQueryOptions = {
+export type PlacesCmsQueryOptions = {
   draft: boolean
   overrideAccess: boolean
 }
 
-export type LoadCanchasBrowsingArgs = {
-  canchas: CanchasAdapter
+export type LoadPlacesBrowsingArgs = {
+  places: PlacesAdapter
   searchParams: Record<string, string | string[] | undefined>
   userGeo: StoredUserGeo | null
 }
@@ -123,7 +123,8 @@ export type LoadCanchasBrowsingArgs = {
 const defaultPageSize = 10
 const maxPageSize = 50
 const geoFetchLimit = 1000
-function isSortField(field: string): field is CanchasSort['field'] {
+
+function isSortField(field: string): field is PlacesSort['field'] {
   switch (field) {
     case 'accessType':
     case 'city':
@@ -135,24 +136,24 @@ function isSortField(field: string): field is CanchasSort['field'] {
   }
 }
 
-export function createPayloadCanchasAdapter({
+export function createPayloadPlacesAdapter({
   cmsQuery,
   payload,
 }: {
-  cmsQuery: CanchasCmsQueryOptions
+  cmsQuery: PlacesCmsQueryOptions
   payload: Pick<Payload, 'find'>
-}): CanchasAdapter {
+}): PlacesAdapter {
   return {
     find: async (args) => {
       const result = await payload.find({
-        collection: 'canchas',
+        collection: 'places',
         ...args,
         ...cmsQuery,
       })
 
       return {
         // oxlint-disable-next-line typescript/consistent-type-assertions, typescript/no-unnecessary-type-assertion
-        docs: result.docs as CanchaMapItem[],
+        docs: result.docs as PlaceMapItem[],
         page: result.page ?? undefined,
         totalDocs: result.totalDocs,
         totalPages: result.totalPages,
@@ -161,32 +162,32 @@ export function createPayloadCanchasAdapter({
   }
 }
 
-export async function loadCanchasBrowsing({
-  canchas,
+export async function loadPlacesBrowsing({
+  places,
   searchParams,
   userGeo,
-}: LoadCanchasBrowsingArgs): Promise<CanchasBrowsingModel> {
-  const filters = parseCanchasFilters(searchParams)
+}: LoadPlacesBrowsingArgs): Promise<PlacesBrowsingModel> {
+  const filters = parsePlacesFilters(searchParams)
   const view = filters.view === 'table' ? 'table' : 'cards'
-  const hrefSearchParams = normalizeCanchasSearchParams(searchParams, filters)
-  const where = getCanchasWhere(filters, userGeo)
+  const hrefSearchParams = normalizePlacesSearchParams(searchParams, filters)
+  const where = getPlacesWhere(filters, userGeo)
 
   const [filterOptionsResult, tableResult, poolResult] = await Promise.all([
-    canchas.find({
+    places.find({
       depth: 0,
       limit: 1000,
       locale: 'es',
       sort: 'title',
     }),
-    findTableCanchasPage(canchas, { filters, userGeo, view, where }),
-    findCardPoolCanchas(canchas, { userGeo, view, where }),
+    findTablePlacesPage(places, { filters, userGeo, view, where }),
+    findCardPoolPlaces(places, { userGeo, view, where }),
   ])
 
   const tableDocs = tableResult ? annotatePool(tableResult.docs, userGeo) : []
   const annotatedCardPool = poolResult ? annotatePool(poolResult.docs, userGeo) : null
   const pagination = buildResultsPagination({
     cardsPagination: annotatedCardPool
-      ? paginateCanchas(annotatedCardPool, filters.page, filters.pageSize)
+      ? paginatePlaces(annotatedCardPool, filters.page, filters.pageSize)
       : null,
     filterOptionsSearch: hrefSearchParams,
     filters,
@@ -194,7 +195,7 @@ export async function loadCanchasBrowsing({
     tableResult,
     view,
   })
-  const controls: CanchasControlsModel = {
+  const controls: PlacesControlsModel = {
     filterOptions: {
       accessTypes: getUniqueValues(filterOptionsResult.docs, 'accessType'),
       cities: getUniqueValues(filterOptionsResult.docs, 'city'),
@@ -202,8 +203,8 @@ export async function loadCanchasBrowsing({
     },
     view,
   }
-  const results: CanchasResultsModel = {
-    mapCanchas: userGeo && annotatedCardPool ? annotatedCardPool : undefined,
+  const results: PlacesResultsModel = {
+    mapPlaces: userGeo && annotatedCardPool ? annotatedCardPool : undefined,
     navigation: {
       sortLinks: buildSortLinks(hrefSearchParams, filters.sort, userGeo !== null),
     },
@@ -220,23 +221,23 @@ export async function loadCanchasBrowsing({
   }
 }
 
-type CanchaFindInput = {
-  filters: CanchasFilters
+type PlaceFindInput = {
+  filters: PlacesFilters
   userGeo: StoredUserGeo | null
-  view: CanchasView
+  view: PlacesView
   where?: Where
 }
 
-type CanchaFindResult = Awaited<ReturnType<CanchasAdapter['find']>>
+type PlaceFindResult = Awaited<ReturnType<PlacesAdapter['find']>>
 
 /** Table view pages through the filtered result set server-side. */
-function findTableCanchasPage(
-  canchas: CanchasAdapter,
-  { filters, userGeo, view, where }: CanchaFindInput,
-): Promise<CanchaFindResult | null> {
+function findTablePlacesPage(
+  places: PlacesAdapter,
+  { filters, userGeo, view, where }: PlaceFindInput,
+): Promise<PlaceFindResult | null> {
   if (view !== 'table') return Promise.resolve(null)
 
-  return canchas.find({
+  return places.find({
     depth: 0,
     limit: filters.pageSize,
     locale: 'es',
@@ -247,13 +248,13 @@ function findTableCanchasPage(
 }
 
 /** Card view fetches one bounded pool and paginates it in memory. */
-function findCardPoolCanchas(
-  canchas: CanchasAdapter,
-  { userGeo, view, where }: Omit<CanchaFindInput, 'filters'>,
-): Promise<CanchaFindResult | null> {
+function findCardPoolPlaces(
+  places: PlacesAdapter,
+  { userGeo, view, where }: Omit<PlaceFindInput, 'filters'>,
+): Promise<PlaceFindResult | null> {
   if (view !== 'cards') return Promise.resolve(null)
 
-  return canchas.find({
+  return places.find({
     depth: 0,
     limit: geoFetchLimit,
     locale: 'es',
@@ -264,12 +265,12 @@ function findCardPoolCanchas(
 }
 
 function buildResultsPagination(args: {
-  cardsPagination: ReturnType<typeof paginateCanchas<CanchaMapItem>> | null
+  cardsPagination: ReturnType<typeof paginatePlaces<PlaceMapItem>> | null
   filterOptionsSearch: Record<string, string>
-  filters: CanchasFilters
-  tableDocs: CanchaMapItem[]
-  tableResult: CanchaFindResult | null
-  view: CanchasView
+  filters: PlacesFilters
+  tableDocs: PlaceMapItem[]
+  tableResult: PlaceFindResult | null
+  view: PlacesView
 }) {
   const { cardsPagination, filterOptionsSearch, filters, tableDocs, tableResult, view } = args
 
@@ -308,9 +309,7 @@ function buildResultsPagination(args: {
   })
 }
 
-function parseCanchasFilters(
-  params: Record<string, string | string[] | undefined>,
-): CanchasFilters {
+function parsePlacesFilters(params: Record<string, string | string[] | undefined>): PlacesFilters {
   const sort = parseSort(getParam(params.sort))
 
   return {
@@ -335,42 +334,47 @@ function clampNumber(value: string, min: number, max: number, fallback: number) 
   return Math.min(Math.max(number, min), max)
 }
 
-function getCanchasHref(
+function copySearchParams(
+  target: URLSearchParams,
   searchParams: Record<string, string | string[] | undefined>,
-  updates: Record<string, null | string>,
-  options?: { view?: CanchasView },
 ) {
-  const params = new URLSearchParams()
-
   for (const [key, value] of Object.entries(searchParams)) {
     const paramValue = Array.isArray(value) ? value[0] : value
-    if (paramValue) params.set(key, paramValue)
+    if (paramValue) target.set(key, paramValue)
   }
+}
 
-  if (options?.view === 'table') {
-    params.set('view', 'table')
-  }
-
-  if (options?.view === 'cards') {
-    params.delete('view')
-  }
-
+function applyParamUpdates(target: URLSearchParams, updates: Record<string, null | string>) {
   for (const [key, value] of Object.entries(updates)) {
     if (value) {
-      params.set(key, value)
+      target.set(key, value)
     } else {
-      params.delete(key)
+      target.delete(key)
     }
   }
+}
+
+function getPlacesHref(
+  searchParams: Record<string, string | string[] | undefined>,
+  updates: Record<string, null | string>,
+  options?: { view?: PlacesView },
+) {
+  const params = new URLSearchParams()
+  copySearchParams(params, searchParams)
+
+  if (options?.view === 'table') params.set('view', 'table')
+  if (options?.view === 'cards') params.delete('view')
+
+  applyParamUpdates(params, updates)
 
   const query = params.toString()
 
-  return query ? `/canchas?${query}` : '/canchas'
+  return query ? `/places?${query}` : '/places'
 }
 
-function normalizeCanchasSearchParams(
+function normalizePlacesSearchParams(
   searchParams: Record<string, string | string[] | undefined>,
-  filters: CanchasFilters,
+  filters: PlacesFilters,
 ) {
   const normalized: Record<string, string> = {}
 
@@ -392,7 +396,7 @@ function hasParam(value: string | string[] | undefined) {
   return getParam(value).trim().length > 0
 }
 
-function getCanchasWhere(filters: CanchasFilters, userGeo?: StoredUserGeo | null) {
+function getPlacesWhere(filters: PlacesFilters, userGeo?: StoredUserGeo | null) {
   const and: Where[] = []
 
   if (filters.q) {
@@ -437,7 +441,7 @@ function getCanchasWhere(filters: CanchasFilters, userGeo?: StoredUserGeo | null
   }
 
   if (userGeo) {
-    and.push(getCanchasNearWhere(userGeo, userGeo.maxKm))
+    and.push(getPlacesNearWhere(userGeo, userGeo.maxKm))
   }
 
   if (and.length === 0) return undefined
@@ -452,7 +456,7 @@ function getParam(value: string | string[] | undefined) {
   return value ?? ''
 }
 
-function parseSort(value: string): CanchasSort {
+function parseSort(value: string): PlacesSort {
   const direction = value.startsWith('-') ? 'desc' : 'asc'
   const field = value.replace(/^-/, '')
 
@@ -469,7 +473,7 @@ function parseSort(value: string): CanchasSort {
   }
 }
 
-function getPayloadSort(sort: CanchasSort) {
+function getPayloadSort(sort: PlacesSort) {
   return `${sort.direction === 'desc' ? '-' : ''}${sort.field}`
 }
 
@@ -482,47 +486,47 @@ function buildPaginationModel({
   totalPages,
   view,
 }: {
-  docs: CanchaMapItem[]
+  docs: PlaceMapItem[]
   page: number
   pageSize: number
   searchParams: Record<string, string | string[] | undefined>
   totalDocs: number
   totalPages: number
-  view: CanchasView
-}): CanchasPaginationModel {
+  view: PlacesView
+}): PlacesPaginationModel {
   const firstRow = totalDocs === 0 ? 0 : (page - 1) * pageSize + 1
   const lastRow = Math.min(page * pageSize, totalDocs)
   const hrefOptions = { view }
 
   return {
-    canchas: docs,
     firstRow,
-    label: `${firstRow}-${lastRow} de ${totalDocs} canchas`,
+    label: `${firstRow}-${lastRow} de ${totalDocs} lugares`,
     links: {
       first: {
         disabled: page <= 1,
-        href: getCanchasHref(searchParams, { page: '1' }, hrefOptions),
+        href: getPlacesHref(searchParams, { page: '1' }, hrefOptions),
       },
       last: {
         disabled: page >= totalPages,
-        href: getCanchasHref(searchParams, { page: `${totalPages}` }, hrefOptions),
+        href: getPlacesHref(searchParams, { page: `${totalPages}` }, hrefOptions),
       },
       next: {
         disabled: page >= totalPages,
-        href: getCanchasHref(searchParams, { page: `${page + 1}` }, hrefOptions),
+        href: getPlacesHref(searchParams, { page: `${page + 1}` }, hrefOptions),
       },
       previous: {
         disabled: page <= 1,
-        href: getCanchasHref(searchParams, { page: `${page - 1}` }, hrefOptions),
+        href: getPlacesHref(searchParams, { page: `${page - 1}` }, hrefOptions),
       },
     },
     page,
     pageLabel: `Pagina ${page} de ${Math.max(totalPages, 1)}`,
     pageSize,
     pageSizeOptions: [10, 20, 50].map((value) => ({
-      href: getCanchasHref(searchParams, { page: null, pageSize: `${value}` }, hrefOptions),
+      href: getPlacesHref(searchParams, { page: null, pageSize: `${value}` }, hrefOptions),
       value,
     })),
+    places: docs,
     totalDocs,
     totalPages,
   }
@@ -530,9 +534,9 @@ function buildPaginationModel({
 
 function buildSortLinks(
   searchParams: Record<string, string | string[] | undefined>,
-  sort: CanchasSort,
+  sort: PlacesSort,
   disabled: boolean,
-): Record<CanchasSort['field'], CanchasSortLink> {
+): Record<PlacesSort['field'], PlacesSortLink> {
   return {
     accessType: buildSortLink(searchParams, sort, 'accessType', disabled),
     city: buildSortLink(searchParams, sort, 'city', disabled),
@@ -543,10 +547,10 @@ function buildSortLinks(
 
 function buildSortLink(
   searchParams: Record<string, string | string[] | undefined>,
-  sort: CanchasSort,
-  field: CanchasSort['field'],
+  sort: PlacesSort,
+  field: PlacesSort['field'],
   disabled: boolean,
-): CanchasSortLink {
+): PlacesSortLink {
   const active = sort.field === field
   const direction = active && sort.direction === 'asc' ? 'desc' : 'asc'
 
@@ -554,7 +558,7 @@ function buildSortLink(
     active,
     direction,
     disabled,
-    href: getCanchasHref(
+    href: getPlacesHref(
       searchParams,
       {
         page: null,
@@ -565,13 +569,13 @@ function buildSortLink(
   }
 }
 
-function annotatePool(docs: CanchaMapItem[], userGeo: StoredUserGeo | null) {
+function annotatePool(docs: PlaceMapItem[], userGeo: StoredUserGeo | null) {
   if (!userGeo) return docs
 
-  return annotateCanchasWithDistance(docs, userGeo)
+  return annotatePlacesWithDistance(docs, userGeo)
 }
 
-function getUniqueValues(docs: CanchaMapItem[], key: keyof CanchaMapItem): string[] {
+function getUniqueValues(docs: PlaceMapItem[], key: keyof PlaceMapItem): string[] {
   return Array.from(
     new Set(
       docs

@@ -99,9 +99,9 @@ function HomeHeroCtas() {
       </Link>
       <Link
         className={cn(buttonVariants({ variant: 'outline' }), 'min-h-10 px-4 font-bold')}
-        href="/canchas"
+        href="/places"
       >
-        Ver canchas
+        Ver lugares
       </Link>
     </div>
   )

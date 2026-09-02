@@ -3,7 +3,7 @@ import {
   maxMaxDistanceKm,
   minMaxDistanceKm,
   type GeoPoint,
-} from '@/lib/canchasGeo'
+} from '@/lib/placesGeo'
 
 export type StoredUserGeo = GeoPoint & {
   maxKm: number

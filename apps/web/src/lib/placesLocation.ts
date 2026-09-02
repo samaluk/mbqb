@@ -1,14 +1,14 @@
-import type { Cancha } from '@/payload-types'
+import type { Place } from '@/payload-types'
 
 /** Payload point fields are `[longitude, latitude]`. */
-export type CanchaLocationPoint = [number, number]
+export type PlaceLocationPoint = [number, number]
 
 export type GeoCoordinates = {
   latitude: number
   longitude: number
 }
 
-export function isCanchaLocationPoint(value: unknown): value is CanchaLocationPoint {
+export function isPlaceLocationPoint(value: unknown): value is PlaceLocationPoint {
   if (!Array.isArray(value) || value.length !== 2) return false
 
   // oxlint-disable-next-line typescript/no-unsafe-assignment
@@ -26,31 +26,26 @@ export function isCanchaLocationPoint(value: unknown): value is CanchaLocationPo
   )
 }
 
-export function toGeoCoordinates(point: CanchaLocationPoint): GeoCoordinates {
+export function toGeoCoordinates(point: PlaceLocationPoint): GeoCoordinates {
   const [longitude, latitude] = point
 
   return { latitude, longitude }
 }
 
-export function toCanchaLocationPoint({
-  latitude,
-  longitude,
-}: GeoCoordinates): CanchaLocationPoint {
+export function toPlaceLocationPoint({ latitude, longitude }: GeoCoordinates): PlaceLocationPoint {
   return [longitude, latitude]
 }
 
-export function getCanchaLocationFromPoint(
-  location: Cancha['location'],
-): GeoCoordinates | undefined {
-  if (!isCanchaLocationPoint(location)) return undefined
+export function getPlaceLocationFromPoint(location: Place['location']): GeoCoordinates | undefined {
+  if (!isPlaceLocationPoint(location)) return undefined
 
   return toGeoCoordinates(location)
 }
 
 const metersPerKm = 1000
 
-export function getCanchasNearWhere(origin: GeoCoordinates, maxKm: number) {
-  const [longitude, latitude] = toCanchaLocationPoint(origin)
+export function getPlacesNearWhere(origin: GeoCoordinates, maxKm: number) {
+  const [longitude, latitude] = toPlaceLocationPoint(origin)
 
   // Payload point `near` is [longitude, latitude, maxDistanceMeters, minDistanceMeters?]
   // — not a sibling `maxDistance` key (rejected as location.maxDistance).

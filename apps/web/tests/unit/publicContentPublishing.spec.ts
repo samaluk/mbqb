@@ -10,9 +10,9 @@ import {
 
 describe('Public Content Publishing', () => {
   it('builds collection preview URLs from the shared route facts', () => {
-    const canchasPreview = parsePreviewUrl(
+    const placesPreview = parsePreviewUrl(
       getPublicContentPreviewUrl({
-        collection: 'canchas',
+        collection: 'places',
         data: { slug: 'club-test' },
         locale: 'es',
       }),
@@ -32,9 +32,9 @@ describe('Public Content Publishing', () => {
       }),
     )
 
-    expect(canchasPreview).toMatchObject({
-      collection: 'canchas',
-      path: '/canchas/club-test',
+    expect(placesPreview).toMatchObject({
+      collection: 'places',
+      path: '/places/club-test',
       slug: 'club-test',
     })
     expect(articlesPreview).toMatchObject({
@@ -47,7 +47,7 @@ describe('Public Content Publishing', () => {
       path: '/products/polera',
       slug: 'polera',
     })
-    expect(canchasPreview.previewSecret).toBeTruthy()
+    expect(placesPreview.previewSecret).toBeTruthy()
   })
 
   it('does not build preview URLs for content without a slug', () => {
@@ -75,7 +75,7 @@ describe('Public Content Publishing', () => {
   })
 
   it('wires public route revalidation hooks into collection publishing', () => {
-    const publishing = getPublicContentPublishing('canchas')
+    const publishing = getPublicContentPublishing('places')
     const afterChange = publishing.hooks.afterChange?.[0]
     const afterDelete = publishing.hooks.afterDelete?.[0]
 
@@ -88,7 +88,7 @@ describe('Public Content Publishing', () => {
     const revalidate = (path: string) => revalidatedPaths.push(path)
 
     await revalidatePublicContentDoc({
-      collection: 'canchas',
+      collection: 'places',
       doc: {
         _status: 'published',
         slug: 'nuevo-slug',
@@ -101,7 +101,7 @@ describe('Public Content Publishing', () => {
     })
 
     await revalidateDeletedPublicContentDoc({
-      collection: 'canchas',
+      collection: 'places',
       doc: {
         _status: 'published',
         slug: 'nuevo-slug',
@@ -110,11 +110,11 @@ describe('Public Content Publishing', () => {
     })
 
     expect(revalidatedPaths).toEqual([
-      '/canchas',
-      '/canchas/nuevo-slug',
-      '/canchas/slug-viejo',
-      '/canchas',
-      '/canchas/nuevo-slug',
+      '/places',
+      '/places/nuevo-slug',
+      '/places/slug-viejo',
+      '/places',
+      '/places/nuevo-slug',
     ])
   })
 

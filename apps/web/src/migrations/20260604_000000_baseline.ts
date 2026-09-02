@@ -22,17 +22,17 @@ const baselineStatements = [
     'draft',
     'published'
 )`,
-  sql`CREATE TYPE public.enum__canchas_v_published_locale AS ENUM (
+  sql`CREATE TYPE public.enum__places_v_published_locale AS ENUM (
     'es',
     'en'
 )`,
-  sql`CREATE TYPE public.enum__canchas_v_version_access_type AS ENUM (
-    'pay-and-play',
+  sql`CREATE TYPE public.enum__places_v_version_access_type AS ENUM (
+    'open',
     'private',
     'restricted',
     'unknown'
 )`,
-  sql`CREATE TYPE public.enum__canchas_v_version_status AS ENUM (
+  sql`CREATE TYPE public.enum__places_v_version_status AS ENUM (
     'draft',
     'published'
 )`,
@@ -65,13 +65,13 @@ const baselineStatements = [
     'draft',
     'published'
 )`,
-  sql`CREATE TYPE public.enum_canchas_access_type AS ENUM (
-    'pay-and-play',
+  sql`CREATE TYPE public.enum_places_access_type AS ENUM (
+    'open',
     'private',
     'restricted',
     'unknown'
 )`,
-  sql`CREATE TYPE public.enum_canchas_status AS ENUM (
+  sql`CREATE TYPE public.enum_places_status AS ENUM (
     'draft',
     'published'
 )`,
@@ -134,37 +134,36 @@ const baselineStatements = [
     NO MAXVALUE
     CACHE 1`,
   sql`ALTER SEQUENCE public._articles_v_locales_id_seq OWNED BY public._articles_v_locales.id`,
-  sql`CREATE TABLE public._canchas_v (
+  sql`CREATE TABLE public._places_v (
     id integer NOT NULL,
     parent_id integer,
     version_slug character varying,
-    version_access_type public.enum__canchas_v_version_access_type DEFAULT 'unknown'::public.enum__canchas_v_version_access_type,
+    version_access_type public.enum__places_v_version_access_type DEFAULT 'open'::public.enum__places_v_version_access_type,
     version_region character varying,
     version_city character varying,
-    version_holes numeric,
-    version_public_booking_url character varying,
+    version_external_url character varying,
     version_location public.geometry(Point),
     version_source_url character varying,
     version_source_updated_at timestamp(3) with time zone,
     version_updated_at timestamp(3) with time zone,
     version_created_at timestamp(3) with time zone,
-    version__status public.enum__canchas_v_version_status DEFAULT 'draft'::public.enum__canchas_v_version_status,
+    version__status public.enum__places_v_version_status DEFAULT 'draft'::public.enum__places_v_version_status,
     created_at timestamp(3) with time zone DEFAULT now() NOT NULL,
     updated_at timestamp(3) with time zone DEFAULT now() NOT NULL,
     snapshot boolean,
-    published_locale public.enum__canchas_v_published_locale,
+    published_locale public.enum__places_v_published_locale,
     latest boolean,
     autosave boolean
 )`,
-  sql`CREATE SEQUENCE public._canchas_v_id_seq
+  sql`CREATE SEQUENCE public._places_v_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1`,
-  sql`ALTER SEQUENCE public._canchas_v_id_seq OWNED BY public._canchas_v.id`,
-  sql`CREATE TABLE public._canchas_v_locales (
+  sql`ALTER SEQUENCE public._places_v_id_seq OWNED BY public._places_v.id`,
+  sql`CREATE TABLE public._places_v_locales (
     version_title character varying,
     version_summary character varying,
     id integer NOT NULL,
@@ -172,14 +171,14 @@ const baselineStatements = [
     _parent_id integer NOT NULL,
     version_body jsonb
 )`,
-  sql`CREATE SEQUENCE public._canchas_v_locales_id_seq
+  sql`CREATE SEQUENCE public._places_v_locales_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1`,
-  sql`ALTER SEQUENCE public._canchas_v_locales_id_seq OWNED BY public._canchas_v_locales.id`,
+  sql`ALTER SEQUENCE public._places_v_locales_id_seq OWNED BY public._places_v_locales.id`,
   sql`CREATE TABLE public._home_page_v (
     id integer NOT NULL,
     version_hero_video_id integer,
@@ -300,30 +299,29 @@ const baselineStatements = [
     NO MAXVALUE
     CACHE 1`,
   sql`ALTER SEQUENCE public.articles_locales_id_seq OWNED BY public.articles_locales.id`,
-  sql`CREATE TABLE public.canchas (
+  sql`CREATE TABLE public.places (
     id integer NOT NULL,
     slug character varying NOT NULL,
     region character varying,
     city character varying,
-    access_type public.enum_canchas_access_type DEFAULT 'unknown'::public.enum_canchas_access_type NOT NULL,
-    holes numeric,
-    public_booking_url character varying,
+    access_type public.enum_places_access_type DEFAULT 'open'::public.enum_places_access_type NOT NULL,
+    external_url character varying,
     source_url character varying NOT NULL,
     source_updated_at timestamp(3) with time zone,
     updated_at timestamp(3) with time zone DEFAULT now() NOT NULL,
     created_at timestamp(3) with time zone DEFAULT now() NOT NULL,
     location public.geometry(Point),
-    _status public.enum_canchas_status DEFAULT 'draft'::public.enum_canchas_status
+    _status public.enum_places_status DEFAULT 'draft'::public.enum_places_status
 )`,
-  sql`CREATE SEQUENCE public.canchas_id_seq
+  sql`CREATE SEQUENCE public.places_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1`,
-  sql`ALTER SEQUENCE public.canchas_id_seq OWNED BY public.canchas.id`,
-  sql`CREATE TABLE public.canchas_locales (
+  sql`ALTER SEQUENCE public.places_id_seq OWNED BY public.places.id`,
+  sql`CREATE TABLE public.places_locales (
     title character varying NOT NULL,
     summary character varying NOT NULL,
     id integer NOT NULL,
@@ -331,14 +329,14 @@ const baselineStatements = [
     _parent_id integer NOT NULL,
     body jsonb
 )`,
-  sql`CREATE SEQUENCE public.canchas_locales_id_seq
+  sql`CREATE SEQUENCE public.places_locales_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1`,
-  sql`ALTER SEQUENCE public.canchas_locales_id_seq OWNED BY public.canchas_locales.id`,
+  sql`ALTER SEQUENCE public.places_locales_id_seq OWNED BY public.places_locales.id`,
   sql`CREATE TABLE public.home_page (
     id integer NOT NULL,
     hero_video_id integer,
@@ -431,7 +429,7 @@ const baselineStatements = [
     users_id integer,
     media_id integer,
     memberships_id integer,
-    canchas_id integer,
+    places_id integer,
     articles_id integer,
     products_id integer
 )`,
@@ -570,16 +568,16 @@ const baselineStatements = [
 )`,
   sql`ALTER TABLE ONLY public._articles_v ALTER COLUMN id SET DEFAULT nextval('public._articles_v_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public._articles_v_locales ALTER COLUMN id SET DEFAULT nextval('public._articles_v_locales_id_seq'::regclass)`,
-  sql`ALTER TABLE ONLY public._canchas_v ALTER COLUMN id SET DEFAULT nextval('public._canchas_v_id_seq'::regclass)`,
-  sql`ALTER TABLE ONLY public._canchas_v_locales ALTER COLUMN id SET DEFAULT nextval('public._canchas_v_locales_id_seq'::regclass)`,
+  sql`ALTER TABLE ONLY public._places_v ALTER COLUMN id SET DEFAULT nextval('public._places_v_id_seq'::regclass)`,
+  sql`ALTER TABLE ONLY public._places_v_locales ALTER COLUMN id SET DEFAULT nextval('public._places_v_locales_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public._home_page_v ALTER COLUMN id SET DEFAULT nextval('public._home_page_v_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public._memberships_v ALTER COLUMN id SET DEFAULT nextval('public._memberships_v_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public._products_v ALTER COLUMN id SET DEFAULT nextval('public._products_v_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public._products_v_locales ALTER COLUMN id SET DEFAULT nextval('public._products_v_locales_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.articles ALTER COLUMN id SET DEFAULT nextval('public.articles_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.articles_locales ALTER COLUMN id SET DEFAULT nextval('public.articles_locales_id_seq'::regclass)`,
-  sql`ALTER TABLE ONLY public.canchas ALTER COLUMN id SET DEFAULT nextval('public.canchas_id_seq'::regclass)`,
-  sql`ALTER TABLE ONLY public.canchas_locales ALTER COLUMN id SET DEFAULT nextval('public.canchas_locales_id_seq'::regclass)`,
+  sql`ALTER TABLE ONLY public.places ALTER COLUMN id SET DEFAULT nextval('public.places_id_seq'::regclass)`,
+  sql`ALTER TABLE ONLY public.places_locales ALTER COLUMN id SET DEFAULT nextval('public.places_locales_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.home_page ALTER COLUMN id SET DEFAULT nextval('public.home_page_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.media ALTER COLUMN id SET DEFAULT nextval('public.media_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.memberships ALTER COLUMN id SET DEFAULT nextval('public.memberships_id_seq'::regclass)`,
@@ -597,10 +595,10 @@ const baselineStatements = [
     ADD CONSTRAINT _articles_v_locales_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public._articles_v
     ADD CONSTRAINT _articles_v_pkey PRIMARY KEY (id)`,
-  sql`ALTER TABLE ONLY public._canchas_v_locales
-    ADD CONSTRAINT _canchas_v_locales_pkey PRIMARY KEY (id)`,
-  sql`ALTER TABLE ONLY public._canchas_v
-    ADD CONSTRAINT _canchas_v_pkey PRIMARY KEY (id)`,
+  sql`ALTER TABLE ONLY public._places_v_locales
+    ADD CONSTRAINT _places_v_locales_pkey PRIMARY KEY (id)`,
+  sql`ALTER TABLE ONLY public._places_v
+    ADD CONSTRAINT _places_v_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public._home_page_v
     ADD CONSTRAINT _home_page_v_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public._memberships_v
@@ -613,10 +611,10 @@ const baselineStatements = [
     ADD CONSTRAINT articles_locales_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public.articles
     ADD CONSTRAINT articles_pkey PRIMARY KEY (id)`,
-  sql`ALTER TABLE ONLY public.canchas_locales
-    ADD CONSTRAINT canchas_locales_pkey PRIMARY KEY (id)`,
-  sql`ALTER TABLE ONLY public.canchas
-    ADD CONSTRAINT canchas_pkey PRIMARY KEY (id)`,
+  sql`ALTER TABLE ONLY public.places_locales
+    ADD CONSTRAINT places_locales_pkey PRIMARY KEY (id)`,
+  sql`ALTER TABLE ONLY public.places
+    ADD CONSTRAINT places_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public.home_page
     ADD CONSTRAINT home_page_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public.media
@@ -657,18 +655,18 @@ const baselineStatements = [
   sql`CREATE INDEX _articles_v_version_version_created_at_idx ON public._articles_v USING btree (version_created_at)`,
   sql`CREATE INDEX _articles_v_version_version_slug_idx ON public._articles_v USING btree (version_slug)`,
   sql`CREATE INDEX _articles_v_version_version_updated_at_idx ON public._articles_v USING btree (version_updated_at)`,
-  sql`CREATE INDEX _canchas_v_autosave_idx ON public._canchas_v USING btree (autosave)`,
-  sql`CREATE INDEX _canchas_v_created_at_idx ON public._canchas_v USING btree (created_at)`,
-  sql`CREATE INDEX _canchas_v_latest_idx ON public._canchas_v USING btree (latest)`,
-  sql`CREATE UNIQUE INDEX _canchas_v_locales_locale_parent_id_unique ON public._canchas_v_locales USING btree (_locale, _parent_id)`,
-  sql`CREATE INDEX _canchas_v_parent_idx ON public._canchas_v USING btree (parent_id)`,
-  sql`CREATE INDEX _canchas_v_published_locale_idx ON public._canchas_v USING btree (published_locale)`,
-  sql`CREATE INDEX _canchas_v_snapshot_idx ON public._canchas_v USING btree (snapshot)`,
-  sql`CREATE INDEX _canchas_v_updated_at_idx ON public._canchas_v USING btree (updated_at)`,
-  sql`CREATE INDEX _canchas_v_version_version__status_idx ON public._canchas_v USING btree (version__status)`,
-  sql`CREATE INDEX _canchas_v_version_version_created_at_idx ON public._canchas_v USING btree (version_created_at)`,
-  sql`CREATE INDEX _canchas_v_version_version_slug_idx ON public._canchas_v USING btree (version_slug)`,
-  sql`CREATE INDEX _canchas_v_version_version_updated_at_idx ON public._canchas_v USING btree (version_updated_at)`,
+  sql`CREATE INDEX _places_v_autosave_idx ON public._places_v USING btree (autosave)`,
+  sql`CREATE INDEX _places_v_created_at_idx ON public._places_v USING btree (created_at)`,
+  sql`CREATE INDEX _places_v_latest_idx ON public._places_v USING btree (latest)`,
+  sql`CREATE UNIQUE INDEX _places_v_locales_locale_parent_id_unique ON public._places_v_locales USING btree (_locale, _parent_id)`,
+  sql`CREATE INDEX _places_v_parent_idx ON public._places_v USING btree (parent_id)`,
+  sql`CREATE INDEX _places_v_published_locale_idx ON public._places_v USING btree (published_locale)`,
+  sql`CREATE INDEX _places_v_snapshot_idx ON public._places_v USING btree (snapshot)`,
+  sql`CREATE INDEX _places_v_updated_at_idx ON public._places_v USING btree (updated_at)`,
+  sql`CREATE INDEX _places_v_version_version__status_idx ON public._places_v USING btree (version__status)`,
+  sql`CREATE INDEX _places_v_version_version_created_at_idx ON public._places_v USING btree (version_created_at)`,
+  sql`CREATE INDEX _places_v_version_version_slug_idx ON public._places_v USING btree (version_slug)`,
+  sql`CREATE INDEX _places_v_version_version_updated_at_idx ON public._places_v USING btree (version_updated_at)`,
   sql`CREATE INDEX _home_page_v_autosave_idx ON public._home_page_v USING btree (autosave)`,
   sql`CREATE INDEX _home_page_v_created_at_idx ON public._home_page_v USING btree (created_at)`,
   sql`CREATE INDEX _home_page_v_latest_idx ON public._home_page_v USING btree (latest)`,
@@ -701,15 +699,15 @@ const baselineStatements = [
   sql`CREATE UNIQUE INDEX articles_locales_locale_parent_id_unique ON public.articles_locales USING btree (_locale, _parent_id)`,
   sql`CREATE UNIQUE INDEX articles_slug_idx ON public.articles USING btree (slug)`,
   sql`CREATE INDEX articles_updated_at_idx ON public.articles USING btree (updated_at)`,
-  sql`CREATE INDEX canchas__status_idx ON public.canchas USING btree (_status)`,
-  sql`CREATE INDEX canchas_access_type_idx ON public.canchas USING btree (access_type)`,
-  sql`CREATE INDEX canchas_city_idx ON public.canchas USING btree (city)`,
-  sql`CREATE INDEX canchas_created_at_idx ON public.canchas USING btree (created_at)`,
-  sql`CREATE UNIQUE INDEX canchas_locales_locale_parent_id_unique ON public.canchas_locales USING btree (_locale, _parent_id)`,
-  sql`CREATE INDEX canchas_location_idx ON public.canchas USING gist (location)`,
-  sql`CREATE INDEX canchas_region_idx ON public.canchas USING btree (region)`,
-  sql`CREATE UNIQUE INDEX canchas_slug_idx ON public.canchas USING btree (slug)`,
-  sql`CREATE INDEX canchas_updated_at_idx ON public.canchas USING btree (updated_at)`,
+  sql`CREATE INDEX places__status_idx ON public.places USING btree (_status)`,
+  sql`CREATE INDEX places_access_type_idx ON public.places USING btree (access_type)`,
+  sql`CREATE INDEX places_city_idx ON public.places USING btree (city)`,
+  sql`CREATE INDEX places_created_at_idx ON public.places USING btree (created_at)`,
+  sql`CREATE UNIQUE INDEX places_locales_locale_parent_id_unique ON public.places_locales USING btree (_locale, _parent_id)`,
+  sql`CREATE INDEX places_location_idx ON public.places USING gist (location)`,
+  sql`CREATE INDEX places_region_idx ON public.places USING btree (region)`,
+  sql`CREATE UNIQUE INDEX places_slug_idx ON public.places USING btree (slug)`,
+  sql`CREATE INDEX places_updated_at_idx ON public.places USING btree (updated_at)`,
   sql`CREATE INDEX home_page__status_idx ON public.home_page USING btree (_status)`,
   sql`CREATE INDEX memberships_created_at_idx ON public.memberships USING btree (created_at)`,
   sql`CREATE UNIQUE INDEX memberships_lookup_hash_idx ON public.memberships USING btree (lookup_hash)`,
@@ -719,7 +717,7 @@ const baselineStatements = [
   sql`CREATE INDEX payload_locked_documents_created_at_idx ON public.payload_locked_documents USING btree (created_at)`,
   sql`CREATE INDEX payload_locked_documents_global_slug_idx ON public.payload_locked_documents USING btree (global_slug)`,
   sql`CREATE INDEX payload_locked_documents_rels_articles_id_idx ON public.payload_locked_documents_rels USING btree (articles_id)`,
-  sql`CREATE INDEX payload_locked_documents_rels_canchas_id_idx ON public.payload_locked_documents_rels USING btree (canchas_id)`,
+  sql`CREATE INDEX payload_locked_documents_rels_places_id_idx ON public.payload_locked_documents_rels USING btree (places_id)`,
   sql`CREATE INDEX payload_locked_documents_rels_media_id_idx ON public.payload_locked_documents_rels USING btree (media_id)`,
   sql`CREATE INDEX payload_locked_documents_rels_memberships_id_idx ON public.payload_locked_documents_rels USING btree (memberships_id)`,
   sql`CREATE INDEX payload_locked_documents_rels_order_idx ON public.payload_locked_documents_rels USING btree ("order")`,
@@ -753,10 +751,10 @@ const baselineStatements = [
     ADD CONSTRAINT _articles_v_locales_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._articles_v(id) ON DELETE CASCADE`,
   sql`ALTER TABLE ONLY public._articles_v
     ADD CONSTRAINT _articles_v_parent_id_articles_id_fk FOREIGN KEY (parent_id) REFERENCES public.articles(id) ON DELETE SET NULL`,
-  sql`ALTER TABLE ONLY public._canchas_v_locales
-    ADD CONSTRAINT _canchas_v_locales_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._canchas_v(id) ON DELETE CASCADE`,
-  sql`ALTER TABLE ONLY public._canchas_v
-    ADD CONSTRAINT _canchas_v_parent_id_canchas_id_fk FOREIGN KEY (parent_id) REFERENCES public.canchas(id) ON DELETE SET NULL`,
+  sql`ALTER TABLE ONLY public._places_v_locales
+    ADD CONSTRAINT _places_v_locales_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._places_v(id) ON DELETE CASCADE`,
+  sql`ALTER TABLE ONLY public._places_v
+    ADD CONSTRAINT _places_v_parent_id_places_id_fk FOREIGN KEY (parent_id) REFERENCES public.places(id) ON DELETE SET NULL`,
   sql`ALTER TABLE ONLY public._home_page_v
     ADD CONSTRAINT _home_page_v_version_hero_video_id_media_id_fk FOREIGN KEY (version_hero_video_id) REFERENCES public.media(id) ON DELETE SET NULL`,
   sql`ALTER TABLE ONLY public._memberships_v
@@ -767,12 +765,12 @@ const baselineStatements = [
     ADD CONSTRAINT _products_v_parent_id_products_id_fk FOREIGN KEY (parent_id) REFERENCES public.products(id) ON DELETE SET NULL`,
   sql`ALTER TABLE ONLY public.articles_locales
     ADD CONSTRAINT articles_locales_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.articles(id) ON DELETE CASCADE`,
-  sql`ALTER TABLE ONLY public.canchas_locales
-    ADD CONSTRAINT canchas_locales__parent_id_fkey FOREIGN KEY (_parent_id) REFERENCES public.canchas(id) ON DELETE CASCADE`,
+  sql`ALTER TABLE ONLY public.places_locales
+    ADD CONSTRAINT places_locales__parent_id_fkey FOREIGN KEY (_parent_id) REFERENCES public.places(id) ON DELETE CASCADE`,
   sql`ALTER TABLE ONLY public.payload_locked_documents_rels
     ADD CONSTRAINT payload_locked_documents_rels_articles_fk FOREIGN KEY (articles_id) REFERENCES public.articles(id) ON DELETE CASCADE`,
   sql`ALTER TABLE ONLY public.payload_locked_documents_rels
-    ADD CONSTRAINT payload_locked_documents_rels_canchas_fk FOREIGN KEY (canchas_id) REFERENCES public.canchas(id) ON DELETE CASCADE`,
+    ADD CONSTRAINT payload_locked_documents_rels_places_fk FOREIGN KEY (places_id) REFERENCES public.places(id) ON DELETE CASCADE`,
   sql`ALTER TABLE ONLY public.payload_locked_documents_rels
     ADD CONSTRAINT payload_locked_documents_rels_media_fk FOREIGN KEY (media_id) REFERENCES public.media(id) ON DELETE CASCADE`,
   sql`ALTER TABLE ONLY public.payload_locked_documents_rels
