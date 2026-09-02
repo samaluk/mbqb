@@ -36,8 +36,8 @@ _Avoid_: Public course, unrestricted access
 An MBQB editorial assessment of how suitable a Cancha is for newer golfers, based on practical beginner experience rather than an official course metric.
 _Avoid_: Official difficulty rating, user review score
 
-**La Biblia**:
-MBQB's evergreen educational content hub for golf concepts, rules, etiquette, equipment, culture, and beginner guidance.
+**Articles**:
+The community platform's educational content hub and knowledge base for guides, tutorials, and community resources.
 _Avoid_: News, blog, opinion feed
 
 **Product**:
@@ -45,5 +45,6 @@ An MBQB merchandise item promoted through the site for inquiry or purchase throu
 _Avoid_: Cart item, checkout item
 
 **Public Content Publishing**:
-The shared CMS publishing behavior for public Cancha, La Biblia, and Product content: draft previews, staff-only editing, published public reads, and public route revalidation.
+The shared CMS publishing behavior for public Cancha, Articles, and Product content: draft previews, staff-only editing, published public reads, and public route revalidation.
 _Avoid_: Generic CMS plumbing, private membership validation
+

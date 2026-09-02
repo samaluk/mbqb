@@ -71,7 +71,7 @@ export interface Config {
     media: Media;
     memberships: Membership;
     canchas: Cancha;
-    'la-biblia-articles': LaBibliaArticle;
+    articles: Article;
     products: Product;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -84,7 +84,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     memberships: MembershipsSelect<false> | MembershipsSelect<true>;
     canchas: CanchasSelect<false> | CanchasSelect<true>;
-    'la-biblia-articles': LaBibliaArticlesSelect<false> | LaBibliaArticlesSelect<true>;
+    articles: ArticlesSelect<false> | ArticlesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -238,9 +238,9 @@ export interface Cancha {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "la-biblia-articles".
+ * via the `definition` "articles".
  */
-export interface LaBibliaArticle {
+export interface Article {
   id: number;
   title: string;
   slug: string;
@@ -259,15 +259,8 @@ export interface LaBibliaArticle {
     };
     [k: string]: unknown;
   };
-  category:
-    | 'primeros-pasos'
-    | 'reglas-y-etiqueta'
-    | 'equipo'
-    | 'canchas'
-    | 'tecnica-basica'
-    | 'diccionario-golfistico'
-    | 'cultura-golf';
-  difficulty: 'principiante' | 'intermedio' | 'avanzado';
+  category?: string | null;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
   reviewedAt?: string | null;
   sourceUrl: string;
   sourceUpdatedAt?: string | null;
@@ -348,8 +341,8 @@ export interface PayloadLockedDocument {
         value: number | Cancha;
       } | null)
     | ({
-        relationTo: 'la-biblia-articles';
-        value: number | LaBibliaArticle;
+        relationTo: 'articles';
+        value: number | Article;
       } | null)
     | ({
         relationTo: 'products';
@@ -474,9 +467,9 @@ export interface CanchasSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "la-biblia-articles_select".
+ * via the `definition` "articles_select".
  */
-export interface LaBibliaArticlesSelect<T extends boolean = true> {
+export interface ArticlesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   body?: T;

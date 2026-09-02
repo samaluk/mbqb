@@ -4,13 +4,13 @@ import { getPublicContentPublishing } from '@/lib/publicContentPublishing'
 
 import { localizedRichBodyField, localizedTitleField, uniqueSlugField } from './fields'
 
-const publishing = getPublicContentPublishing('la-biblia-articles')
+const publishing = getPublicContentPublishing('articles')
 
-export const LaBibliaArticles: CollectionConfig = {
-  slug: 'la-biblia-articles',
+export const Articles: CollectionConfig = {
+  slug: 'articles',
   labels: {
-    singular: 'La Biblia Article',
-    plural: 'La Biblia Articles',
+    singular: 'Article',
+    plural: 'Articles',
   },
   admin: {
     ...publishing.admin,
@@ -26,24 +26,27 @@ export const LaBibliaArticles: CollectionConfig = {
     localizedRichBodyField(),
     {
       name: 'category',
-      type: 'select',
-      defaultValue: 'equipo',
-      options: [
-        'primeros-pasos',
-        'reglas-y-etiqueta',
-        'equipo',
-        'canchas',
-        'tecnica-basica',
-        'diccionario-golfistico',
-        'cultura-golf',
-      ],
-      required: true,
+      type: 'text',
+      label: 'Category',
     },
     {
       name: 'difficulty',
       type: 'select',
-      defaultValue: 'principiante',
-      options: ['principiante', 'intermedio', 'avanzado'],
+      defaultValue: 'beginner',
+      options: [
+        {
+          label: 'Beginner',
+          value: 'beginner',
+        },
+        {
+          label: 'Intermediate',
+          value: 'intermediate',
+        },
+        {
+          label: 'Advanced',
+          value: 'advanced',
+        },
+      ],
       required: true,
     },
     {

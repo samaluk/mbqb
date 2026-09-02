@@ -36,7 +36,7 @@ const richTextBody = {
   },
 }
 
-const fixtureCollections = ['canchas', 'la-biblia-articles', 'products'] as const
+const fixtureCollections = ['canchas', 'articles', 'products'] as const
 
 type FixtureCollection = (typeof fixtureCollections)[number]
 
@@ -54,6 +54,24 @@ type FixtureDoc<C extends FixtureCollection> = Omit<RequiredDataFromCollectionSl
 }
 
 const fixtures = {
+  articles: [
+    {
+      body: richTextBody,
+      category: 'Getting Started',
+      difficulty: 'beginner',
+      slug: 'articulo-fixture-1',
+      sourceUrl: 'https://mbqb.cl/fixture/articulo-1',
+      title: 'Articulo Fixture Uno',
+    },
+    {
+      body: richTextBody,
+      category: 'Rules & Etiquette',
+      difficulty: 'intermediate',
+      slug: 'articulo-fixture-2',
+      sourceUrl: 'https://mbqb.cl/fixture/articulo-2',
+      title: 'Articulo Fixture Dos',
+    },
+  ],
   canchas: [
     {
       accessType: 'pay-and-play',
@@ -70,24 +88,6 @@ const fixtures = {
       sourceUrl: 'https://mbqb.cl/fixture/cancha-2',
       summary: 'Cancha de fixture privada.',
       title: 'Cancha Fixture Dos',
-    },
-  ],
-  'la-biblia-articles': [
-    {
-      body: richTextBody,
-      category: 'primeros-pasos',
-      difficulty: 'principiante',
-      slug: 'articulo-fixture-1',
-      sourceUrl: 'https://mbqb.cl/fixture/articulo-1',
-      title: 'Articulo Fixture Uno',
-    },
-    {
-      body: richTextBody,
-      category: 'reglas-y-etiqueta',
-      difficulty: 'intermedio',
-      slug: 'articulo-fixture-2',
-      sourceUrl: 'https://mbqb.cl/fixture/articulo-2',
-      title: 'Articulo Fixture Dos',
     },
   ],
   products: [

@@ -17,9 +17,9 @@ describe('Public Content Publishing', () => {
         locale: 'es',
       }),
     )
-    const laBibliaPreview = parsePreviewUrl(
+    const articlesPreview = parsePreviewUrl(
       getPublicContentPreviewUrl({
-        collection: 'la-biblia-articles',
+        collection: 'articles',
         data: { slug: 'reglas-basicas' },
         locale: 'en',
       }),
@@ -37,9 +37,9 @@ describe('Public Content Publishing', () => {
       path: '/canchas/club-test',
       slug: 'club-test',
     })
-    expect(laBibliaPreview).toMatchObject({
-      collection: 'la-biblia-articles',
-      path: '/la-biblia/reglas-basicas?locale=en',
+    expect(articlesPreview).toMatchObject({
+      collection: 'articles',
+      path: '/articles/reglas-basicas?locale=en',
       slug: 'reglas-basicas',
     })
     expect(productPreview).toMatchObject({
@@ -60,11 +60,11 @@ describe('Public Content Publishing', () => {
   it('builds listing and detail revalidation paths from the same route facts', () => {
     expect(
       getPublicContentRevalidationPaths({
-        collection: 'la-biblia-articles',
+        collection: 'articles',
         doc: { slug: 'nuevo-slug' },
         previousDoc: { slug: 'slug-viejo' },
       }),
-    ).toEqual(['/la-biblia', '/la-biblia/nuevo-slug', '/la-biblia/slug-viejo'])
+    ).toEqual(['/articles', '/articles/nuevo-slug', '/articles/slug-viejo'])
 
     expect(
       getPublicContentRevalidationPaths({
@@ -122,7 +122,7 @@ describe('Public Content Publishing', () => {
     const revalidatedPaths: string[] = []
 
     await revalidatePublicContentDoc({
-      collection: 'la-biblia-articles',
+      collection: 'articles',
       doc: {
         _status: 'draft',
         slug: 'draft-slug',

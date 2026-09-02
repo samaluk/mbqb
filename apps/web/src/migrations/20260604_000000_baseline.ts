@@ -9,6 +9,19 @@ const baselineStatements = [
     'es',
     'en'
 )`,
+  sql`CREATE TYPE public.enum__articles_v_published_locale AS ENUM (
+    'es',
+    'en'
+)`,
+  sql`CREATE TYPE public.enum__articles_v_version_difficulty AS ENUM (
+    'beginner',
+    'intermediate',
+    'advanced'
+)`,
+  sql`CREATE TYPE public.enum__articles_v_version_status AS ENUM (
+    'draft',
+    'published'
+)`,
   sql`CREATE TYPE public.enum__canchas_v_published_locale AS ENUM (
     'es',
     'en'
@@ -31,28 +44,6 @@ const baselineStatements = [
     'draft',
     'published'
 )`,
-  sql`CREATE TYPE public.enum__la_biblia_articles_v_published_locale AS ENUM (
-    'es',
-    'en'
-)`,
-  sql`CREATE TYPE public.enum__la_biblia_articles_v_version_category AS ENUM (
-    'primeros-pasos',
-    'reglas-y-etiqueta',
-    'equipo',
-    'canchas',
-    'tecnica-basica',
-    'diccionario-golfistico',
-    'cultura-golf'
-)`,
-  sql`CREATE TYPE public.enum__la_biblia_articles_v_version_difficulty AS ENUM (
-    'principiante',
-    'intermedio',
-    'avanzado'
-)`,
-  sql`CREATE TYPE public.enum__la_biblia_articles_v_version_status AS ENUM (
-    'draft',
-    'published'
-)`,
   sql`CREATE TYPE public.enum__products_v_published_locale AS ENUM (
     'es',
     'en'
@@ -65,6 +56,15 @@ const baselineStatements = [
     'available',
     'unavailable'
 )`,
+  sql`CREATE TYPE public.enum_articles_difficulty AS ENUM (
+    'beginner',
+    'intermediate',
+    'advanced'
+)`,
+  sql`CREATE TYPE public.enum_articles_status AS ENUM (
+    'draft',
+    'published'
+)`,
   sql`CREATE TYPE public.enum_canchas_access_type AS ENUM (
     'pay-and-play',
     'private',
@@ -76,24 +76,6 @@ const baselineStatements = [
     'published'
 )`,
   sql`CREATE TYPE public.enum_home_page_status AS ENUM (
-    'draft',
-    'published'
-)`,
-  sql`CREATE TYPE public.enum_la_biblia_articles_category AS ENUM (
-    'primeros-pasos',
-    'reglas-y-etiqueta',
-    'equipo',
-    'canchas',
-    'tecnica-basica',
-    'diccionario-golfistico',
-    'cultura-golf'
-)`,
-  sql`CREATE TYPE public.enum_la_biblia_articles_difficulty AS ENUM (
-    'principiante',
-    'intermedio',
-    'avanzado'
-)`,
-  sql`CREATE TYPE public.enum_la_biblia_articles_status AS ENUM (
     'draft',
     'published'
 )`,
@@ -110,6 +92,48 @@ const baselineStatements = [
     'editor',
     'validation-manager'
 )`,
+  sql`CREATE TABLE public._articles_v (
+    id integer NOT NULL,
+    parent_id integer,
+    version_slug character varying,
+    version_category character varying,
+    version_difficulty public.enum__articles_v_version_difficulty DEFAULT 'beginner'::public.enum__articles_v_version_difficulty,
+    version_reviewed_at timestamp(3) with time zone,
+    version_source_url character varying,
+    version_source_updated_at timestamp(3) with time zone,
+    version_updated_at timestamp(3) with time zone,
+    version_created_at timestamp(3) with time zone,
+    version__status public.enum__articles_v_version_status DEFAULT 'draft'::public.enum__articles_v_version_status,
+    created_at timestamp(3) with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp(3) with time zone DEFAULT now() NOT NULL,
+    snapshot boolean,
+    published_locale public.enum__articles_v_published_locale,
+    latest boolean,
+    autosave boolean
+)`,
+  sql`CREATE SEQUENCE public._articles_v_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1`,
+  sql`ALTER SEQUENCE public._articles_v_id_seq OWNED BY public._articles_v.id`,
+  sql`CREATE TABLE public._articles_v_locales (
+    version_title character varying,
+    id integer NOT NULL,
+    _locale public._locales NOT NULL,
+    _parent_id integer NOT NULL,
+    version_body jsonb
+)`,
+  sql`CREATE SEQUENCE public._articles_v_locales_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1`,
+  sql`ALTER SEQUENCE public._articles_v_locales_id_seq OWNED BY public._articles_v_locales.id`,
   sql`CREATE TABLE public._canchas_v (
     id integer NOT NULL,
     parent_id integer,
@@ -178,48 +202,6 @@ const baselineStatements = [
     NO MAXVALUE
     CACHE 1`,
   sql`ALTER SEQUENCE public._home_page_v_id_seq OWNED BY public._home_page_v.id`,
-  sql`CREATE TABLE public._la_biblia_articles_v (
-    id integer NOT NULL,
-    parent_id integer,
-    version_slug character varying,
-    version_category public.enum__la_biblia_articles_v_version_category DEFAULT 'equipo'::public.enum__la_biblia_articles_v_version_category,
-    version_difficulty public.enum__la_biblia_articles_v_version_difficulty DEFAULT 'principiante'::public.enum__la_biblia_articles_v_version_difficulty,
-    version_reviewed_at timestamp(3) with time zone,
-    version_source_url character varying,
-    version_source_updated_at timestamp(3) with time zone,
-    version_updated_at timestamp(3) with time zone,
-    version_created_at timestamp(3) with time zone,
-    version__status public.enum__la_biblia_articles_v_version_status DEFAULT 'draft'::public.enum__la_biblia_articles_v_version_status,
-    created_at timestamp(3) with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp(3) with time zone DEFAULT now() NOT NULL,
-    snapshot boolean,
-    published_locale public.enum__la_biblia_articles_v_published_locale,
-    latest boolean,
-    autosave boolean
-)`,
-  sql`CREATE SEQUENCE public._la_biblia_articles_v_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1`,
-  sql`ALTER SEQUENCE public._la_biblia_articles_v_id_seq OWNED BY public._la_biblia_articles_v.id`,
-  sql`CREATE TABLE public._la_biblia_articles_v_locales (
-    version_title character varying,
-    id integer NOT NULL,
-    _locale public._locales NOT NULL,
-    _parent_id integer NOT NULL,
-    version_body jsonb
-)`,
-  sql`CREATE SEQUENCE public._la_biblia_articles_v_locales_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1`,
-  sql`ALTER SEQUENCE public._la_biblia_articles_v_locales_id_seq OWNED BY public._la_biblia_articles_v_locales.id`,
   sql`CREATE TABLE public._memberships_v (
     id integer NOT NULL,
     parent_id integer,
@@ -283,6 +265,41 @@ const baselineStatements = [
     NO MAXVALUE
     CACHE 1`,
   sql`ALTER SEQUENCE public._products_v_locales_id_seq OWNED BY public._products_v_locales.id`,
+  sql`CREATE TABLE public.articles (
+    id integer NOT NULL,
+    slug character varying NOT NULL,
+    category character varying,
+    difficulty public.enum_articles_difficulty DEFAULT 'beginner'::public.enum_articles_difficulty NOT NULL,
+    reviewed_at timestamp(3) with time zone,
+    source_url character varying NOT NULL,
+    source_updated_at timestamp(3) with time zone,
+    updated_at timestamp(3) with time zone DEFAULT now() NOT NULL,
+    created_at timestamp(3) with time zone DEFAULT now() NOT NULL,
+    _status public.enum_articles_status DEFAULT 'draft'::public.enum_articles_status
+)`,
+  sql`CREATE SEQUENCE public.articles_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1`,
+  sql`ALTER SEQUENCE public.articles_id_seq OWNED BY public.articles.id`,
+  sql`CREATE TABLE public.articles_locales (
+    title character varying NOT NULL,
+    id integer NOT NULL,
+    _locale public._locales NOT NULL,
+    _parent_id integer NOT NULL,
+    body jsonb
+)`,
+  sql`CREATE SEQUENCE public.articles_locales_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1`,
+  sql`ALTER SEQUENCE public.articles_locales_id_seq OWNED BY public.articles_locales.id`,
   sql`CREATE TABLE public.canchas (
     id integer NOT NULL,
     slug character varying NOT NULL,
@@ -338,41 +355,6 @@ const baselineStatements = [
     NO MAXVALUE
     CACHE 1`,
   sql`ALTER SEQUENCE public.home_page_id_seq OWNED BY public.home_page.id`,
-  sql`CREATE TABLE public.la_biblia_articles (
-    id integer NOT NULL,
-    slug character varying NOT NULL,
-    category public.enum_la_biblia_articles_category DEFAULT 'equipo'::public.enum_la_biblia_articles_category NOT NULL,
-    difficulty public.enum_la_biblia_articles_difficulty DEFAULT 'principiante'::public.enum_la_biblia_articles_difficulty NOT NULL,
-    reviewed_at timestamp(3) with time zone,
-    source_url character varying NOT NULL,
-    source_updated_at timestamp(3) with time zone,
-    updated_at timestamp(3) with time zone DEFAULT now() NOT NULL,
-    created_at timestamp(3) with time zone DEFAULT now() NOT NULL,
-    _status public.enum_la_biblia_articles_status DEFAULT 'draft'::public.enum_la_biblia_articles_status
-)`,
-  sql`CREATE SEQUENCE public.la_biblia_articles_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1`,
-  sql`ALTER SEQUENCE public.la_biblia_articles_id_seq OWNED BY public.la_biblia_articles.id`,
-  sql`CREATE TABLE public.la_biblia_articles_locales (
-    title character varying NOT NULL,
-    id integer NOT NULL,
-    _locale public._locales NOT NULL,
-    _parent_id integer NOT NULL,
-    body jsonb
-)`,
-  sql`CREATE SEQUENCE public.la_biblia_articles_locales_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1`,
-  sql`ALTER SEQUENCE public.la_biblia_articles_locales_id_seq OWNED BY public.la_biblia_articles_locales.id`,
   sql`CREATE TABLE public.media (
     id integer NOT NULL,
     alt character varying NOT NULL,
@@ -450,7 +432,7 @@ const baselineStatements = [
     media_id integer,
     memberships_id integer,
     canchas_id integer,
-    la_biblia_articles_id integer,
+    articles_id integer,
     products_id integer
 )`,
   sql`CREATE SEQUENCE public.payload_locked_documents_rels_id_seq
@@ -586,19 +568,19 @@ const baselineStatements = [
     created_at timestamp(3) with time zone,
     expires_at timestamp(3) with time zone NOT NULL
 )`,
+  sql`ALTER TABLE ONLY public._articles_v ALTER COLUMN id SET DEFAULT nextval('public._articles_v_id_seq'::regclass)`,
+  sql`ALTER TABLE ONLY public._articles_v_locales ALTER COLUMN id SET DEFAULT nextval('public._articles_v_locales_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public._canchas_v ALTER COLUMN id SET DEFAULT nextval('public._canchas_v_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public._canchas_v_locales ALTER COLUMN id SET DEFAULT nextval('public._canchas_v_locales_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public._home_page_v ALTER COLUMN id SET DEFAULT nextval('public._home_page_v_id_seq'::regclass)`,
-  sql`ALTER TABLE ONLY public._la_biblia_articles_v ALTER COLUMN id SET DEFAULT nextval('public._la_biblia_articles_v_id_seq'::regclass)`,
-  sql`ALTER TABLE ONLY public._la_biblia_articles_v_locales ALTER COLUMN id SET DEFAULT nextval('public._la_biblia_articles_v_locales_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public._memberships_v ALTER COLUMN id SET DEFAULT nextval('public._memberships_v_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public._products_v ALTER COLUMN id SET DEFAULT nextval('public._products_v_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public._products_v_locales ALTER COLUMN id SET DEFAULT nextval('public._products_v_locales_id_seq'::regclass)`,
+  sql`ALTER TABLE ONLY public.articles ALTER COLUMN id SET DEFAULT nextval('public.articles_id_seq'::regclass)`,
+  sql`ALTER TABLE ONLY public.articles_locales ALTER COLUMN id SET DEFAULT nextval('public.articles_locales_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.canchas ALTER COLUMN id SET DEFAULT nextval('public.canchas_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.canchas_locales ALTER COLUMN id SET DEFAULT nextval('public.canchas_locales_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.home_page ALTER COLUMN id SET DEFAULT nextval('public.home_page_id_seq'::regclass)`,
-  sql`ALTER TABLE ONLY public.la_biblia_articles ALTER COLUMN id SET DEFAULT nextval('public.la_biblia_articles_id_seq'::regclass)`,
-  sql`ALTER TABLE ONLY public.la_biblia_articles_locales ALTER COLUMN id SET DEFAULT nextval('public.la_biblia_articles_locales_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.media ALTER COLUMN id SET DEFAULT nextval('public.media_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.memberships ALTER COLUMN id SET DEFAULT nextval('public.memberships_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.payload_kv ALTER COLUMN id SET DEFAULT nextval('public.payload_kv_id_seq'::regclass)`,
@@ -611,32 +593,32 @@ const baselineStatements = [
   sql`ALTER TABLE ONLY public.products_locales ALTER COLUMN id SET DEFAULT nextval('public.products_locales_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.site_settings ALTER COLUMN id SET DEFAULT nextval('public.site_settings_id_seq'::regclass)`,
   sql`ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass)`,
+  sql`ALTER TABLE ONLY public._articles_v_locales
+    ADD CONSTRAINT _articles_v_locales_pkey PRIMARY KEY (id)`,
+  sql`ALTER TABLE ONLY public._articles_v
+    ADD CONSTRAINT _articles_v_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public._canchas_v_locales
     ADD CONSTRAINT _canchas_v_locales_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public._canchas_v
     ADD CONSTRAINT _canchas_v_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public._home_page_v
     ADD CONSTRAINT _home_page_v_pkey PRIMARY KEY (id)`,
-  sql`ALTER TABLE ONLY public._la_biblia_articles_v_locales
-    ADD CONSTRAINT _la_biblia_articles_v_locales_pkey PRIMARY KEY (id)`,
-  sql`ALTER TABLE ONLY public._la_biblia_articles_v
-    ADD CONSTRAINT _la_biblia_articles_v_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public._memberships_v
     ADD CONSTRAINT _memberships_v_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public._products_v_locales
     ADD CONSTRAINT _products_v_locales_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public._products_v
     ADD CONSTRAINT _products_v_pkey PRIMARY KEY (id)`,
+  sql`ALTER TABLE ONLY public.articles_locales
+    ADD CONSTRAINT articles_locales_pkey PRIMARY KEY (id)`,
+  sql`ALTER TABLE ONLY public.articles
+    ADD CONSTRAINT articles_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public.canchas_locales
     ADD CONSTRAINT canchas_locales_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public.canchas
     ADD CONSTRAINT canchas_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public.home_page
     ADD CONSTRAINT home_page_pkey PRIMARY KEY (id)`,
-  sql`ALTER TABLE ONLY public.la_biblia_articles_locales
-    ADD CONSTRAINT la_biblia_articles_locales_pkey PRIMARY KEY (id)`,
-  sql`ALTER TABLE ONLY public.la_biblia_articles
-    ADD CONSTRAINT la_biblia_articles_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public.media
     ADD CONSTRAINT media_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public.memberships
@@ -663,6 +645,18 @@ const baselineStatements = [
     ADD CONSTRAINT users_pkey PRIMARY KEY (id)`,
   sql`ALTER TABLE ONLY public.users_sessions
     ADD CONSTRAINT users_sessions_pkey PRIMARY KEY (id)`,
+  sql`CREATE INDEX _articles_v_autosave_idx ON public._articles_v USING btree (autosave)`,
+  sql`CREATE INDEX _articles_v_created_at_idx ON public._articles_v USING btree (created_at)`,
+  sql`CREATE INDEX _articles_v_latest_idx ON public._articles_v USING btree (latest)`,
+  sql`CREATE UNIQUE INDEX _articles_v_locales_locale_parent_id_unique ON public._articles_v_locales USING btree (_locale, _parent_id)`,
+  sql`CREATE INDEX _articles_v_parent_idx ON public._articles_v USING btree (parent_id)`,
+  sql`CREATE INDEX _articles_v_published_locale_idx ON public._articles_v USING btree (published_locale)`,
+  sql`CREATE INDEX _articles_v_snapshot_idx ON public._articles_v USING btree (snapshot)`,
+  sql`CREATE INDEX _articles_v_updated_at_idx ON public._articles_v USING btree (updated_at)`,
+  sql`CREATE INDEX _articles_v_version_version__status_idx ON public._articles_v USING btree (version__status)`,
+  sql`CREATE INDEX _articles_v_version_version_created_at_idx ON public._articles_v USING btree (version_created_at)`,
+  sql`CREATE INDEX _articles_v_version_version_slug_idx ON public._articles_v USING btree (version_slug)`,
+  sql`CREATE INDEX _articles_v_version_version_updated_at_idx ON public._articles_v USING btree (version_updated_at)`,
   sql`CREATE INDEX _canchas_v_autosave_idx ON public._canchas_v USING btree (autosave)`,
   sql`CREATE INDEX _canchas_v_created_at_idx ON public._canchas_v USING btree (created_at)`,
   sql`CREATE INDEX _canchas_v_latest_idx ON public._canchas_v USING btree (latest)`,
@@ -683,18 +677,6 @@ const baselineStatements = [
   sql`CREATE INDEX _home_page_v_updated_at_idx ON public._home_page_v USING btree (updated_at)`,
   sql`CREATE INDEX _home_page_v_version_version__status_idx ON public._home_page_v USING btree (version__status)`,
   sql`CREATE INDEX _home_page_v_version_version_hero_video_idx ON public._home_page_v USING btree (version_hero_video_id)`,
-  sql`CREATE INDEX _la_biblia_articles_v_autosave_idx ON public._la_biblia_articles_v USING btree (autosave)`,
-  sql`CREATE INDEX _la_biblia_articles_v_created_at_idx ON public._la_biblia_articles_v USING btree (created_at)`,
-  sql`CREATE INDEX _la_biblia_articles_v_latest_idx ON public._la_biblia_articles_v USING btree (latest)`,
-  sql`CREATE UNIQUE INDEX _la_biblia_articles_v_locales_locale_parent_id_unique ON public._la_biblia_articles_v_locales USING btree (_locale, _parent_id)`,
-  sql`CREATE INDEX _la_biblia_articles_v_parent_idx ON public._la_biblia_articles_v USING btree (parent_id)`,
-  sql`CREATE INDEX _la_biblia_articles_v_published_locale_idx ON public._la_biblia_articles_v USING btree (published_locale)`,
-  sql`CREATE INDEX _la_biblia_articles_v_snapshot_idx ON public._la_biblia_articles_v USING btree (snapshot)`,
-  sql`CREATE INDEX _la_biblia_articles_v_updated_at_idx ON public._la_biblia_articles_v USING btree (updated_at)`,
-  sql`CREATE INDEX _la_biblia_articles_v_version_version__status_idx ON public._la_biblia_articles_v USING btree (version__status)`,
-  sql`CREATE INDEX _la_biblia_articles_v_version_version_created_at_idx ON public._la_biblia_articles_v USING btree (version_created_at)`,
-  sql`CREATE INDEX _la_biblia_articles_v_version_version_slug_idx ON public._la_biblia_articles_v USING btree (version_slug)`,
-  sql`CREATE INDEX _la_biblia_articles_v_version_version_updated_at_idx ON public._la_biblia_articles_v USING btree (version_updated_at)`,
   sql`CREATE INDEX _memberships_v_created_at_idx ON public._memberships_v USING btree (created_at)`,
   sql`CREATE INDEX _memberships_v_parent_idx ON public._memberships_v USING btree (parent_id)`,
   sql`CREATE INDEX _memberships_v_updated_at_idx ON public._memberships_v USING btree (updated_at)`,
@@ -714,6 +696,11 @@ const baselineStatements = [
   sql`CREATE INDEX _products_v_version_version_created_at_idx ON public._products_v USING btree (version_created_at)`,
   sql`CREATE INDEX _products_v_version_version_slug_idx ON public._products_v USING btree (version_slug)`,
   sql`CREATE INDEX _products_v_version_version_updated_at_idx ON public._products_v USING btree (version_updated_at)`,
+  sql`CREATE INDEX articles__status_idx ON public.articles USING btree (_status)`,
+  sql`CREATE INDEX articles_created_at_idx ON public.articles USING btree (created_at)`,
+  sql`CREATE UNIQUE INDEX articles_locales_locale_parent_id_unique ON public.articles_locales USING btree (_locale, _parent_id)`,
+  sql`CREATE UNIQUE INDEX articles_slug_idx ON public.articles USING btree (slug)`,
+  sql`CREATE INDEX articles_updated_at_idx ON public.articles USING btree (updated_at)`,
   sql`CREATE INDEX canchas__status_idx ON public.canchas USING btree (_status)`,
   sql`CREATE INDEX canchas_access_type_idx ON public.canchas USING btree (access_type)`,
   sql`CREATE INDEX canchas_city_idx ON public.canchas USING btree (city)`,
@@ -724,13 +711,6 @@ const baselineStatements = [
   sql`CREATE UNIQUE INDEX canchas_slug_idx ON public.canchas USING btree (slug)`,
   sql`CREATE INDEX canchas_updated_at_idx ON public.canchas USING btree (updated_at)`,
   sql`CREATE INDEX home_page__status_idx ON public.home_page USING btree (_status)`,
-  sql`CREATE INDEX la_biblia_articles__status_idx ON public.la_biblia_articles USING btree (_status)`,
-  sql`CREATE INDEX la_biblia_articles_category_idx ON public.la_biblia_articles USING btree (category)`,
-  sql`CREATE INDEX la_biblia_articles_created_at_idx ON public.la_biblia_articles USING btree (created_at)`,
-  sql`CREATE INDEX la_biblia_articles_difficulty_idx ON public.la_biblia_articles USING btree (difficulty)`,
-  sql`CREATE UNIQUE INDEX la_biblia_articles_locales_locale_parent_id_unique ON public.la_biblia_articles_locales USING btree (_locale, _parent_id)`,
-  sql`CREATE UNIQUE INDEX la_biblia_articles_slug_idx ON public.la_biblia_articles USING btree (slug)`,
-  sql`CREATE INDEX la_biblia_articles_updated_at_idx ON public.la_biblia_articles USING btree (updated_at)`,
   sql`CREATE INDEX memberships_created_at_idx ON public.memberships USING btree (created_at)`,
   sql`CREATE UNIQUE INDEX memberships_lookup_hash_idx ON public.memberships USING btree (lookup_hash)`,
   sql`CREATE UNIQUE INDEX memberships_normalized_identifier_idx ON public.memberships USING btree (normalized_identifier)`,
@@ -738,8 +718,8 @@ const baselineStatements = [
   sql`CREATE UNIQUE INDEX payload_kv_key_idx ON public.payload_kv USING btree (key)`,
   sql`CREATE INDEX payload_locked_documents_created_at_idx ON public.payload_locked_documents USING btree (created_at)`,
   sql`CREATE INDEX payload_locked_documents_global_slug_idx ON public.payload_locked_documents USING btree (global_slug)`,
+  sql`CREATE INDEX payload_locked_documents_rels_articles_id_idx ON public.payload_locked_documents_rels USING btree (articles_id)`,
   sql`CREATE INDEX payload_locked_documents_rels_canchas_id_idx ON public.payload_locked_documents_rels USING btree (canchas_id)`,
-  sql`CREATE INDEX payload_locked_documents_rels_la_biblia_articles_id_idx ON public.payload_locked_documents_rels USING btree (la_biblia_articles_id)`,
   sql`CREATE INDEX payload_locked_documents_rels_media_id_idx ON public.payload_locked_documents_rels USING btree (media_id)`,
   sql`CREATE INDEX payload_locked_documents_rels_memberships_id_idx ON public.payload_locked_documents_rels USING btree (memberships_id)`,
   sql`CREATE INDEX payload_locked_documents_rels_order_idx ON public.payload_locked_documents_rels USING btree ("order")`,
@@ -769,30 +749,30 @@ const baselineStatements = [
   sql`CREATE INDEX users_sessions_order_idx ON public.users_sessions USING btree (_order)`,
   sql`CREATE INDEX users_sessions_parent_id_idx ON public.users_sessions USING btree (_parent_id)`,
   sql`CREATE INDEX users_updated_at_idx ON public.users USING btree (updated_at)`,
+  sql`ALTER TABLE ONLY public._articles_v_locales
+    ADD CONSTRAINT _articles_v_locales_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._articles_v(id) ON DELETE CASCADE`,
+  sql`ALTER TABLE ONLY public._articles_v
+    ADD CONSTRAINT _articles_v_parent_id_articles_id_fk FOREIGN KEY (parent_id) REFERENCES public.articles(id) ON DELETE SET NULL`,
   sql`ALTER TABLE ONLY public._canchas_v_locales
     ADD CONSTRAINT _canchas_v_locales_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._canchas_v(id) ON DELETE CASCADE`,
   sql`ALTER TABLE ONLY public._canchas_v
     ADD CONSTRAINT _canchas_v_parent_id_canchas_id_fk FOREIGN KEY (parent_id) REFERENCES public.canchas(id) ON DELETE SET NULL`,
   sql`ALTER TABLE ONLY public._home_page_v
     ADD CONSTRAINT _home_page_v_version_hero_video_id_media_id_fk FOREIGN KEY (version_hero_video_id) REFERENCES public.media(id) ON DELETE SET NULL`,
-  sql`ALTER TABLE ONLY public._la_biblia_articles_v_locales
-    ADD CONSTRAINT _la_biblia_articles_v_locales_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._la_biblia_articles_v(id) ON DELETE CASCADE`,
-  sql`ALTER TABLE ONLY public._la_biblia_articles_v
-    ADD CONSTRAINT _la_biblia_articles_v_parent_id_la_biblia_articles_id_fk FOREIGN KEY (parent_id) REFERENCES public.la_biblia_articles(id) ON DELETE SET NULL`,
   sql`ALTER TABLE ONLY public._memberships_v
     ADD CONSTRAINT _memberships_v_parent_id_memberships_id_fk FOREIGN KEY (parent_id) REFERENCES public.memberships(id) ON DELETE SET NULL`,
   sql`ALTER TABLE ONLY public._products_v_locales
     ADD CONSTRAINT _products_v_locales_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._products_v(id) ON DELETE CASCADE`,
   sql`ALTER TABLE ONLY public._products_v
     ADD CONSTRAINT _products_v_parent_id_products_id_fk FOREIGN KEY (parent_id) REFERENCES public.products(id) ON DELETE SET NULL`,
+  sql`ALTER TABLE ONLY public.articles_locales
+    ADD CONSTRAINT articles_locales_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.articles(id) ON DELETE CASCADE`,
   sql`ALTER TABLE ONLY public.canchas_locales
     ADD CONSTRAINT canchas_locales__parent_id_fkey FOREIGN KEY (_parent_id) REFERENCES public.canchas(id) ON DELETE CASCADE`,
-  sql`ALTER TABLE ONLY public.la_biblia_articles_locales
-    ADD CONSTRAINT la_biblia_articles_locales__parent_id_fkey FOREIGN KEY (_parent_id) REFERENCES public.la_biblia_articles(id) ON DELETE CASCADE`,
+  sql`ALTER TABLE ONLY public.payload_locked_documents_rels
+    ADD CONSTRAINT payload_locked_documents_rels_articles_fk FOREIGN KEY (articles_id) REFERENCES public.articles(id) ON DELETE CASCADE`,
   sql`ALTER TABLE ONLY public.payload_locked_documents_rels
     ADD CONSTRAINT payload_locked_documents_rels_canchas_fk FOREIGN KEY (canchas_id) REFERENCES public.canchas(id) ON DELETE CASCADE`,
-  sql`ALTER TABLE ONLY public.payload_locked_documents_rels
-    ADD CONSTRAINT payload_locked_documents_rels_la_biblia_articles_fk FOREIGN KEY (la_biblia_articles_id) REFERENCES public.la_biblia_articles(id) ON DELETE CASCADE`,
   sql`ALTER TABLE ONLY public.payload_locked_documents_rels
     ADD CONSTRAINT payload_locked_documents_rels_media_fk FOREIGN KEY (media_id) REFERENCES public.media(id) ON DELETE CASCADE`,
   sql`ALTER TABLE ONLY public.payload_locked_documents_rels
