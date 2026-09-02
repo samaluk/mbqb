@@ -38,7 +38,7 @@
   `pnpm test:e2e` (sets `E2E_SEED_FIXTURES=1`); the same suite runs in the
   `build-and-integration` job. No deploy approvals or secrets needed.
 - VERIFICATION: acceptance criteria map as follows.
-  - AC 1-4 (instant UI on canchas / La Biblia / productos / home CTAs): the
+  - AC 1-4 (instant UI on canchas / La Biblia / products / home CTAs): the
     self-validating `@next/playwright` `instant()` locks in
     `tests/e2e/instant-nav.e2e.spec.ts`. Each locks dynamic data while
     navigating and asserts the static shell commits under the lock, then

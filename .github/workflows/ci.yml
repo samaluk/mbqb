@@ -39,6 +39,16 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
+      # `tsc --noEmit` compiles against Next.js's generated route types in
+      # `.next/types`. On self-hosted runners the checkout is NOT clean
+      # (`clean: false`), so a `.next` left over from a previous run can
+      # reference routes that no longer exist after a rename/remove and make
+      # typecheck fail spuriously. This job never builds, so discard any
+      # stale generated types and typecheck the real source instead.
+      - name: Clean stale generated types
+        run: rm -rf apps/web/.next/types apps/web/.next/dev
+        working-directory: .
+
       - name: Typecheck
         run: pnpm typecheck
 

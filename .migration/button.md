@@ -8,7 +8,7 @@
 - Leftover scan clean: no `radix-ui` / `@radix-ui` / `IconPlaceholder` in the wrapper.
 - Consumer sweep (link compositions cannot use Base UI Button `render` safely — Base UI forces `role="button"`):
   - `apps/web/src/app/(frontend)/page.tsx`
-  - `apps/web/src/app/(frontend)/productos/page.tsx`
+  - `apps/web/src/app/(frontend)/products/page.tsx`
   - `apps/web/src/app/(frontend)/la-biblia/page.tsx`
   - `apps/web/src/app/(frontend)/canchas/CanchasFilteredResults.tsx`
   - `apps/web/src/app/(frontend)/canchas/CanchasDataTable.tsx`
@@ -27,5 +27,5 @@
 ## Verify by hand
 
 - Home hero CTAs navigate to bogeyficador / canchas.
-- Productos / La Biblia card links navigate.
+- Products / La Biblia card links navigate.
 - Canchas table title/sort/pagination/maps links still work and look like buttons.

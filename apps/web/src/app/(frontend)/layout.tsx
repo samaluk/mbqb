@@ -30,7 +30,7 @@ const navItems = [
   { href: '/canchas', label: 'Canchas' },
   { href: '/la-biblia', label: 'La Biblia' },
   { href: '/bogeyficador', label: 'Bogeyficador' },
-  { href: '/productos', label: 'Productos' },
+  { href: '/products', label: 'Products' },
 ]
 
 function SiteHeader({ brandName }: { brandName: string }) {
