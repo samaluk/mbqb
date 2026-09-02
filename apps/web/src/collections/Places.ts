@@ -32,7 +32,7 @@ export const Places: CollectionConfig = {
     {
       name: 'accessType',
       type: 'select',
-      defaultValue: 'unknown',
+      defaultValue: 'open',
       options: [
         {
           label: 'Open',
@@ -45,10 +45,6 @@ export const Places: CollectionConfig = {
         {
           label: 'Restricted',
           value: 'restricted',
-        },
-        {
-          label: 'Unknown',
-          value: 'unknown',
         },
       ],
       required: true,

@@ -7,4 +7,3 @@ export const migrations = [
     up: migration_20260604_000000_baseline.up,
   },
 ]
-

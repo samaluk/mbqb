@@ -336,10 +336,6 @@
     @apply grid place-items-center rounded-full border-2 border-white-soft text-label font-black text-white-soft shadow-map-pin [&_span]:block [&_span]:leading-none bg-map-teal;
   }
 
-  .map-marker-unknown {
-    @apply grid place-items-center rounded-full border-2 border-white-soft text-label font-black text-white-soft shadow-map-pin [&_span]:block [&_span]:leading-none bg-muted;
-  }
-
   .map-marker-user {
     @apply grid place-items-center rounded-full border-2 border-white-soft text-label font-black text-white-soft shadow-map-pin [&_span]:block [&_span]:leading-none bg-map-blue text-lg;
   }

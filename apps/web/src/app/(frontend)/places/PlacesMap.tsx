@@ -19,7 +19,6 @@ const placeMarkerClassByAccess: Record<PlaceMapItem['accessType'], string> = {
   open: 'map-marker-open',
   private: 'map-marker-private',
   restricted: 'map-marker-restricted',
-  unknown: 'map-marker-unknown',
 }
 
 const userLocationMarkerClass = 'map-marker-user'

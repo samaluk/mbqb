@@ -2,7 +2,6 @@ export const placeAccessLabels = {
   private: 'Privado',
   open: 'Abierto',
   restricted: 'Restringido',
-  unknown: 'Por confirmar',
 } as const
 
 export type PlaceAccessType = keyof typeof placeAccessLabels

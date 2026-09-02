@@ -220,7 +220,7 @@ export interface Place {
     };
     [k: string]: unknown;
   };
-  accessType: 'open' | 'private' | 'restricted' | 'unknown';
+  accessType: 'open' | 'private' | 'restricted';
   region?: string | null;
   city?: string | null;
   externalUrl?: string | null;

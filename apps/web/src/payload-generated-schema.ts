@@ -33,7 +33,6 @@ export const enum_places_access_type = pgEnum("enum_places_access_type", [
   "open",
   "private",
   "restricted",
-  "unknown",
 ]);
 export const enum_places_status = pgEnum("enum_places_status", [
   "draft",
@@ -41,7 +40,7 @@ export const enum_places_status = pgEnum("enum_places_status", [
 ]);
 export const enum__places_v_version_access_type = pgEnum(
   "enum__places_v_version_access_type",
-  ["open", "private", "restricted", "unknown"],
+  ["open", "private", "restricted"],
 );
 export const enum__places_v_version_status = pgEnum(
   "enum__places_v_version_status",
@@ -312,7 +311,7 @@ export const places = pgTable(
   {
     id: serial("id").primaryKey(),
     slug: varchar("slug"),
-    accessType: enum_places_access_type("access_type").default("unknown"),
+    accessType: enum_places_access_type("access_type").default("open"),
     region: varchar("region"),
     city: varchar("city"),
     externalUrl: varchar("external_url"),
@@ -380,7 +379,7 @@ export const _places_v = pgTable(
     version_slug: varchar("version_slug"),
     version_accessType: enum__places_v_version_access_type(
       "version_access_type",
-    ).default("unknown"),
+    ).default("open"),
     version_region: varchar("version_region"),
     version_city: varchar("version_city"),
     version_externalUrl: varchar("version_external_url"),
