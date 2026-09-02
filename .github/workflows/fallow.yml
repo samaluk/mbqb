@@ -119,6 +119,14 @@ jobs:
           fi
           echo "version=$fallow_version" >> "$GITHUB_OUTPUT"
 
+      # The Fallow Action requires the fallow CLI on PATH. Install it globally
+      # using the workspace-pinned version resolved above.
+      - name: Install Fallow CLI
+        run: |
+          npm install --global --ignore-scripts \
+            "fallow@${{ steps.fver.outputs.version }}" \
+            "@fallow-cli/linux-x64-gnu@${{ steps.fver.outputs.version }}"
+
       # Same coverage evidence the test job produced, so audit CRAP scoring
       # matches — downloaded rather than regenerated to avoid a second
       # install + test run. Istanbul coverage keys embed the producing
