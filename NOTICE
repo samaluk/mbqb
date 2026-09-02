@@ -14,7 +14,7 @@ Third-Party Dependencies & Components
    License Reference: https://firstdonoharm.dev/version/2/1/license.html
 
 2. Leaflet
-   Copyright (c) 2010-2023 Vladimir Agafonkin
+   Copyright (c) 2010-2026 Volodymyr Agafonkin
    Copyright (c) 2010-2011 CloudMade
    License: BSD-2-Clause
    Source: https://github.com/Leaflet/Leaflet
@@ -24,7 +24,7 @@ Bundled Agent Skills (.agents/skills)
 ========================================================================
 
 The following agent skill bundles are vendored within .agents/skills/
-and tracked via skills-lock.json:
+(skills managed via the skills CLI are tracked in skills-lock.json):
 
 1. mattpocock/skills
    - Skills: caveman, design-an-interface, diagnose, grill-with-docs,
@@ -65,14 +65,14 @@ and tracked via skills-lock.json:
    - Source: https://github.com/vercel/vercel
 
 7. Vercel Labs Agent Skills (MIT)
-   - Skills: vercel-composition-patterns, vercel-react-best-practices,
-     vercel-react-view-transitions
+   - Skills: vercel-composition-patterns, vercel-optimize,
+     vercel-react-best-practices, vercel-react-view-transitions
    - Copyright (c) 2024 Vercel, Inc.
    - License: MIT
    - Source: https://github.com/vercel-labs/agent-skills
 
 8. Vercel Labs Agent Skills (Traceable Provenance / Implied Intent)
-   - Skills: vercel-optimize, web-design-guidelines
+   - Skills: web-design-guidelines
    - Notice: Bundled under implied-intent acceptance with traceable provenance
      and source attribution per project policy (#346).
    - Source: https://github.com/vercel-labs/agent-skills
