@@ -40,12 +40,12 @@ const publicContentTargets = {
   },
   products: {
     collection: 'products',
-    detailPrefix: '/productos',
-    listingPath: '/productos',
+    detailPrefix: '/products',
+    listingPath: '/products',
   },
 } satisfies Record<PublicContentCollection, PublicContentPublishingTarget>
 
-const globalPublicPaths = ['/', '/canchas', '/la-biblia', '/productos', '/privacy']
+const globalPublicPaths = ['/', '/canchas', '/la-biblia', '/products', '/privacy']
 
 export function getPublicContentPublishing(collection: PublicContentCollection) {
   return {

@@ -4,16 +4,16 @@ import { MetaPills, PayloadDocDetail, RichContent, type SlugPageProps } from '@/
 import { payloadDocMetadata } from '@/lib/payloadBySlug'
 import type { Product } from '@/payload-types'
 
-export const generateMetadata = payloadDocMetadata('products', 'Productos')
+export const generateMetadata = payloadDocMetadata('products', 'Products')
 
 export default function ProductDetailPage({ params }: SlugPageProps) {
   return (
     <PayloadDocDetail
-      backHref="/productos"
-      backLabel="Volver a productos"
+      backHref="/products"
+      backLabel="Back to products"
       backTestId="product-detail-back-link"
       collection="products"
-      kicker="Producto"
+      kicker="Product"
       params={params}
       titleTestId="product-detail-title"
     >
@@ -38,7 +38,7 @@ function ProductDetailBody({ product }: { product: Product }) {
       <MetaPills
         items={[
           formatPrice(product.priceCLP),
-          product.stockStatus === 'available' ? 'Disponible' : 'Agotado',
+          product.stockStatus === 'available' ? 'Available' : 'Unavailable',
         ]}
       />
       {product.imageUrl ? (

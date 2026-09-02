@@ -44,7 +44,7 @@ describe('Public Content Publishing', () => {
     })
     expect(productPreview).toMatchObject({
       collection: 'products',
-      path: '/productos/polera',
+      path: '/products/polera',
       slug: 'polera',
     })
     expect(canchasPreview.previewSecret).toBeTruthy()
@@ -71,7 +71,7 @@ describe('Public Content Publishing', () => {
         collection: 'products',
         doc: { slug: 'gorra' },
       }),
-    ).toEqual(['/productos', '/productos/gorra'])
+    ).toEqual(['/products', '/products/gorra'])
   })
 
   it('wires public route revalidation hooks into collection publishing', () => {

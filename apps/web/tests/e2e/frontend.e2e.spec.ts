@@ -28,7 +28,7 @@ test.describe('Frontend', () => {
   })
 
   test('public launch routes render', async () => {
-    for (const path of ['/canchas', '/la-biblia', '/productos', '/privacy']) {
+    for (const path of ['/canchas', '/la-biblia', '/products', '/privacy']) {
       const response = await page.goto(path)
 
       expect(response?.status()).toBe(200)

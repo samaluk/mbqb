@@ -41,13 +41,13 @@ const listToDetailFlows = [
     urlPattern: /\/la-biblia\/articulo-fixture-1/,
   },
   {
-    name: 'productos',
-    listPath: '/productos',
+    name: 'products',
+    listPath: '/products',
     fixtureCard: 'Producto Fixture Uno',
-    triggerLink: 'Ver producto',
+    triggerLink: 'View product',
     shell: SHELL.productDetail,
     deferredTitle: 'product-detail-title',
-    urlPattern: /\/productos\/producto-fixture-1/,
+    urlPattern: /\/products\/producto-fixture-1/,
   },
 ] as const
 
