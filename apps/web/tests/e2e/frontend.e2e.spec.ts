@@ -18,17 +18,17 @@ test.describe('Frontend', () => {
     await expect(heading).toHaveText('Community')
   })
 
-  test('can check invalid Bogeyficador input', async () => {
-    await page.goto('/bogeyficador')
+  test('can check invalid verification input', async () => {
+    await page.goto('/verify')
 
-    await page.getByLabel('RUT').fill('123456789')
-    await page.getByRole('button', { name: 'Revisar membresia' }).click()
+    await page.getByLabel('Member identifier').fill('   ')
+    await page.getByRole('button', { name: 'Verify membership' }).click()
 
-    await expect(page.getByText('Revisa el RUT ingresado.')).toBeVisible()
+    await expect(page.getByText('Please provide a valid member identifier.')).toBeVisible()
   })
 
   test('public launch routes render', async () => {
-    for (const path of ['/canchas', '/la-biblia', '/products', '/privacy']) {
+    for (const path of ['/canchas', '/la-biblia', '/products', '/privacy', '/verify']) {
       const response = await page.goto(path)
 
       expect(response?.status()).toBe(200)

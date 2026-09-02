@@ -9,7 +9,7 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
-type CheckStatus = 'active' | 'invalid_rut' | 'not_found' | 'rate_limited'
+type CheckStatus = 'active' | 'invalid_identifier' | 'not_found' | 'rate_limited'
 
 type CheckResponse = {
   message: string
@@ -19,7 +19,7 @@ type CheckResponse = {
 function isCheckStatus(status: unknown): status is CheckStatus {
   return (
     status === 'active' ||
-    status === 'invalid_rut' ||
+    status === 'invalid_identifier' ||
     status === 'not_found' ||
     status === 'rate_limited'
   )
@@ -27,14 +27,14 @@ function isCheckStatus(status: unknown): status is CheckStatus {
 
 function parseCheckResponse(data: unknown): CheckResponse {
   if (typeof data !== 'object' || data === null) {
-    return { message: 'Respuesta invalida.', status: 'not_found' }
+    return { message: 'Invalid response.', status: 'not_found' }
   }
 
   return { message: parseResponseMessage(data), status: parseResponseStatus(data) }
 }
 
 function parseResponseMessage(data: object): string {
-  const fallback = 'Respuesta invalida.'
+  const fallback = 'Invalid response.'
 
   return 'message' in data && typeof data.message === 'string' ? data.message : fallback
 }
@@ -45,31 +45,8 @@ function parseResponseStatus(data: object): CheckStatus {
   return isCheckStatus(status) ? status : 'not_found'
 }
 
-// Module scope: constructing an Intl formatter loads locale data and is
-// expensive, so build the es-CL formatter once instead of per keystroke.
-const rutBodyFormatter = new Intl.NumberFormat('es-CL')
-
-const formatRutInput = (value: string) => {
-  const { body, check } = splitRut(value)
-
-  if (!body && !check) return ''
-
-  return body ? `${rutBodyFormatter.format(Number(body))}${formatCheckSuffix(check)}` : check
-}
-
-const splitRut = (value: string) => {
-  const cleaned = value.replace(/[.\-\s]/g, '').toUpperCase()
-
-  return {
-    body: cleaned.slice(0, -1).replace(/\D/g, ''),
-    check: cleaned.slice(-1).replace(/[^0-9K]/g, ''),
-  }
-}
-
-const formatCheckSuffix = (check: string) => (check ? `-${check}` : '')
-
-export function BogeyficadorForm() {
-  const [rut, setRut] = useState('')
+export function VerifyForm() {
+  const [identifier, setIdentifier] = useState('')
   const [result, setResult] = useState<CheckResponse | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -79,8 +56,8 @@ export function BogeyficadorForm() {
     setResult(null)
 
     try {
-      const response = await fetch('/api/bogeyficador/check', {
-        body: JSON.stringify({ rut }),
+      const response = await fetch('/api/verify', {
+        body: JSON.stringify({ identifier }),
         headers: {
           'content-type': 'application/json',
         },
@@ -88,9 +65,6 @@ export function BogeyficadorForm() {
       })
 
       if (!response.ok) {
-        // The check API reports outcomes through a `{ message, status }` JSON
-        // body even on HTTP errors (400 invalid RUT, 404 not found, 429 rate
-        // limited), so error responses are parsed and shown like successes.
         const data: unknown = await response.json()
         setResult(parseCheckResponse(data))
         return
@@ -99,11 +73,9 @@ export function BogeyficadorForm() {
       const data: unknown = await response.json()
       setResult(parseCheckResponse(data))
     } catch (error) {
-      console.error('Failed to check membership', error)
+      console.error('Failed to verify membership', error)
     }
 
-    // Unconditional: the catch above swallows transport failures, so this
-    // runs on every path. (React Compiler cannot compile `finally` blocks.)
     setIsSubmitting(false)
   }
 
@@ -117,20 +89,20 @@ export function BogeyficadorForm() {
         <CardContent>
           <FieldGroup>
             <Field>
-              <FieldLabel className="font-bold" htmlFor="rut">
-                RUT
+              <FieldLabel className="font-bold" htmlFor="identifier">
+                Member identifier
               </FieldLabel>
               <Input
-                className="min-h-10 bg-paper px-3 uppercase"
+                className="min-h-10 bg-paper px-3"
+                autoCapitalize="none"
                 autoComplete="off"
-                id="rut"
+                id="identifier"
                 inputMode="text"
-                maxLength={12}
-                name="rut"
-                onChange={(event) => setRut(formatRutInput(event.target.value))}
-                placeholder="12.345.678-5"
+                name="identifier"
+                onChange={(event) => setIdentifier(event.target.value)}
+                placeholder="e.g. MEMBER-1234"
                 required
-                value={rut}
+                value={identifier}
               />
             </Field>
           </FieldGroup>
@@ -140,10 +112,10 @@ export function BogeyficadorForm() {
             {isSubmitting ? (
               <>
                 <Spinner data-icon="inline-start" />
-                Revisando...
+                Verifying...
               </>
             ) : (
-              'Revisar membresia'
+              'Verify membership'
             )}
           </Button>
           {result ? (

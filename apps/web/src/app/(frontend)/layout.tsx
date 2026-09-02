@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const navItems = [
   { href: '/canchas', label: 'Canchas' },
   { href: '/la-biblia', label: 'La Biblia' },
-  { href: '/bogeyficador', label: 'Bogeyficador' },
+  { href: '/verify', label: 'Verify' },
   { href: '/products', label: 'Products' },
 ]
 

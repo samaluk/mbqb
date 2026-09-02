@@ -8,7 +8,7 @@ import sharp from 'sharp'
 
 import { env } from '@/env'
 
-import { ActiveMemberships } from './collections/ActiveMemberships'
+import { Memberships } from './collections/Memberships'
 import { Canchas } from './collections/Canchas'
 import { LaBibliaArticles } from './collections/LaBibliaArticles'
 import { Users } from './collections/Users'
@@ -37,7 +37,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, ActiveMemberships, Canchas, LaBibliaArticles, Products],
+  collections: [Users, Media, Memberships, Canchas, LaBibliaArticles, Products],
   globals: [SiteSettings, HomePage],
   localization: {
     defaultLocale: 'es',

@@ -3,23 +3,23 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { env } from '@/env'
 import config from '@/payload.config'
-import { checkActiveMembership, findActiveMembershipByLookupHash } from '@/lib/bogeyficador'
-import { getActiveMembershipPrivacyFields } from '@/lib/activeMembershipPrivacy'
+import { checkMembership, findMembershipByLookupHash } from '@/lib/memberships'
+import { getMembershipPrivacyFields } from '@/lib/membershipPrivacy'
 
 let payload: Payload
 
-const testRut = '12.345.678-5'
+const testIdentifier = 'MEMBER-42'
 const getTestMembershipPrivacyFields = () => {
-  const fields = getActiveMembershipPrivacyFields(testRut, env.PAYLOAD_SECRET)
+  const fields = getMembershipPrivacyFields(testIdentifier, env.PAYLOAD_SECRET)
 
   if (!fields) {
-    throw new Error('Invalid test RUT')
+    throw new Error('Invalid test identifier')
   }
 
   return fields
 }
 
-describe('Bogeyficador membership integration', () => {
+describe('Memberships integration', () => {
   beforeAll(async () => {
     const payloadConfig = await config
     payload = await getPayload({ config: payloadConfig })
@@ -27,11 +27,11 @@ describe('Bogeyficador membership integration', () => {
 
   beforeEach(async () => {
     await payload.delete({
-      collection: 'active-memberships',
+      collection: 'memberships',
       overrideAccess: true,
       where: {
-        rut: {
-          equals: testRut,
+        identifier: {
+          equals: testIdentifier,
         },
       },
     })
@@ -39,18 +39,18 @@ describe('Bogeyficador membership integration', () => {
 
   it('finds active memberships through the hashed lookup field', async () => {
     await payload.create({
-      collection: 'active-memberships',
+      collection: 'memberships',
       data: {
         ...getTestMembershipPrivacyFields(),
+        identifier: testIdentifier,
         isActive: true,
-        rut: testRut,
       },
       draft: false,
       overrideAccess: true,
     })
 
-    const result = await checkActiveMembership(testRut, {
-      findByLookupHash: (lookupHash) => findActiveMembershipByLookupHash(payload, lookupHash),
+    const result = await checkMembership(testIdentifier, {
+      findByLookupHash: (lookupHash) => findMembershipByLookupHash(payload, lookupHash),
       hashSecret: env.PAYLOAD_SECRET,
     })
 
@@ -59,18 +59,18 @@ describe('Bogeyficador membership integration', () => {
 
   it('does not expose inactive memberships as active', async () => {
     await payload.create({
-      collection: 'active-memberships',
+      collection: 'memberships',
       data: {
         ...getTestMembershipPrivacyFields(),
+        identifier: testIdentifier,
         isActive: false,
-        rut: testRut,
       },
       draft: false,
       overrideAccess: true,
     })
 
-    const result = await checkActiveMembership(testRut, {
-      findByLookupHash: (lookupHash) => findActiveMembershipByLookupHash(payload, lookupHash),
+    const result = await checkMembership(testIdentifier, {
+      findByLookupHash: (lookupHash) => findMembershipByLookupHash(payload, lookupHash),
       hashSecret: env.PAYLOAD_SECRET,
     })
 

@@ -92,10 +92,10 @@ function HomeHeroCtas() {
     <div className="mt-5 flex flex-wrap gap-2">
       <Link
         className={cn(buttonVariants(), 'min-h-10 px-4 font-bold')}
-        data-testid="home-bogeyficador-cta"
-        href="/bogeyficador"
+        data-testid="home-verify-cta"
+        href="/verify"
       >
-        Bogeyficador
+        Verify membership
       </Link>
       <Link
         className={cn(buttonVariants({ variant: 'outline' }), 'min-h-10 px-4 font-bold')}

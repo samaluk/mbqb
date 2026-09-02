@@ -3,11 +3,11 @@ import { headers } from 'next/headers'
 import { getPayload } from 'payload'
 
 import { env } from '@/env'
-import { checkActiveMembership, findActiveMembershipByLookupHash } from '@/lib/bogeyficador'
-import { handleBogeyficadorCheck } from '@/lib/bogeyficadorRoute'
+import { checkMembership, findMembershipByLookupHash } from '@/lib/memberships'
+import { handleVerifyCheck } from '@/lib/verifyRoute'
 import { createFixedWindowRateLimiter } from '@/lib/rateLimit'
 
-const bogeyficadorRateLimiter = createFixedWindowRateLimiter({
+const verifyRateLimiter = createFixedWindowRateLimiter({
   limit: 10,
   windowMs: 60_000,
 })
@@ -23,13 +23,13 @@ export const POST = async (request: Request) => {
   const payloadConfig = await configPromise
   const payload = await getPayload({ config: payloadConfig })
 
-  return handleBogeyficadorCheck(request, {
-    checkMembership: (rut) =>
-      checkActiveMembership(rut, {
-        findByLookupHash: (lookupHash) => findActiveMembershipByLookupHash(payload, lookupHash),
+  return handleVerifyCheck(request, {
+    checkMembership: (identifier) =>
+      checkMembership(identifier, {
+        findByLookupHash: (lookupHash) => findMembershipByLookupHash(payload, lookupHash),
         hashSecret: env.PAYLOAD_SECRET,
       }),
     clientKey: await getClientKey(),
-    rateLimiter: bogeyficadorRateLimiter,
+    rateLimiter: verifyRateLimiter,
   })
 }
