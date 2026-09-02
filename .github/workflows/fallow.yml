@@ -121,14 +121,19 @@ jobs:
       # The Action self-installs the fallow CLI. The `version` input reads the
       # pinned version from the root package.json `fallow` dependency automatically
       # when omitted — no manual install step needed.
+      #
+      # This is the PR feedback surface (sticky comment + inline review comments).
+      # The hard gate is the separate `gate` job that runs `pnpm fallow:ci`.
+      # Use `gate: new-only` so pre-existing findings on incidentally-touched
+      # files don't block the PR, and `type-aware-require: best-effort` so an
+      # unavailable type-aware sidecar degrades gracefully instead of failing.
       - name: Fallow changed-code audit
         uses: fallow-rs/fallow@85d490ce31ada36388dd59f7860716b261b48694 # v3.20.0
         with:
           command: audit
-          # Fully blocking: every finding in changed files counts (there is no
-          # backlog), matching audit.gate: all in .fallowrc.json.
-          gate: all
+          gate: new-only
           type-aware: true
+          type-aware-require: best-effort
           coverage: coverage/coverage-final.json
           coverage-root: ${{ github.workspace }}
           comment: true
